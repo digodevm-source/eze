@@ -44,6 +44,8 @@ function docTop(el) {
 }
 
 export function createScrub({ headings, blocks, zoom = [], start = performance.now() }) {
+  // blur filters are costly on tablets and phones; there the motion goes without them
+  const touch = matchMedia('(hover: none), (pointer: coarse)').matches;
   const strata = document.getElementById('strata');
   const items = [];
   const all = [...new Set([...headings, ...blocks])].sort((a, b) =>
@@ -89,8 +91,9 @@ export function createScrub({ headings, blocks, zoom = [], start = performance.n
     it.ax = x;
     if (it.chars) {
       // the heading drifts away as a whole; its letters rise one after another
-      it.el.style.transform = x > 0.0005 ? `translate3d(0, ${(-x * 70).toFixed(1)}px, 0)` : '';
-      it.el.style.opacity = x > 0.0005 ? (1 - x * 0.85).toFixed(3) : '';
+      it.el.style.transform = x > 0.0005 ? `perspective(1000px) translate3d(0, ${(-x * 140).toFixed(1)}px, ${(-x * 160).toFixed(1)}px) rotateX(${(-x * 12).toFixed(2)}deg)` : '';
+      it.el.style.opacity = x > 0.0005 ? (1 - x).toFixed(3) : '';
+      if (!touch) it.el.style.filter = x > 0.02 ? `blur(${(x * 8).toFixed(2)}px)` : '';
       const n = it.chars.length;
       const spread = 0.75;
       for (let i = 0; i < n; i++) {
@@ -101,33 +104,44 @@ export function createScrub({ headings, blocks, zoom = [], start = performance.n
           s.transform = '';
           s.opacity = '';
         } else {
-          s.transform = `translate3d(0, ${((1 - ec) * 115).toFixed(1)}%, 0) rotate(${((1 - ec) * 8).toFixed(2)}deg)`;
+          // each letter swings up out of its word, hinged at the baseline
+          s.transform = `translate3d(0, ${((1 - ec) * 120).toFixed(1)}%, 0) rotateX(${((1 - ec) * -80).toFixed(1)}deg)`;
           s.opacity = ec.toFixed(3);
         }
       }
       return;
     }
-    const ty = (1 - e) * 90 - x * 70;
-    const sc = it.zoom ? ` scale(${(0.93 + 0.07 * e).toFixed(4)})` : '';
-    const op = e * (1 - x * 0.85);
+    // rise up out of the depth: from far below, small, tipped back and blurred
+    const d = 1 - e;
+    const ty = d * 170 - x * 140;
+    const tz = -d * 260 - x * 160;
+    const rx = d * 22 - x * 12;
+    const sc = it.zoom ? 0.86 + 0.14 * e : 1;
+    const op = e * (1 - x);
     const settled = e > 0.999 && x < 0.0005;
-    it.el.style.transform = settled ? '' : `translate3d(0, ${ty.toFixed(1)}px, 0)${sc}`;
+    it.el.style.transform = settled
+      ? ''
+      : `perspective(1000px) translate3d(0, ${ty.toFixed(1)}px, ${tz.toFixed(1)}px) rotateX(${rx.toFixed(2)}deg) scale(${sc.toFixed(4)})`;
     it.el.style.opacity = settled ? '' : op.toFixed(3);
+    if (!touch) {
+      const b = d * 10 + x * 8;
+      it.el.style.filter = b > 0.15 ? `blur(${b.toFixed(2)}px)` : '';
+    }
   }
 
   function update(dt, now) {
     const vh = innerHeight, vw = innerWidth, sy = scrollY;
     const sr = strata.getBoundingClientRect();
-    const strataIn = clamp((vh * 1.02 - sr.top) / (vh * 0.5), 0, 1);
+    const strataIn = clamp((vh * 1.05 - sr.top) / (vh * 0.65), 0, 1);
     // the pinned screen's centre once the section starts scrolling away
     const strataOut = clamp((vh * 0.38 - (sr.bottom - vh * 0.5)) / (vh * 0.4), 0, 1);
-    const k = damp(7, dt);
+    const k = damp(6, dt);
     for (const it of items) {
       let enter, exit = 0;
       if (it.horiz) {
         if (sr.bottom < -vh || sr.top > vh * 1.5) continue;
         const r = it.el.getBoundingClientRect();
-        enter = Math.min(strataIn, clamp((vw * 1.02 - r.left) / (vw * 0.45), 0, 1));
+        enter = Math.min(strataIn, clamp((vw * 1.05 - r.left) / (vw * 0.55), 0, 1));
         exit = strataOut;
       } else if (it.pinned) {
         if (sr.bottom < -vh || sr.top > vh * 1.5) continue;
@@ -136,8 +150,9 @@ export function createScrub({ headings, blocks, zoom = [], start = performance.n
       } else {
         const top = it.top - sy;
         if (it.ready && (top > vh * 1.6 || top + it.h < -vh * 0.8)) continue;
-        enter = clamp((vh * 1.02 - top) / (vh * 0.42) - it.k * 0.18, 0, 1);
-        exit = clamp((vh * 0.16 - (top + it.h)) / (vh * 0.34), 0, 1);
+        // floats in over the lower 60% of the screen, drifts off over the top 40%
+        enter = clamp((vh * 1.05 - top) / (vh * 0.6) - it.k * 0.15, 0, 1);
+        exit = clamp((vh * 0.3 - (top + it.h)) / (vh * 0.45), 0, 1);
       }
       if (it.hero) enter = Math.min(enter, clamp((now - start - it.heroDelay) / 1100, 0, 1));
       if (!it.ready) {
