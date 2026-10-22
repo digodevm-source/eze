@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Пик Эзе</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Пик Эзе — выдуманная гора, от которой откалываются парящие камни.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Sans+Extra+Condensed:wght@500;700;800;900&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="style.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three.module.min.js"
+  }
+}
+</script>
+</head>
+<body>
+<!--BODY-->
+<canvas id="scene" aria-hidden="true"></canvas>
+<div class="cursor" aria-hidden="true"><span class="cursor__ring"></span><span class="cursor__label">трава</span></div>
+
+<header class="nav">
+  <a class="nav__logo" href="#top" aria-label="Пик Эзе, наверх">ЭЗЕ<sup>4812</sup></a>
+  <nav class="nav__links" aria-label="Разделы">
+    <a href="#peak">Пик</a>
+    <a href="#float">Невесомость</a>
+    <a href="#strata">Порода</a>
+    <a href="#chronicle">Хроника</a>
+    <a href="#stones">Камни</a>
+  </nav>
+  <a class="nav__cta" href="#expedition">Экспедиция</a>
+</header>
+
+<main>
+  <!-- 1. Hero: the stone that grows grass -->
+  <section class="hero wrap" id="top" data-morph="dust">
+    <div class="hero__text">
+      <p class="label">51°07′ с.ш. · 87°44′ в.д. · хребет Тальвар</p>
+      <h1 class="hero__title">
+        <span class="outline">Парящая</span>
+        <span>плита</span>
+        <span class="hero__title-accent">Эзе</span>
+      </h1>
+      <p class="hero__lead">Северный склон пика Эзе теряет по камню в год. Обломки не падают, а поднимаются и зависают над долиной. Перед тобой Плита Пастбище, самая большая из них. Говорят, трава на ней растёт там, где её касаются.</p>
+      <p class="hero__hint"><span class="dot" aria-hidden="true"></span><span class="hint-desktop">Води курсором по камню</span><span class="hint-touch">Води пальцем по камню</span></p>
+    </div>
+
+    <div class="hero__stage">
+      <div class="stone" id="stone">
+        <div class="stone__float">
+          <img class="stone__img" src="assets/rock.webp" width="1099" height="819" alt="Парящая каменная плита с плоской потрескавшейся вершиной и сосульками породы снизу">
+          <canvas class="stone__moss" aria-hidden="true"></canvas>
+          <canvas class="stone__grass" aria-hidden="true"></canvas>
+        </div>
+        <div class="stone__shadow" aria-hidden="true"></div>
+      </div>
+      <div class="hud" aria-live="polite">
+        <div class="hud__row">
+          <span class="label">Покрыто травой</span>
+          <span class="hud__value" id="moss-value">0%</span>
+        </div>
+        <div class="hud__bar"><span id="moss-bar"></span></div>
+        <button class="btn-ghost" id="moss-reset" type="button">Очистить камень</button>
+      </div>
+    </div>
+    <a class="scroll-cue" href="#peak" aria-label="Листать вниз"><span></span></a>
+  </section>
+
+  <div class="debris" aria-hidden="true">
+    <img src="assets/rubble.webp" width="626" height="383" alt="">
+  </div>
+
+  <!-- 2. The peak -->
+  <section class="peak wrap" id="peak" data-morph="dust">
+    <div class="peak__head">
+      <p class="label">Пик Эзе · северная стена</p>
+      <h2 class="h2"><span>4 812 метров</span> <span class="outline">тишины</span></h2>
+    </div>
+    <div class="peak__body">
+      <figure class="peak__figure">
+        <img src="assets/mountain.webp" width="546" height="375" alt="Скалистый пик со снежником и голубым ледником на склоне">
+        <span class="pin" style="--x:42%;--y:15%"><i></i>Вершина · 4 812 м</span>
+        <span class="pin" style="--x:59%;--y:33%"><i></i>Снежник Белая Чаша</span>
+        <span class="pin pin--left" style="--x:44%;--y:60%"><i></i>Ледник Серебряный язык</span>
+        <span class="pin pin--left" style="--x:80%;--y:40%"><i></i>Зона отрыва камней</span>
+      </figure>
+      <div class="peak__info">
+        <p>Эзе сложена полосчатым гнейсом с жилами кварца и магнетита. Местные зовут гору «Стоящая на одной ноге»: за триста лет северная стена отдала небу больше тысячи камней и стала заметно тоньше южной.</p>
+        <dl class="stats">
+          <div><dt>Высота</dt><dd><b data-count="4812">4 812</b> м</dd></div>
+          <div><dt>Возраст породы</dt><dd><b data-count="412">412</b> млн лет</dd></div>
+          <div><dt>Ледник</dt><dd><b data-count="7.4" data-decimals="1">7,4</b> км</dd></div>
+          <div><dt>Вершина зимой</dt><dd><b data-count="-38">−38</b> °C</dd></div>
+          <div><dt>Парящих камней</dt><dd><b data-count="1280">1 280</b></dd></div>
+          <div><dt>Первое восхождение</dt><dd><b>1911</b></dd></div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Weightlessness: real 3D stones -->
+  <section class="float wrap" id="float" data-morph="dust">
+    <div class="float__text">
+      <p class="label">Аномалия «Эзе-поле»</p>
+      <h2 class="h2"><span class="outline">Камни,</span> <span>забывшие</span> <span>о гравитации</span></h2>
+      <p>Магнетит в породе реагирует на поле, которое бьёт из-под горы. Когда трещина отделяет кусок стены, он теряет вес и медленно всплывает, как пузырь в мёде. Дальше камень живёт в воздухе годами: дрейфует, вращается, иногда сталкивается с соседями.</p>
+      <ul class="facts">
+        <li><b>40–900 м</b><span>высота парения</span></li>
+        <li><b>3 см/ч</b><span>средняя скорость дрейфа</span></li>
+        <li><b>6–40 дней</b><span>один оборот вокруг своей оси</span></li>
+      </ul>
+    </div>
+    <div class="float__stage" id="float-stage" aria-hidden="true">
+      <p class="float__note label">Наведи на камни: они отплывают от курсора</p>
+    </div>
+  </section>
+
+  <!-- 4. Strata: pinned horizontal scroll -->
+  <section class="strata" id="strata" data-morph="core">
+    <div class="strata__pin">
+      <div class="strata__head wrap">
+        <p class="label">Из чего состоит Эзе</p>
+        <p class="strata__counter" aria-hidden="true"><span id="strata-num">01</span> / 05</p>
+      </div>
+      <div class="strata__track" id="strata-track">
+        <h2 class="strata__title"><span class="outline">Строение</span> породы</h2>
+        <article class="mineral">
+          <p class="mineral__pct">62%</p>
+          <h3>Гнейс</h3>
+          <p>Основа массива. Полосчатый, серо-бежевый, раскалывается плитами. Из него сделана Плита Пастбище.</p>
+          <span class="mineral__bar" style="--v:.62"></span>
+        </article>
+        <article class="mineral">
+          <p class="mineral__pct">21%</p>
+          <h3>Гранит</h3>
+          <p>Розоватые линзы у подножия. Самая твёрдая часть горы: гранитные камни почти не взлетают.</p>
+          <span class="mineral__bar" style="--v:.21"></span>
+        </article>
+        <article class="mineral">
+          <p class="mineral__pct">9%</p>
+          <h3>Кварц</h3>
+          <p>Белые жилы толщиной с ладонь. В ясный день они блестят так, что их видно из долины за 30 км.</p>
+          <span class="mineral__bar" style="--v:.09"></span>
+        </article>
+        <article class="mineral">
+          <p class="mineral__pct">6%</p>
+          <h3>Магнетит</h3>
+          <p>Чёрные зёрна, из-за которых камни теряют вес. Компас на северной стене крутится без остановки.</p>
+          <span class="mineral__bar" style="--v:.06"></span>
+        </article>
+        <article class="mineral">
+          <p class="mineral__pct">2%</p>
+          <h3>Лёд и мох</h3>
+          <p>Ледник в кулуарах и мох на вершинах парящих плит. Тонкий слой, но только он здесь живой.</p>
+          <span class="mineral__bar" style="--v:.02"></span>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Chronicle -->
+  <section class="chronicle wrap" id="chronicle" data-morph="island">
+    <div class="chronicle__head">
+      <p class="label">Хроника наблюдений</p>
+      <h2 class="h2"><span>177 лет</span> <span class="outline">под камнями</span></h2>
+    </div>
+    <ol class="timeline">
+      <li><time>1847</time><p>Пастух Аким Чеботарь рассказывает в долине о «камне, который ушёл в небо». Ему никто не верит.</p></li>
+      <li><time>1911</time><p>Первое восхождение. Связка Левандовской и Оруджева девять дней идёт по северной стене и ночует под парящей плитой.</p></li>
+      <li><time>1936</time><p>Геологи находят в гнейсе жилы магнетита и поле в сорок раз сильнее нормы. Аномалию называют «Эзе-поле».</p></li>
+      <li><time>1968</time><p>На седловине открывают станцию «Эзе-3». С неё каждый камень получает номер, имя и карточку.</p></li>
+      <li><time>2004</time><p>На Плите Пастбище замечают траву. По версии ботаников, семена принесли клушицы, которые гнездятся на камнях.</p></li>
+      <li><time>2024</time><p>В марте от стены отрывается обломок №1280. Его называют «Последний», хотя все понимают, что это не так.</p></li>
+    </ol>
+  </section>
+
+  <!-- 6. Named stones -->
+  <section class="stones wrap" id="stones" data-morph="cluster">
+    <div class="stones__head">
+      <p class="label">Реестр станции «Эзе-3»</p>
+      <h2 class="h2"><span class="outline">Камни</span> <span>с именами</span></h2>
+    </div>
+    <ul class="names">
+      <li class="name name--xl"><span class="name__t">Пастбище</span><span class="name__m">1 812 т · 420 м · единственный с травой</span></li>
+      <li class="name name--l name--o"><span class="name__t">Наковальня</span><span class="name__m">960 т · 610 м</span></li>
+      <li class="name name--m"><span class="name__t">Монах</span><span class="name__m">140 т · 880 м · стоит вертикально</span></li>
+      <li class="name name--l"><span class="name__t">Странник</span><span class="name__m">410 т · дрейфует 9 см/ч</span></li>
+      <li class="name name--m name--o"><span class="name__t">Близнецы</span><span class="name__m">2 × 75 т · оборот за 11 дней</span></li>
+      <li class="name name--s"><span class="name__t">Колокол</span><span class="name__m">52 т · гудит при северном ветре</span></li>
+      <li class="name name--l name--o"><span class="name__t">Гнездо</span><span class="name__m">33 т · 540 м · живут клушицы</span></li>
+      <li class="name name--m"><span class="name__t">Последний</span><span class="name__m">8 т · 40 м · с марта 2024</span></li>
+    </ul>
+  </section>
+
+  <!-- 7. Footer / expedition -->
+  <footer class="foot wrap" id="expedition" data-morph="mountain">
+    <p class="label">Экспедиция 2027</p>
+    <h2 class="foot__title"><span class="outline">Увидимся</span> <span>на высоте</span></h2>
+    <div class="foot__grid">
+      <div><p class="label">Сезон</p><p>Июль — август</p></div>
+      <div><p class="label">Группа</p><p>До 8 человек</p></div>
+      <div><p class="label">Старт</p><p>Станция «Эзе-3», 3 140 м</p></div>
+      <div><p class="label">Маршрут</p><p>6 дней, 4 парящих камня</p></div>
+    </div>
+    <p class="foot__note">Пик Эзе выдуман. Все цифры, имена и истории на этой странице придуманы.</p>
+  </footer>
+</main>
+
+<script type="module" src="js/main.js"></script>
+<!--/BODY-->
+</body>
+</html>
