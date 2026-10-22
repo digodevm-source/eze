@@ -224,7 +224,7 @@ export function createGrass(root, { onProgress, toLocal } = {}) {
     for (const c of [mossCanvas, carpetCanvas, liveCanvas]) { c.width = w; c.height = h; }
     scale = w / CANVAS_W;
     // replay everything already painted at the new resolution
-    for (const [x, y] of stamps) paintMoss(x, y);
+    for (const [x, y, k] of stamps) paintMoss(x, y, k);
     paintSpecks(specks);
     const lists = new Map();
     for (const b of blades) if (b.baked) pushTo(lists, b);
@@ -248,14 +248,14 @@ export function createGrass(root, { onProgress, toLocal } = {}) {
   let brush = 78;
   const pointer = { x: -999, y: -999, sx: -999, sy: -999, inside: false, last: null };
 
-  function paintMoss(x, y) {
+  function paintMoss(x, y, k = 1) {
     // darkens the rock to damp soil under the grass (multiplied over the photo)
     mctx.save();
     setBase(mctx);
     mctx.clip(facePath);
     const g = mctx.createRadialGradient(x, y, 0, x, y, brush * 1.05);
-    g.addColorStop(0, 'rgba(78, 86, 46, 0.34)');
-    g.addColorStop(0.6, 'rgba(96, 104, 64, 0.16)');
+    g.addColorStop(0, `rgba(78, 86, 46, ${0.34 * k})`);
+    g.addColorStop(0.6, `rgba(96, 104, 64, ${0.16 * k})`);
     g.addColorStop(1, 'rgba(140, 140, 110, 0)');
     mctx.fillStyle = g;
     mctx.fillRect(x - brush * 1.2, y - brush * 1.2, brush * 2.4, brush * 2.4);
@@ -293,9 +293,9 @@ export function createGrass(root, { onProgress, toLocal } = {}) {
     return [(lx0 / r.width) * CANVAS_W - PAD_X, (ly0 / r.height) * CANVAS_H - PAD_TOP];
   }
 
-  function stamp(x, y, now) {
-    stamps.push([x, y]);
-    paintMoss(x, y);
+  function stamp(x, y, now, k = 1) {
+    stamps.push([x, y, k]);
+    paintMoss(x, y, k);
     const fresh = [];
     for (let i = 0; i < 26; i++) {
       const a = Math.random() * Math.PI * 2;
@@ -400,7 +400,40 @@ export function createGrass(root, { onProgress, toLocal } = {}) {
     }
   }
 
+  // ----- grass that grows by itself: spreads out from a few spots over `duration` ms -----
+  const queue = [];
+  function grow(duration = 6000) {
+    const now = performance.now();
+    const seeds = [[240, 120, 0], [720, 150, 0.12], [980, 170, 0.22]];
+    const spacing = 46;
+    const pts = [];
+    for (let y = minY - 10; y <= maxY + 10; y += spacing * 0.7) {
+      for (let x = minX - 10; x <= maxX + 10; x += spacing) {
+        const px = x + (Math.random() - 0.5) * spacing * 0.6;
+        const py = y + (Math.random() - 0.5) * spacing * 0.4;
+        if (!inPolygon(px, py, TOP_FACE)) continue;
+        let t = Infinity;
+        for (const [sx, sy, off] of seeds) t = Math.min(t, off + Math.hypot(px - sx, (py - sy) * 1.8) / 620);
+        pts.push([px, py, t + Math.random() * 0.08]);
+      }
+    }
+    const max = Math.max(...pts.map((p) => p[2]));
+    // the last spots are reached a little before the end so their blades can finish growing
+    const span = Math.max(0, duration - 500);
+    for (const [x, y, t] of pts) queue.push({ x, y, at: now + (t / max) * span });
+    queue.sort((a, b) => a.at - b.at);
+    wake();
+  }
+
   function frame(now) {
+    let stamped = false;
+    while (queue.length && queue[0].at <= now) {
+      const q = queue.shift();
+      stamp(q.x, q.y, now, 0.45);
+      stamped = true;
+    }
+    if (stamped) report();
+
     const dt = Math.min(0.05, (now - lastT) / 1000);
     lastT = now;
     time += dt;
@@ -455,12 +488,13 @@ export function createGrass(root, { onProgress, toLocal } = {}) {
     };
     drawBuckets(lctx, live, livePose);
 
-    const keepGoing = visible && (growing || swaying || pin);
+    const keepGoing = visible && (growing || swaying || pin || queue.length > 0);
     if (keepGoing) requestAnimationFrame(frame);
     else running = false;
   }
 
   function reset() {
+    queue.length = 0;
     for (const b of blades) {
       b.g = 0;
       b.start = Infinity;
@@ -501,5 +535,5 @@ export function createGrass(root, { onProgress, toLocal } = {}) {
   brushScreenRadius();
   report();
 
-  return { reset, brushScreenRadius };
+  return { reset, grow, brushScreenRadius };
 }
