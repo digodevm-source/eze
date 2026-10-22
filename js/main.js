@@ -1,5 +1,6 @@
 import { createGrass } from './grass.js';
 import Lenis from '../vendor/lenis.mjs';
+import { createScrub } from './scrub.js';
 
 const TOUCH = matchMedia('(hover: none), (pointer: coarse)').matches;
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -142,6 +143,21 @@ const peakImg = document.querySelector('.peak__figure img');
 const debris = document.querySelector('.debris');
 const debrisImg = debris.querySelector('img');
 
+// ---------- scroll-linked motion: blocks float in and out with the scroll itself ----------
+const scrub = REDUCED ? null : createScrub({
+  headings: [...document.querySelectorAll('.hero__title, .h2, .strata__title, .mineral h3, .foot__title, .name__t')],
+  blocks: [...document.querySelectorAll([
+    '.hero__text .label', '.hero__lead', '.hero__hint', '.hud',
+    '.peak__head .label', '.peak__figure', '.peak__info > p', '.stats > div',
+    '.float__text .label', '.float__text > p', '.facts li', '.float__note',
+    '.strata__head', '.mineral__pct', '.mineral > p:not(.mineral__pct)', '.mineral__bar',
+    '.chronicle__head .label', '.timeline li', '.stones__head .label', '.name__m',
+    '.foot > .label', '.foot__grid > div', '.foot__note',
+  ].join(','))],
+  zoom: [document.querySelector('.peak__figure')],
+  start: intro.start,
+});
+
 // one loop for everything scroll-driven: read layout first, then write
 let lastT = performance.now();
 let time = 0;
@@ -168,6 +184,7 @@ function tick(now) {
   const maxX = track.scrollWidth - innerWidth;
 
   if (heroRect.bottom > -200) moveStone(time, dt, heroRect);
+  scrub?.update(dt, now);
 
   const p = clamp(-sr.top / (sr.height - innerHeight), 0, 1);
   const target = -p * Math.max(0, maxX);
@@ -186,79 +203,6 @@ function tick(now) {
   requestAnimationFrame(tick);
 }
 requestAnimationFrame(tick);
-
-// ---------- reveal: letters rise into headings, text drifts up out of a blur ----------
-function splitLetters(el) {
-  el.setAttribute('aria-label', el.textContent.replace(/\s+/g, ' ').trim());
-  let i = 0;
-  const walk = (node) => {
-    for (const child of [...node.childNodes]) {
-      if (child.nodeType === Node.ELEMENT_NODE) { walk(child); continue; }
-      if (child.nodeType !== Node.TEXT_NODE) continue;
-      const frag = document.createDocumentFragment();
-      for (const part of child.textContent.split(/(\s+)/)) {
-        if (!part) continue;
-        if (/^\s+$/.test(part)) { frag.append(' '); continue; }
-        const w = document.createElement('span');
-        w.className = 'w';
-        w.setAttribute('aria-hidden', 'true');
-        for (const ch of part) {
-          const c = document.createElement('span');
-          c.className = 'c';
-          c.textContent = ch;
-          c.style.setProperty('--i', i++);
-          w.append(c);
-        }
-        frag.append(w);
-      }
-      child.replaceWith(frag);
-    }
-  };
-  walk(el);
-  el.classList.add('split');
-}
-
-if (!REDUCED && 'IntersectionObserver' in window) {
-  const headings = document.querySelectorAll('.hero__title, .h2, .strata__title, .mineral h3, .foot__title, .name__t');
-  headings.forEach(splitLetters);
-  const blocks = document.querySelectorAll([
-    '.hero__text .label', '.hero__lead', '.hero__hint', '.hud',
-    '.peak__head .label', '.peak__figure', '.peak__info > p', '.stats > div',
-    '.float__text .label', '.float__text > p', '.facts li', '.float__note',
-    '.strata__head', '.mineral__pct', '.mineral > p:not(.mineral__pct)', '.mineral__bar',
-    '.chronicle__head .label', '.timeline li', '.stones__head .label', '.name__m',
-    '.foot > .label', '.foot__grid > div', '.foot__note',
-  ].join(','));
-  // hide them without animating the hiding itself
-  blocks.forEach((el) => {
-    el.style.transition = 'none';
-    el.classList.add('rise');
-  });
-  void document.body.offsetHeight;
-  blocks.forEach((el) => (el.style.transition = ''));
-
-  const io = new IntersectionObserver((entries) => {
-    // things entering together come in one after another
-    let n = 0;
-    for (const e of entries) {
-      if (!e.isIntersecting) continue;
-      e.target.style.setProperty('--delay', `${Math.min(n++, 6) * 90}ms`);
-      e.target.classList.add('in');
-      io.unobserve(e.target);
-    }
-  }, { rootMargin: '0px 0px -12% 0px', threshold: 0.01 });
-  // horizontal cards are judged against the whole screen, since they slide in sideways
-  const ioWide = new IntersectionObserver((entries) => {
-    for (const e of entries) {
-      if (!e.isIntersecting) continue;
-      e.target.classList.add('in');
-      ioWide.unobserve(e.target);
-    }
-  }, { rootMargin: '0px -8% 0px 0px' });
-
-  const inStrata = (el) => el.closest('.strata__track');
-  [...headings, ...blocks].forEach((el) => (inStrata(el) ? ioWide : io).observe(el));
-}
 
 // ---------- counters ----------
 const fmt = (v, dec) => {
