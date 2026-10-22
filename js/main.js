@@ -57,6 +57,8 @@ const grass = createGrass(stoneEl, {
   },
 });
 document.getElementById('moss-reset').addEventListener('click', () => grass.reset());
+// the stone grows its grass by itself once the opening screen has played in
+setTimeout(() => grass.grow(6000), 500);
 
 const mouse = { x: 0, y: 0, sx: 0, sy: 0 };
 addEventListener('pointermove', (e) => {
@@ -75,12 +77,13 @@ function moveStone(t, dt, heroRect) {
   const ie = 1 - Math.pow(1 - ip, 4);
   const calm = REDUCED ? 0 : 1;
 
-  const bob = (Math.sin(t * 0.55) * 0.024 + Math.sin(t * 1.15 + 1) * 0.008) * H * calm;
-  const tx = (mouse.sx * 18 + Math.sin(t * 0.21) * W * 0.012) * calm;
+  // slow turn side to side (about 15° each way), drift sideways, gentle bob and roll
+  const bob = (Math.sin(t * 0.55) * 0.03 + Math.sin(t * 1.15 + 1) * 0.008) * H * calm;
+  const tx = (mouse.sx * 18 + Math.sin(t * 0.48 + 0.6) * W * 0.035) * calm;
   const ty = bob + mouse.sy * 10 * calm - p * H * 0.45 + (1 - ie) * H * 0.18;
-  const rx = (-mouse.sy * 7 + Math.sin(t * 0.37) * 2.2) * calm + p * 10;
-  const ry = (mouse.sx * 11 + Math.sin(t * 0.26 + 2) * 3.5) * calm;
-  const rz = Math.sin(t * 0.31) * 1.6 * calm + p * 7 - (1 - ie) * 4;
+  const rx = (-mouse.sy * 6 + Math.sin(t * 0.37) * 2.5) * calm + p * 10;
+  const ry = (mouse.sx * 6 + Math.sin(t * 0.6) * 15) * calm;
+  const rz = Math.sin(t * 0.42 + 1.3) * 2.5 * calm + p * 7 - (1 - ie) * 4;
   const s = 1 - p * 0.08 - (1 - ie) * 0.06;
 
   const persp = new DOMMatrix();
