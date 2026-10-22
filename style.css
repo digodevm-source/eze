@@ -772,7 +772,7 @@ html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-stopped { overflow: hidden; }
 
 /* ---------- reveal ---------- */
-/* headings: every letter rises out of its word as the heading scrolls into view */
+/* headings: every letter rises out of its word as the heading scrolls into view (driven from js/scrub.js) */
 .split .w {
   display: inline-block;
   overflow: hidden;
@@ -781,30 +781,8 @@ html.lenis, html.lenis body { height: auto; }
   padding: 0.08em 0.04em 0.14em;
   margin: -0.08em -0.04em -0.14em;
 }
-.split .c {
-  display: inline-block;
-  transform: translate3d(0, 115%, 0) rotate(8deg);
-  transform-origin: 0 100%;
-  opacity: 0;
-  transition:
-    transform 1.4s var(--ease) calc(var(--i) * 24ms + var(--delay, 0ms)),
-    opacity 1s ease calc(var(--i) * 24ms + var(--delay, 0ms));
-}
-.split.in .c { transform: none; opacity: 1; }
-
-/* text and blocks drift up out of a soft blur */
-.js .rise {
-  opacity: 0;
-  transform: translate3d(0, 56px, 0);
-  filter: blur(8px);
-  transition:
-    opacity 1.4s var(--ease) var(--delay, 0ms),
-    transform 1.6s var(--ease) var(--delay, 0ms),
-    filter 1.2s var(--ease) var(--delay, 0ms);
-}
-.js .rise.in { opacity: 1; transform: none; filter: none; }
+.split .c { display: inline-block; transform-origin: 0 100%; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
-  .split .c, .js .rise { opacity: 1; transform: none; filter: none; }
 }
