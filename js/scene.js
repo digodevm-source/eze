@@ -255,37 +255,112 @@ function makeRockGeometry(seed, detail) {
   g.deleteAttribute('uv');
   g = mergeVertices(g);
   const pos = g.attributes.position;
+  // fracture planes give the chunk flat broken faces and sharp edges
   const planes = [];
-  const cuts = 3 + Math.floor(r() * 4);
+  const cuts = 7 + Math.floor(r() * 5);
   for (let i = 0; i < cuts; i++) {
     const n = new THREE.Vector3(r() * 2 - 1, r() * 2 - 1, r() * 2 - 1).normalize();
-    planes.push([n, 0.55 + r() * 0.3]);
+    planes.push([n, 0.48 + r() * 0.34]);
   }
-  const stretch = new THREE.Vector3(0.85 + r() * 0.55, 0.6 + r() * 0.4, 0.7 + r() * 0.45);
+  const stretch = new THREE.Vector3(0.9 + r() * 0.5, 0.62 + r() * 0.35, 0.75 + r() * 0.4);
   const off = r() * 100;
   const v = new THREE.Vector3();
-  const colors = new Float32Array(pos.count * 3);
+  const d = new THREE.Vector3();
+  const ao = new Float32Array(pos.count);
   for (let i = 0; i < pos.count; i++) {
-    v.fromBufferAttribute(pos, i).normalize();
-    const big = fbm(v.x * 1.4 + off, v.y * 1.4, v.z * 1.4, 4);
-    const fine = fbm(v.x * 5 + off, v.y * 5, v.z * 5, 3);
-    const grain = noise(v.x * 18 + off, v.y * 18, v.z * 18);
-    v.multiplyScalar(1 + big * 0.35 + fine * 0.08 + grain * 0.012);
+    d.fromBufferAttribute(pos, i).normalize();
+    v.copy(d).multiplyScalar(1 + 0.14 * fbm(d.x * 1.3 + off, d.y * 1.3, d.z * 1.3, 3));
     for (const [n, dist] of planes) {
       const k = v.dot(n) - dist;
-      if (k > 0) v.addScaledVector(n, -k * 0.85);
+      if (k > 0) v.addScaledVector(n, -k);
     }
+    // broken faces are never perfectly flat
+    const rough = fbm(v.x * 3.5 + off, v.y * 3.5, v.z * 3.5, 4) * 0.05;
+    const chip = Math.abs(noise(v.x * 7 + off, v.y * 7, v.z * 7));
+    v.addScaledVector(d, rough - (chip < 0.08 ? (0.08 - chip) * 0.25 : 0));
     v.multiply(stretch);
     pos.setXYZ(i, v.x, v.y, v.z);
-    const shade = Math.max(0.018, 0.05 + fine * 0.09 + big * 0.03 + r() * 0.01);
-    colors[i * 3] = shade;
-    colors[i * 3 + 1] = shade * 1.01;
-    colors[i * 3 + 2] = shade * 1.06;
+    ao[i] = Math.min(1, Math.max(0.3, 0.72 + fbm(v.x * 2.2 + off, v.y * 2.2, v.z * 2.2, 3) * 0.7 + rough * 3 - (chip < 0.08 ? 0.25 : 0)));
   }
-  g.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  g.setAttribute('aAo', new THREE.BufferAttribute(ao, 1));
   g.computeVertexNormals();
   return g;
 }
+
+// Stone surface: the texture photographed from the reference rock, mapped from three sides
+// (triplanar) so it wraps any shape without seams, with its own relief (normal map).
+const stoneVert = /* glsl */ `
+  attribute float aAo;
+  varying vec3 vObjPos; varying vec3 vObjNormal; varying vec3 vWorldPos; varying float vAo;
+  varying vec3 vM0; varying vec3 vM1; varying vec3 vM2;
+  void main() {
+    vObjPos = position;
+    vObjNormal = normal;
+    vAo = aAo;
+    vM0 = modelMatrix[0].xyz; vM1 = modelMatrix[1].xyz; vM2 = modelMatrix[2].xyz;
+    vec4 wp = modelMatrix * vec4(position, 1.0);
+    vWorldPos = wp.xyz;
+    gl_Position = projectionMatrix * viewMatrix * wp;
+  }
+`;
+const stoneFrag = /* glsl */ `
+  uniform sampler2D tAlb; uniform sampler2D tNrm;
+  uniform float uScale; uniform float uRelief;
+  uniform vec3 uTint;
+  uniform vec3 uKeyDir; uniform vec3 uKeyCol;
+  uniform vec3 uRimDir; uniform vec3 uRimCol;
+  uniform vec3 uGlowPos; uniform vec3 uGlowCol; uniform float uGlow;
+  varying vec3 vObjPos; varying vec3 vObjNormal; varying vec3 vWorldPos; varying float vAo;
+  varying vec3 vM0; varying vec3 vM1; varying vec3 vM2;
+
+  float hash(vec3 p) { return fract(sin(dot(p, vec3(127.1, 311.7, 74.7))) * 43758.5453); }
+
+  void main() {
+    vec3 n = normalize(vObjNormal);
+    vec3 b = pow(abs(n), vec3(4.0));
+    b /= (b.x + b.y + b.z);
+    vec3 p = vObjPos * uScale;
+
+    float alb = texture2D(tAlb, p.zy).r * b.x + texture2D(tAlb, p.xz).r * b.y + texture2D(tAlb, p.xy).r * b.z;
+    float big = texture2D(tAlb, p.xy * 0.11 + p.z * 0.07).r;
+
+    vec3 tx = texture2D(tNrm, p.zy).xyz * 2.0 - 1.0;
+    vec3 ty = texture2D(tNrm, p.xz).xyz * 2.0 - 1.0;
+    vec3 tz = texture2D(tNrm, p.xy).xyz * 2.0 - 1.0;
+    tx.xy *= uRelief; ty.xy *= uRelief; tz.xy *= uRelief;
+    tx = vec3(tx.xy + n.zy, abs(tx.z) * n.x);
+    ty = vec3(ty.xy + n.xz, abs(ty.z) * n.y);
+    tz = vec3(tz.xy + n.xy, abs(tz.z) * n.z);
+    vec3 on = normalize(tx.zyx * b.x + ty.xzy * b.y + tz.xyz * b.z);
+    mat3 M = mat3(normalize(vM0), normalize(vM1), normalize(vM2));
+    vec3 N = normalize(M * on);
+    vec3 V = normalize(cameraPosition - vWorldPos);
+
+    vec3 base = uTint * (0.2 + alb * alb * 1.9) * (0.65 + big * 0.7) * vAo;
+
+    float ndl = max(dot(N, uKeyDir), 0.0);
+    vec3 H = normalize(uKeyDir + V);
+    float spec = pow(max(dot(N, H), 0.0), 14.0) * (0.01 + alb * 0.07);
+    vec3 col = base * uKeyCol * ndl + uKeyCol * spec * vAo;
+
+    float rdl = max(dot(N, uRimDir), 0.0);
+    float fres = pow(1.0 - max(dot(N, V), 0.0), 2.2);
+    col += base * uRimCol * rdl * 1.2 + uRimCol * fres * rdl * 0.08;
+
+    float sky = N.y * 0.5 + 0.5;
+    col += base * mix(vec3(0.05, 0.045, 0.04), vec3(0.12, 0.14, 0.18), sky);
+
+    vec3 Lg = uGlowPos - vWorldPos;
+    float dg = length(Lg);
+    col += base * uGlowCol * max(dot(N, Lg / dg), 0.0) * uGlow / (1.0 + dg * dg * 0.35);
+
+    // mica glints like the specks on the reference stones
+    float sp = hash(floor(vObjPos * 150.0));
+    if (sp > 0.996) col += vec3(1.0, 0.97, 0.9) * pow(max(dot(N, H), 0.0), 8.0) * 1.2;
+
+    gl_FragColor = vec4(pow(col, vec3(1.0 / 2.2)), 1.0);
+  }
+`;
 
 // layout of the floating stones, in units of the stage (x: −1…1, y: −1…1, z depth, size)
 const STONES = [
@@ -398,9 +473,33 @@ export async function createScene(canvas) {
   // ----- solid stones -----
   const stoneGroup = new THREE.Group();
   scene.add(stoneGroup);
-  const stoneMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.55, metalness: 0.15, flatShading: true });
+  const texLoader = new THREE.TextureLoader();
+  const loadTex = (src) => {
+    const t = texLoader.load(src);
+    t.wrapS = t.wrapT = THREE.RepeatWrapping;
+    t.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+    return t;
+  };
+  const stoneMat = new THREE.ShaderMaterial({
+    uniforms: {
+      tAlb: { value: loadTex('assets/rock-albedo.webp') },
+      tNrm: { value: loadTex('assets/rock-normal.webp') },
+      uScale: { value: 1.3 },
+      uRelief: { value: 0.5 },
+      uTint: { value: new THREE.Color(0.075, 0.074, 0.078) },
+      uKeyDir: { value: new THREE.Vector3(-5, 6, 6).normalize() },
+      uKeyCol: { value: new THREE.Color(1.0, 0.94, 0.86).multiplyScalar(3.2) },
+      uRimDir: { value: new THREE.Vector3(6, 1, -5).normalize() },
+      uRimCol: { value: new THREE.Color(0.45, 0.65, 1.0).multiplyScalar(2.2) },
+      uGlowPos: { value: new THREE.Vector3() },
+      uGlowCol: { value: new THREE.Color(0.64, 0.78, 0.4) },
+      uGlow: { value: 0 },
+    },
+    vertexShader: stoneVert,
+    fragmentShader: stoneFrag,
+  });
   // the big front stone gets a finer mesh so its facets stay small
-  const geos = [0, 1, 2, 3, 4].map((i) => makeRockGeometry(31 + i * 7, (TOUCH ? 16 : 24) + (i === 0 ? 10 : 0)));
+  const geos = [0, 1, 2, 3, 4].map((i) => makeRockGeometry(31 + i * 7, (TOUCH ? 20 : 30) + (i === 0 ? 12 : 0)));
   const stones = STONES.map(([x, y, z, s], i) => {
     const m = new THREE.Mesh(geos[i % geos.length], stoneMat);
     const r = rng(200 + i);
@@ -413,15 +512,6 @@ export async function createScene(canvas) {
     stoneGroup.add(m);
     return m;
   });
-  scene.add(new THREE.HemisphereLight(0x8ea4c0, 0x1a1410, 0.35));
-  const key = new THREE.DirectionalLight(0xfff1e0, 3.2);
-  key.position.set(-5, 6, 6);
-  scene.add(key);
-  const rim = new THREE.DirectionalLight(0x86b6ff, 3.0);
-  rim.position.set(6, 1, -5);
-  scene.add(rim);
-  const glow = new THREE.PointLight(0xa3c867, 0, 7, 1.6);
-  scene.add(glow);
 
   // ----- layout / scroll -----
   const TARGET = { dust: 0, core: 1, island: 2, cluster: 3, mountain: 4 };
@@ -564,8 +654,9 @@ export async function createScene(canvas) {
         m.rotation.y += u.spin.y * dt + u.push.x * dt * 0.8;
         m.rotation.z += u.spin.z * dt;
       }
-      glow.position.set(mouse.sx * halfW, mouse.sy * halfH, 2.5);
-      glow.intensity += ((mouseOn ? 14 : 0) - glow.intensity) * (1 - Math.exp(-dt * 2));
+      const glow = stoneMat.uniforms.uGlow;
+      stoneMat.uniforms.uGlowPos.value.set(mouse.sx * halfW, mouse.sy * halfH, 2.5);
+      glow.value += ((mouseOn ? 3 : 0) - glow.value) * (1 - Math.exp(-dt * 2));
     }
 
     renderer.render(scene, camera);
