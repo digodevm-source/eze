@@ -776,6 +776,7 @@ html.lenis, html.lenis body { height: auto; }
 .split .w {
   display: inline-block;
   overflow: hidden;
+  perspective: 700px;
   vertical-align: top;
   white-space: nowrap;
   padding: 0.08em 0.04em 0.14em;
