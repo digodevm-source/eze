@@ -5,7 +5,7 @@ import { mergeVertices } from '../vendor/BufferGeometryUtils.js';
 
 const TOUCH = matchMedia('(hover: none), (pointer: coarse)').matches;
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const N = TOUCH ? 14000 : 26000;
+const N = TOUCH ? 11000 : 26000;
 const CAM_Z = 12;
 const FOV = 35;
 
@@ -379,7 +379,7 @@ const STONES = [
 
 export async function createScene(canvas) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: !TOUCH, alpha: false, powerPreference: 'high-performance' });
-  const pr = Math.min(window.devicePixelRatio || 1, TOUCH ? 1.5 : 2);
+  const pr = Math.min(window.devicePixelRatio || 1, TOUCH ? 1.25 : 2);
   renderer.setPixelRatio(pr);
   renderer.setClearColor(0x07080b, 1);
   renderer.outputColorSpace = THREE.SRGBColorSpace;

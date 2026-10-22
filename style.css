@@ -286,7 +286,6 @@ main, .nav { position: relative; z-index: 2; }
 .stone__float {
   position: absolute;
   inset: 0;
-  animation: bob 8s ease-in-out infinite;
   will-change: transform;
 }
 .stone__img {
@@ -297,12 +296,12 @@ main, .nav { position: relative; z-index: 2; }
   pointer-events: none;
 }
 /* canvases overhang the image so blades can rise above the top edge */
-.stone__moss, .stone__grass {
+.stone__layer {
   position: absolute;
   left: -1.82%;
-  top: -7.33%;
+  top: -8.547%;
   width: 103.64%;
-  height: 107.33%;
+  height: 108.547%;
   pointer-events: none;
 }
 .stone__moss { mix-blend-mode: multiply; }
@@ -314,15 +313,17 @@ main, .nav { position: relative; z-index: 2; }
   height: 10%;
   border-radius: 50%;
   background: radial-gradient(closest-side, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0));
-  animation: shadow 8s ease-in-out infinite;
+  will-change: transform, opacity;
 }
-@keyframes bob {
-  0%, 100% { transform: translate3d(0, -1.2%, 0) rotate(-0.4deg); }
-  50% { transform: translate3d(0, 1.4%, 0) rotate(0.5deg); }
-}
-@keyframes shadow {
-  0%, 100% { transform: scale(0.92); opacity: 0.7; }
-  50% { transform: scale(1.04); opacity: 1; }
+.chip {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--w);
+  height: auto;
+  pointer-events: none;
+  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.5)) brightness(1.35);
+  will-change: transform;
 }
 
 .hud {
@@ -765,16 +766,45 @@ main, .nav { position: relative; z-index: 2; }
   .foot__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
+/* ---------- smooth scroll (Lenis) ---------- */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-stopped { overflow: hidden; }
+
 /* ---------- reveal ---------- */
-.js .pre {
+/* headings: every letter rises out of its word as the heading scrolls into view */
+.split .w {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  white-space: nowrap;
+  padding: 0.08em 0.04em 0.14em;
+  margin: -0.08em -0.04em -0.14em;
+}
+.split .c {
+  display: inline-block;
+  transform: translate3d(0, 115%, 0) rotate(8deg);
+  transform-origin: 0 100%;
   opacity: 0;
-  transform: translate3d(0, 40px, 0);
+  transition:
+    transform 1.4s var(--ease) calc(var(--i) * 24ms + var(--delay, 0ms)),
+    opacity 1s ease calc(var(--i) * 24ms + var(--delay, 0ms));
 }
-.js .reveal {
-  transition: opacity 1.2s var(--ease), transform 1.4s var(--ease);
+.split.in .c { transform: none; opacity: 1; }
+
+/* text and blocks drift up out of a soft blur */
+.js .rise {
+  opacity: 0;
+  transform: translate3d(0, 56px, 0);
+  filter: blur(8px);
+  transition:
+    opacity 1.4s var(--ease) var(--delay, 0ms),
+    transform 1.6s var(--ease) var(--delay, 0ms),
+    filter 1.2s var(--ease) var(--delay, 0ms);
 }
+.js .rise.in { opacity: 1; transform: none; filter: none; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
-  .js .pre { opacity: 1; transform: none; }
+  .split .c, .js .rise { opacity: 1; transform: none; filter: none; }
 }

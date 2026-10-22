@@ -51,12 +51,18 @@
 
     <div class="hero__stage">
       <div class="stone" id="stone">
+        <div class="stone__shadow" aria-hidden="true"></div>
+        <img class="chip" src="assets/chip-3.webp" alt="" aria-hidden="true" style="--x:-6%;--y:8%;--w:9%;--d:0.6">
+        <img class="chip" src="assets/chip-5.webp" alt="" aria-hidden="true" style="--x:88%;--y:-4%;--w:6%;--d:1.4">
         <div class="stone__float">
           <img class="stone__img" src="assets/rock.webp" width="1099" height="819" alt="Парящая каменная плита с плоской потрескавшейся вершиной и сосульками породы снизу">
-          <canvas class="stone__moss" aria-hidden="true"></canvas>
-          <canvas class="stone__grass" aria-hidden="true"></canvas>
+          <canvas class="stone__layer stone__moss" aria-hidden="true"></canvas>
+          <canvas class="stone__layer stone__carpet" aria-hidden="true"></canvas>
+          <canvas class="stone__layer stone__grass" aria-hidden="true"></canvas>
         </div>
-        <div class="stone__shadow" aria-hidden="true"></div>
+        <img class="chip" src="assets/chip-1.webp" alt="" aria-hidden="true" style="--x:-2%;--y:72%;--w:12%;--d:1.8">
+        <img class="chip" src="assets/chip-4.webp" alt="" aria-hidden="true" style="--x:92%;--y:62%;--w:7%;--d:1.1">
+        <img class="chip" src="assets/chip-2.webp" alt="" aria-hidden="true" style="--x:70%;--y:96%;--w:8%;--d:2.2">
       </div>
       <div class="hud" aria-live="polite">
         <div class="hud__row">
