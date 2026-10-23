@@ -143,8 +143,6 @@ const minerals = [...track.querySelectorAll('.mineral')];
 let trackX = 0;
 
 const peakImg = document.querySelector('.peak__figure img');
-const debris = document.querySelector('.debris');
-const debrisImg = debris.querySelector('img');
 
 // ---------- scroll-linked motion: blocks float in and out with the scroll itself ----------
 const scrub = REDUCED ? null : createScrub({
@@ -183,7 +181,6 @@ function tick(now) {
     });
   }
   const pr = peakImg.parentElement.getBoundingClientRect();
-  const dr = debris.getBoundingClientRect();
   const maxX = track.scrollWidth - innerWidth;
 
   if (heroRect.bottom > -200) moveStone(time, dt, heroRect);
@@ -196,7 +193,6 @@ function tick(now) {
   if (best >= 0) strataNum.textContent = String(best + 1).padStart(2, '0');
 
   peakImg.style.setProperty('--py', `${(((pr.top + pr.height / 2 - innerHeight / 2) / innerHeight) * -40).toFixed(1)}px`);
-  debrisImg.style.setProperty('--py', `${(((dr.top + dr.height / 2 - innerHeight / 2) / innerHeight) * 60).toFixed(1)}px`);
 
   if (!TOUCH) {
     cur.sx += (cur.x - cur.sx) * damp(14, dt);
