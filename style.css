@@ -467,6 +467,10 @@ main, .nav { position: relative; z-index: 2; }
   animation: pulse 3s var(--ease) infinite;
 }
 .pin--left { flex-direction: row-reverse; transform: translateX(calc(-100% + 9px)); }
+/* with WebGL the photo gives way to the 3D peak and the labels follow points on it */
+.peak__figure.is-3d { aspect-ratio: 546 / 375; }
+.peak__figure.is-3d img { visibility: hidden; }
+.peak__figure.is-3d .pin { left: 0; top: 0; opacity: 0; will-change: transform, opacity; }
 .peak__info { display: grid; gap: 32px; min-width: 0; }
 .peak__info > p { margin: 0; color: var(--ash); max-width: 36em; }
 .stats {

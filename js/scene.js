@@ -362,6 +362,144 @@ const stoneFrag = /* glsl */ `
   }
 `;
 
+// ---------- the peak ----------
+// A massif of three cone-shaped peaks, carved by ridged noise into sharp ridges and gullies.
+// Units: about 6.4 wide and 3.4 high; the base sits on y = 0.
+function peakMask(x, z, cx, cz, r) {
+  const d = Math.hypot(x - cx, (z - cz) * 1.25) / r;
+  return d >= 1 ? 0 : Math.pow(1 - d, 1.35);
+}
+function mountainHeight(x, z) {
+  const wx = x + 0.4 * fbm(x * 0.55, 1.7, z * 0.55, 3);
+  const wz = z + 0.4 * fbm(x * 0.55 + 5.2, 3.1, z * 0.55, 3);
+  const m = Math.max(
+    peakMask(wx, wz, -0.35, 0.0, 2.1),
+    0.74 * peakMask(wx, wz, 1.35, -0.25, 1.55),
+    0.5 * peakMask(wx, wz, -1.95, 0.35, 1.3)
+  );
+  if (m <= 0) return 0;
+  let r = 0, amp = 0.55, f = 0.85, w = 1;
+  for (let o = 0; o < 6; o++) {
+    let n = 1 - Math.abs(noise(wx * f + 3.3, o * 7.1, wz * f - 1.7));
+    n *= n;
+    r += n * amp * w;
+    w = Math.min(1, n * 1.6);
+    amp *= 0.5;
+    f *= 2.05;
+  }
+  return Math.pow(m, 1.1) * (0.45 + 0.85 * r) * 2.5;
+}
+
+function makeMountainGeometry(segX, segZ) {
+  const g = new THREE.PlaneGeometry(6.4, 4.4, segX, segZ);
+  g.rotateX(-Math.PI / 2);
+  const pos = g.attributes.position;
+  const n = pos.count;
+  const h = new Float32Array(n);
+  for (let i = 0; i < n; i++) {
+    h[i] = mountainHeight(pos.getX(i), pos.getZ(i));
+    pos.setY(i, h[i]);
+  }
+  // concavity: gullies (couloirs) are positive, ridges negative; it darkens the gullies and
+  // lets snow collect in them
+  const row = segX + 1;
+  const st = 2;
+  const cav = new Float32Array(n);
+  for (let iz = 0; iz <= segZ; iz++) {
+    for (let ix = 0; ix <= segX; ix++) {
+      const at = (x, z) => h[Math.min(segZ, Math.max(0, z)) * row + Math.min(segX, Math.max(0, x))];
+      const i = iz * row + ix;
+      cav[i] = (at(ix - st, iz) + at(ix + st, iz) + at(ix, iz - st) + at(ix, iz + st)) / 4 - h[i];
+    }
+  }
+  const sorted = Array.from(cav, Math.abs).sort((a, b) => a - b);
+  const norm = 1 / (sorted[Math.floor(sorted.length * 0.97)] || 1);
+  for (let i = 0; i < n; i++) cav[i] = Math.max(-1, Math.min(1, cav[i] * norm));
+  g.setAttribute('aCav', new THREE.BufferAttribute(cav, 1));
+  g.computeVertexNormals();
+  return g;
+}
+
+const terrainVert = /* glsl */ `
+  attribute float aCav;
+  varying vec3 vObjPos; varying vec3 vObjNormal; varying vec3 vWorldPos; varying float vAo; varying float vCav;
+  varying vec3 vM0; varying vec3 vM1; varying vec3 vM2;
+  void main() {
+    vObjPos = position;
+    vObjNormal = normal;
+    vCav = aCav;
+    vAo = 1.0 - max(aCav, 0.0) * 0.55 + max(-aCav, 0.0) * 0.12;
+    vM0 = modelMatrix[0].xyz; vM1 = modelMatrix[1].xyz; vM2 = modelMatrix[2].xyz;
+    vec4 wp = modelMatrix * vec4(position, 1.0);
+    vWorldPos = wp.xyz;
+    gl_Position = projectionMatrix * viewMatrix * wp;
+  }
+`;
+
+// the same photographed rock as the stones, plus snow on high flat ground and a glacier
+const terrainFrag = /* glsl */ `
+  uniform sampler2D tAlb; uniform sampler2D tNrm;
+  uniform float uScale; uniform float uRelief; uniform float uFade;
+  uniform vec3 uKeyDir; uniform vec3 uKeyCol;
+  uniform vec3 uRimDir; uniform vec3 uRimCol;
+  uniform vec3 uGlacier;
+  varying vec3 vObjPos; varying vec3 vObjNormal; varying vec3 vWorldPos; varying float vAo; varying float vCav;
+  varying vec3 vM0; varying vec3 vM1; varying vec3 vM2;
+
+  void main() {
+    vec3 n = normalize(vObjNormal);
+    vec3 b = pow(abs(n), vec3(4.0));
+    b /= (b.x + b.y + b.z);
+    vec3 p = vObjPos * uScale;
+    float alb = texture2D(tAlb, p.zy).r * b.x + texture2D(tAlb, p.xz).r * b.y + texture2D(tAlb, p.xy).r * b.z;
+    float big = texture2D(tAlb, vObjPos.xz * 0.22 + 0.3).r;
+    float h = vObjPos.y;
+    float gully = max(vCav, 0.0);
+
+    // snow settles on high, gentler ground and runs down the gullies; its edge is broken up
+    float snowLine = 0.95 + (big - 0.5) * 0.6 - gully * 0.45;
+    float snow = smoothstep(snowLine - 0.15, snowLine + 0.25, h) * smoothstep(0.3, 0.62, n.y + gully * 0.35);
+    snow = max(snow, smoothstep(2.2, 2.7, h) * smoothstep(0.12, 0.4, n.y));
+    // fields and streaks rather than speckles
+    snow *= smoothstep(0.2, 0.45, big * 0.6 + alb * 0.25 + gully * 0.5);
+    float ice = smoothstep(uGlacier.z, uGlacier.z * 0.35, distance(vObjPos.xz, uGlacier.xy))
+              * smoothstep(0.3, 0.6, n.y) * smoothstep(0.35, 0.7, h);
+
+    float relief = uRelief * (1.0 - snow * 0.7);
+    vec3 tx = texture2D(tNrm, p.zy).xyz * 2.0 - 1.0;
+    vec3 ty = texture2D(tNrm, p.xz).xyz * 2.0 - 1.0;
+    vec3 tz = texture2D(tNrm, p.xy).xyz * 2.0 - 1.0;
+    tx.xy *= relief; ty.xy *= relief; tz.xy *= relief;
+    tx = vec3(tx.xy + n.zy, abs(tx.z) * n.x);
+    ty = vec3(ty.xy + n.xz, abs(ty.z) * n.y);
+    tz = vec3(tz.xy + n.xy, abs(tz.z) * n.z);
+    vec3 on = normalize(tx.zyx * b.x + ty.xzy * b.y + tz.xyz * b.z);
+    mat3 M = mat3(normalize(vM0), normalize(vM1), normalize(vM2));
+    vec3 N = normalize(M * on);
+    vec3 V = normalize(cameraPosition - vWorldPos);
+
+    vec3 rock = mix(vec3(0.04, 0.039, 0.038), vec3(0.075, 0.068, 0.062), big) * (0.3 + alb * 1.45) * vAo;
+    vec3 snowCol = vec3(0.82, 0.86, 0.93) * (0.88 + alb * 0.2);
+    vec3 iceCol = vec3(0.42, 0.6, 0.72) * (0.75 + alb * 0.4);
+    vec3 base = mix(rock, snowCol, snow);
+    base = mix(base, iceCol, ice * (1.0 - snow * 0.5));
+
+    float ndl = max(dot(N, uKeyDir), 0.0);
+    vec3 H = normalize(uKeyDir + V);
+    float spec = pow(max(dot(N, H), 0.0), mix(14.0, 40.0, snow)) * mix(0.03 + alb * 0.06, 0.35, max(snow, ice));
+    vec3 col = base * uKeyCol * ndl + uKeyCol * spec;
+    col += base * uRimCol * max(dot(N, uRimDir), 0.0) * 0.9;
+    float sky = N.y * 0.5 + 0.5;
+    col += base * mix(vec3(0.04, 0.035, 0.03), vec3(0.1, 0.12, 0.16), sky) * vAo;
+
+    // the foot of the massif sinks into a dark blue haze
+    float haze = 1.0 - smoothstep(0.05, 1.3, h);
+    col = mix(col, vec3(0.025, 0.03, 0.045), haze * 0.8);
+    float a = smoothstep(0.02, 0.45, h) * uFade;
+    gl_FragColor = vec4(pow(col, vec3(1.0 / 2.2)), a);
+  }
+`;
+
 // layout of the floating stones, in units of the stage (x: −1…1, y: −1…1, z depth, size)
 const STONES = [
   [0.1, 0.05, 0.0, 1.25],
@@ -513,6 +651,51 @@ export async function createScene(canvas) {
     return m;
   });
 
+  // ----- the peak (follows the figure in the "peak" section) -----
+  const peakFigure = document.querySelector('.peak__figure');
+  const mountainGeo = makeMountainGeometry(TOUCH ? 130 : 220, TOUCH ? 90 : 150);
+  const glacier = [-1.15, 0.6, 0.62];
+  const terrainMat = new THREE.ShaderMaterial({
+    uniforms: {
+      tAlb: stoneMat.uniforms.tAlb,
+      tNrm: stoneMat.uniforms.tNrm,
+      uScale: { value: 1.6 },
+      uRelief: { value: 0.55 },
+      uFade: { value: 0 },
+      uKeyDir: stoneMat.uniforms.uKeyDir,
+      uKeyCol: { value: new THREE.Color(1.0, 0.95, 0.88).multiplyScalar(2.6) },
+      uRimDir: stoneMat.uniforms.uRimDir,
+      uRimCol: { value: new THREE.Color(0.45, 0.65, 1.0).multiplyScalar(1.6) },
+      uGlacier: { value: new THREE.Vector3(...glacier) },
+    },
+    vertexShader: terrainVert,
+    fragmentShader: terrainFrag,
+    transparent: true,
+  });
+  const mountain = new THREE.Mesh(mountainGeo, terrainMat);
+  mountain.visible = false;
+  scene.add(mountain);
+  // labelled spots on the massif; the labels on the page follow them
+  const highest = (cx, cz, r) => {
+    const p = mountainGeo.attributes.position;
+    let best = -1, by = -1;
+    for (let i = 0; i < p.count; i++) {
+      if (Math.hypot(p.getX(i) - cx, p.getZ(i) - cz) > r) continue;
+      if (p.getY(i) > by) { by = p.getY(i); best = i; }
+    }
+    return new THREE.Vector3(p.getX(best), by + 0.03, p.getZ(best));
+  };
+  const onGround = (x, z) => new THREE.Vector3(x, mountainHeight(x, z) + 0.03, z);
+  const pinEls = [...peakFigure.querySelectorAll('.pin')];
+  const pins = [
+    highest(-0.35, 0, 1.2),
+    highest(1.35, -0.25, 0.5),
+    onGround(glacier[0] + 0.1, glacier[1]),
+    onGround(0.45, 0.8),
+  ].map((local, i) => ({ local, el: pinEls[i] })).filter((p) => p.el);
+  peakFigure.classList.add('is-3d');
+  const peakShown = { e: 0, x: 0 };
+
   // ----- layout / scroll -----
   const TARGET = { dust: 0, core: 1, island: 2, cluster: 3, mountain: 4 };
   const anchors = [];
@@ -657,6 +840,39 @@ export async function createScene(canvas) {
       const glow = stoneMat.uniforms.uGlow;
       stoneMat.uniforms.uGlowPos.value.set(mouse.sx * halfW, mouse.sy * halfH, 2.5);
       glow.value += ((mouseOn ? 3 : 0) - glow.value) * (1 - Math.exp(-dt * 2));
+    }
+
+    // the peak floats in and out with the scroll like the rest of the page, and slowly turns
+    const pr = peakFigure.getBoundingClientRect();
+    const peakOn = pr.bottom > -innerHeight * 0.3 && pr.top < innerHeight * 1.3;
+    mountain.visible = peakOn;
+    if (peakOn) {
+      const vh = innerHeight;
+      const enter = Math.min(1, Math.max(0, (vh * 1.05 - pr.top) / (vh * 0.6)));
+      const exit = Math.min(1, Math.max(0, (vh * 0.42 - (pr.top + pr.height * 0.5)) / (vh * 0.3)));
+      const kk = 1 - Math.exp(-dt * 6);
+      peakShown.e += (enter - peakShown.e) * kk;
+      peakShown.x += (exit - peakShown.x) * kk;
+      const e = 1 - Math.pow(1 - peakShown.e, 3);
+      const x = peakShown.x;
+      const cx = ((pr.left + pr.width / 2) / innerWidth) * 2 - 1;
+      const cy = ((pr.top + pr.height / 2) / vh) * 2 - 1;
+      const s = ((pr.width / innerWidth) * halfW * 2) / 6.6;
+      mountain.scale.setScalar(s * (0.82 + 0.18 * e));
+      mountain.position.set(cx * halfW, -cy * halfH - s * 1.45 - (1 - e) * 1.6 + x * 1.2, -(1 - e) * 2.5 - x * 1.5);
+      mountain.rotation.set(0.3 + (1 - e) * 0.35 - x * 0.2, (REDUCED ? 0 : Math.sin(t * 0.13) * 0.38) + mouse.sx * 0.18, 0);
+      terrainMat.uniforms.uFade.value = e * (1 - x);
+      mountain.updateMatrixWorld();
+      camera.updateMatrixWorld();
+      const fade = (e * (1 - x)).toFixed(3);
+      for (const p of pins) {
+        tmp.copy(p.local).applyMatrix4(mountain.matrixWorld).project(camera);
+        const px = (tmp.x * 0.5 + 0.5) * innerWidth - pr.left;
+        const py = (-tmp.y * 0.5 + 0.5) * vh - pr.top;
+        const flip = p.el.classList.contains('pin--left') ? ' translateX(calc(-100% + 9px))' : '';
+        p.el.style.transform = `translate3d(${px.toFixed(1)}px, ${py.toFixed(1)}px, 0) translateY(-50%)${flip}`;
+        p.el.style.opacity = fade;
+      }
     }
 
     renderer.render(scene, camera);

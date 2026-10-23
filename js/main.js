@@ -149,13 +149,12 @@ const scrub = REDUCED ? null : createScrub({
   headings: [...document.querySelectorAll('.hero__title, .h2, .strata__title, .mineral h3, .foot__title, .name__t')],
   blocks: [...document.querySelectorAll([
     '.hero__text .label', '.hero__lead', '.hero__hint', '.hud',
-    '.peak__head .label', '.peak__figure', '.peak__info > p', '.stats > div',
+    '.peak__head .label', '.peak__info > p', '.stats > div',
     '.float__text .label', '.float__text > p', '.facts li', '.float__note',
     '.strata__head', '.mineral__pct', '.mineral > p:not(.mineral__pct)', '.mineral__bar',
     '.chronicle__head .label', '.timeline li', '.stones__head .label', '.name__m',
     '.foot > .label', '.foot__grid > div', '.foot__note',
   ].join(','))],
-  zoom: [document.querySelector('.peak__figure')],
   start: intro.start,
 });
 
