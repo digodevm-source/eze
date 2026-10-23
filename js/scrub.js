@@ -150,9 +150,10 @@ export function createScrub({ headings, blocks, zoom = [], start = performance.n
       } else {
         const top = it.top - sy;
         if (it.ready && (top > vh * 1.6 || top + it.h < -vh * 0.8)) continue;
-        // floats in over the lower 60% of the screen, drifts off over the top 40%
+        // floats in over the lower 60% of the screen; drifts off as its middle passes the
+        // upper part, and is gone before it reaches the menu bar
         enter = clamp((vh * 1.05 - top) / (vh * 0.6) - it.k * 0.15, 0, 1);
-        exit = clamp((vh * 0.3 - (top + it.h)) / (vh * 0.45), 0, 1);
+        exit = clamp((vh * 0.42 - (top + it.h * 0.5)) / (vh * 0.3), 0, 1);
       }
       if (it.hero) enter = Math.min(enter, clamp((now - start - it.heroDelay) / 1100, 0, 1));
       if (!it.ready) {

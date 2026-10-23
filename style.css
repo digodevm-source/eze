@@ -171,7 +171,8 @@ main, .nav { position: relative; z-index: 2; }
   padding-block: 22px;
   padding-left: max(var(--side), env(safe-area-inset-left, 0px));
   padding-right: max(var(--side), env(safe-area-inset-right, 0px));
-  background: linear-gradient(to bottom, rgba(7, 8, 11, 0.85), rgba(7, 8, 11, 0));
+  /* solid enough that text drifting off the top disappears under the bar */
+  background: linear-gradient(to bottom, rgba(7, 8, 11, 0.97) 0%, rgba(7, 8, 11, 0.9) 60%, rgba(7, 8, 11, 0) 100%);
 }
 .nav__logo {
   font-family: var(--f-display);
@@ -403,26 +404,6 @@ main, .nav { position: relative; z-index: 2; }
     gap: 40px;
   }
   .hero__text { gap: 20px; }
-}
-
-/* ---------- debris between hero and peak ---------- */
-.debris {
-  position: relative;
-  height: clamp(180px, 34vw, 480px);
-  margin-top: -4vw;
-  pointer-events: none;
-}
-.debris img {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  height: 100%;
-  width: auto;
-  max-width: none;
-  opacity: 0.9;
-  -webkit-mask-image: radial-gradient(ellipse 62% 58% at 62% 52%, #000 45%, transparent 100%);
-  mask-image: radial-gradient(ellipse 62% 58% at 62% 52%, #000 45%, transparent 100%);
-  transform: translate3d(0, var(--py, 0px), 0);
 }
 
 /* ---------- peak ---------- */
