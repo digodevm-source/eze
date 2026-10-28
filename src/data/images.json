@@ -8,6 +8,16 @@
     "height": 610,
     "alpha": true
   },
+  "block_ublock": {
+    "widths": [
+      480,
+      720,
+      844
+    ],
+    "width": 844,
+    "height": 635,
+    "alpha": true
+  },
   "block_wall": {
     "widths": [
       480,
