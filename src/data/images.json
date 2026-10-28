@@ -1,4 +1,13 @@
 {
+  "block_partition": {
+    "widths": [
+      480,
+      692
+    ],
+    "width": 692,
+    "height": 610,
+    "alpha": true
+  },
   "block_wall": {
     "widths": [
       480,
