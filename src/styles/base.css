@@ -1,0 +1,290 @@
+/* ------------------------------------------------------------------
+   Tokens
+   ------------------------------------------------------------------ */
+:root {
+  /* palette: limewash, sand, oak, espresso */
+  --bone: #f3efe8;
+  --linen: #eae4da;
+  --paper: #faf8f4;
+  --sand: #d8cebf;
+  --stone: #a59b8d;
+  --taupe: #7b7266;
+  --ink: #22201c;
+  --ink-2: #57514a;
+  --ink-3: #8a8277;
+  --espresso: #1d1a17;
+  --espresso-2: #262220;
+  --espresso-3: #322d29;
+  --clay: #9a7b5c;
+  --line: rgba(34, 32, 28, 0.14);
+  --line-strong: rgba(34, 32, 28, 0.28);
+  --line-light: rgba(243, 239, 232, 0.16);
+  --on-dark: #efe9df;
+  --on-dark-2: rgba(239, 233, 223, 0.66);
+  --on-dark-3: rgba(239, 233, 223, 0.42);
+
+  --serif: 'Cormorant Garamond', 'Times New Roman', serif;
+  --sans: 'Manrope Variable', 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --gutter: clamp(20px, 4vw, 64px);
+  --max: 1440px;
+  --section: clamp(96px, 11vw, 176px);
+  --header-h: 76px;
+
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-io: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* ------------------------------------------------------------------
+   Reset
+   ------------------------------------------------------------------ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-padding-top: var(--header-h);
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+body {
+  margin: 0;
+  background: var(--bone);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.7;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: 'kern', 'liga';
+  font-variant-numeric: lining-nums;
+  overflow-x: clip;
+}
+
+img,
+picture,
+svg,
+canvas,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+img {
+  height: auto;
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+figure,
+dl,
+dd,
+ol,
+ul {
+  margin: 0;
+}
+
+ol,
+ul {
+  padding: 0;
+  list-style: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  background: none;
+  border: 0;
+  padding: 0;
+}
+
+:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 4px;
+}
+
+::selection {
+  background: var(--sand);
+  color: var(--ink);
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------
+   Layout
+   ------------------------------------------------------------------ */
+.container {
+  width: 100%;
+  max-width: calc(var(--max) + var(--gutter) * 2);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.section {
+  position: relative;
+  padding-block: var(--section);
+}
+
+.section--linen {
+  background: var(--linen);
+}
+
+.section--dark {
+  background: var(--espresso);
+  color: var(--on-dark);
+}
+
+.section--dark ::selection {
+  background: var(--clay);
+  color: var(--on-dark);
+}
+
+/* ------------------------------------------------------------------
+   Typography
+   ------------------------------------------------------------------ */
+.h2 {
+  font-family: var(--serif);
+  font-weight: 300;
+  font-size: clamp(42px, 5.6vw, 88px);
+  line-height: 1;
+  letter-spacing: -0.012em;
+  text-wrap: balance;
+}
+
+.h2 em,
+.hero__title em {
+  font-style: italic;
+  font-weight: 300;
+}
+
+.h3 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(28px, 2.6vw, 40px);
+  line-height: 1.08;
+  letter-spacing: -0.005em;
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  margin-bottom: clamp(20px, 2.4vw, 32px);
+}
+
+.eyebrow__num {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 15px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink);
+}
+
+.eyebrow__num::after {
+  content: '';
+  width: 36px;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.4;
+}
+
+.eyebrow--light,
+.section--dark .eyebrow {
+  color: var(--on-dark-2);
+}
+
+.eyebrow--light .eyebrow__num,
+.section--dark .eyebrow__num {
+  color: var(--on-dark);
+}
+
+.section-head {
+  display: grid;
+  gap: 0;
+  max-width: 980px;
+  margin-bottom: clamp(56px, 7vw, 104px);
+}
+
+.section-head__lead {
+  max-width: 600px;
+  margin-top: clamp(24px, 2.6vw, 36px);
+  color: var(--ink-2);
+  font-size: clamp(15px, 1.15vw, 17px);
+}
+
+.section--dark .section-head__lead {
+  color: var(--on-dark-2);
+}
+
+.section-head--row {
+  max-width: none;
+  grid-template-columns: 1fr;
+  align-items: end;
+  gap: 28px;
+}
+
+.section-head__side {
+  color: var(--ink-2);
+  max-width: 420px;
+}
+
+@media (min-width: 900px) {
+  .section-head--row {
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
+    gap: 64px;
+  }
+}

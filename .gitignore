@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.DS_Store
+*.log
+
+# raw Blender renders (16-bit PNG); optimised images live in public/img
+3d/out/
+3d/__pycache__/

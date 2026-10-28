@@ -1,0 +1,60 @@
+<section class="contact section section--dark" id="contact" aria-labelledby="contact-title">
+  <div class="container contact__grid">
+    <div class="contact__info">
+      <p class="eyebrow eyebrow--light" data-reveal><span class="eyebrow__num">08</span>Контакты</p>
+      <h2 class="h2" id="contact-title" data-reveal>Расскажите, какой дом <em>вы хотите</em></h2>
+      <p class="contact__lead" data-reveal>Перезвоним в течение часа в рабочее время, ответим на вопросы и пригласим в офис или на один из строящихся объектов.</p>
+      <ul class="contact__list" role="list" data-reveal>
+        <li><span>Телефон</span><a href="tel:+70000000000">+7 (000) 000-00-00</a></li>
+        <li><span>Почта</span><a href="mailto:info@ggdevelopment.ru">info@ggdevelopment.ru</a></li>
+        <li><span>Офис и завод</span><p>Адрес офиса и производства</p></li>
+        <li><span>Часы работы</span><p>Пн–Пт 9:00–19:00, Сб 10:00–16:00</p></li>
+      </ul>
+      <div class="socials" data-reveal>
+        <a href="#" aria-label="Telegram"><svg><use href="#telegram"/></svg></a>
+        <a href="#" aria-label="WhatsApp"><svg><use href="#whatsapp"/></svg></a>
+        <a href="#" aria-label="ВКонтакте"><svg><use href="#vk"/></svg></a>
+        <a href="#" aria-label="YouTube"><svg><use href="#youtube"/></svg></a>
+      </div>
+    </div>
+
+    <form class="form" data-form novalidate data-reveal>
+      <fieldset class="form__field">
+        <legend>Что вас интересует</legend>
+        <div class="seg seg--light" role="radiogroup" aria-label="Что вас интересует">
+          <label><input type="radio" name="interest" value="Строительство дома" checked><span>Строительство дома</span></label>
+          <label><input type="radio" name="interest" value="Покупка блоков"><span>Покупка блоков</span></label>
+          <label><input type="radio" name="interest" value="Индивидуальный проект"><span>Индивидуальный проект</span></label>
+        </div>
+      </fieldset>
+      <div class="form__row">
+        <label class="form__field">
+          <span>Имя</span>
+          <input type="text" name="name" autocomplete="name" required placeholder="Как к вам обращаться">
+          <em class="form__error">Укажите имя</em>
+        </label>
+        <label class="form__field">
+          <span>Телефон</span>
+          <input type="tel" name="phone" autocomplete="tel" inputmode="tel" required placeholder="+7 (___) ___-__-__" data-phone>
+          <em class="form__error">Проверьте номер телефона</em>
+        </label>
+      </div>
+      <label class="form__field">
+        <span>Комментарий</span>
+        <textarea name="message" rows="3" placeholder="Площадь дома, участок, сроки — всё, что считаете важным" data-message></textarea>
+      </label>
+      <label class="check">
+        <input type="checkbox" name="consent" required checked>
+        <span>Согласен на обработку персональных данных в соответствии с <a href="#" data-policy>политикой конфиденциальности</a></span>
+      </label>
+      <div class="form__foot">
+        <button class="btn btn--light btn--wide" type="submit"><span>Отправить заявку</span></button>
+        <p class="form__hint">Или позвоните: <a href="tel:+70000000000">+7 (000) 000-00-00</a></p>
+      </div>
+      <div class="form__done" data-form-done hidden>
+        <p class="form__done-title">Спасибо, заявка отправлена</p>
+        <p>Менеджер свяжется с вами в течение часа в рабочее время.</p>
+      </div>
+    </form>
+  </div>
+</section>
