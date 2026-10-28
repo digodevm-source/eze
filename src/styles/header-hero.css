@@ -280,8 +280,7 @@
 }
 
 .hero__picture,
-.hero__img,
-.hero__canvas {
+.hero__img {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -290,23 +289,14 @@
 
 .hero__img {
   object-fit: cover;
-  object-position: 50% 50%;
-  transform: scale(1.08);
+  /* keep the house (right half of the photo) in frame on narrower screens */
+  object-position: 68% 55%;
+  transform: scale(1.06);
   transition: transform 3.2s var(--ease-out), opacity 1.6s var(--ease);
 }
 
-/* rests at 1.02 — the same framing the depth canvas uses (uZoom) */
 .is-loaded .hero__img {
-  transform: scale(1.02);
-}
-
-.hero__canvas {
-  opacity: 0;
-  transition: opacity 1.2s var(--ease);
-}
-
-.hero__canvas.is-ready {
-  opacity: 1;
+  transform: none;
 }
 
 .hero__shade {
@@ -414,6 +404,32 @@
     justify-content: space-between;
   }
 
+}
+
+/* phones: the wide photo becomes a band at the top, the headline sits below
+   it on espresso — a full-height crop of a panorama would be a blurry sliver */
+@media (max-width: 699px) {
+  .hero {
+    min-height: 0;
+  }
+
+  .hero__media {
+    position: relative;
+    inset: auto;
+    z-index: 0;
+    height: min(112vw, 64svh);
+  }
+
+  .hero__shade {
+    background:
+      linear-gradient(180deg, rgba(18, 16, 14, 0.4) 0%, rgba(18, 16, 14, 0) 26%),
+      linear-gradient(0deg, var(--espresso) 0%, rgba(29, 26, 23, 0.55) 22%, rgba(29, 26, 23, 0) 48%);
+  }
+
+  .hero__content {
+    margin-top: -26vw;
+    padding-top: 0;
+  }
 }
 
 @media (max-width: 600px) {

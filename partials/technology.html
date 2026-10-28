@@ -40,11 +40,18 @@
 
       <div class="tech__viewer" data-block-viewer data-reveal="fade">
         <x-img name="block_wall" picture-class="tech__fallback" class="tech__fallback-img" alt="Стеновой блок из полистиролбетона 600×300×400 мм" sizes="(min-width: 900px) 50vw, 100vw">
-        <canvas class="tech__canvas" aria-label="Трёхмерная модель блока из полистиролбетона. Потяните, чтобы повернуть"></canvas>
-        <div class="tech__hint" aria-hidden="true"><span>Потяните, чтобы повернуть</span></div>
+        <canvas class="tech__canvas" aria-label="Трёхмерная модель стенового блока из полистиролбетона на каменном постаменте"></canvas>
+        <svg class="tech__lead" data-lead aria-hidden="true"><line x1="0" y1="0" x2="0" y2="0"/><circle r="3.5" cx="0" cy="0"/></svg>
+        <div class="tech__loupe" aria-hidden="true">
+          <div class="tech__loupe-lens" data-loupe>
+            <x-img name="block_macro" class="tech__loupe-img" alt="" sizes="640px">
+          </div>
+          <span class="tech__loupe-label" data-loupe-label></span>
+        </div>
         <div class="tech__dims" aria-hidden="true">
           <span>600 мм</span><span>300 мм</span><span>400 мм</span>
         </div>
+        <p class="tech__caption"><span>Стеновой блок D400</span><span>600 × 300 × 400 мм</span></p>
       </div>
     </div>
 

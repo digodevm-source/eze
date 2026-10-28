@@ -28,11 +28,7 @@ initForm()
 initTech()
 initProcess(scroll)
 
-initIntro().then(() => {
-  // the hero depth effect is a progressive enhancement, loaded after first paint
-  const hero = document.querySelector('[data-hero]')
-  if (hero) import('./webgl/hero-depth.js').then((m) => m.initHeroDepth(hero, scroll)).catch(() => {})
-})
+initIntro()
 
 const viewer = document.querySelector('[data-block-viewer]')
 if (viewer) {

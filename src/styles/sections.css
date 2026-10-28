@@ -186,18 +186,14 @@ figcaption {
   order: -1;
   position: relative;
   aspect-ratio: 1 / 1;
-  background: radial-gradient(60% 55% at 50% 52%, #f4efe7 0%, rgba(234, 228, 218, 0) 70%);
-  touch-action: pan-y;
-  cursor: grab;
+  container-type: size;
+  background: radial-gradient(64% 58% at 46% 56%, #f6f1e9 0%, rgba(234, 228, 218, 0) 72%);
   user-select: none;
 }
 
-.tech__viewer:active {
-  cursor: grabbing;
-}
-
 .tech__fallback,
-.tech__canvas {
+.tech__canvas,
+.tech__lead {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -225,38 +221,115 @@ figcaption {
   opacity: 1;
 }
 
-.tech__hint {
+/* magnifier: a macro photo of the cut, tied to the block by a hairline */
+.tech__lead {
+  pointer-events: none;
+  overflow: visible;
+  opacity: 0;
+  transition: opacity 0.6s var(--ease);
+}
+
+.tech__lead line {
+  stroke: var(--ink);
+  stroke-width: 1;
+  stroke-opacity: 0.45;
+}
+
+.tech__lead circle {
+  fill: var(--paper);
+  stroke: var(--ink);
+  stroke-width: 1;
+}
+
+.tech__loupe {
   position: absolute;
-  left: 50%;
-  bottom: 4%;
-  transform: translateX(-50%);
+  top: 3%;
+  right: 2%;
+  width: 29%;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.7s var(--ease), transform 0.9s var(--ease);
+}
+
+.tech__loupe-lens {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #d9d3c8;
+  box-shadow:
+    0 0 0 6px rgba(251, 248, 243, 0.92),
+    0 0 0 7px rgba(43, 38, 33, 0.12),
+    0 24px 48px -18px rgba(43, 38, 33, 0.35);
+}
+
+.tech__loupe-lens picture,
+.tech__loupe-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.tech__loupe-img {
+  object-fit: cover;
+  transform-origin: center;
+  transition: transform 1.2s var(--ease), object-position 1.2s var(--ease);
+}
+
+.tech__loupe-label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-align: center;
+  text-wrap: balance;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.tech__viewer.show-loupe .tech__loupe {
+  opacity: 1;
+  transform: none;
+}
+
+.tech__viewer.show-loupe .tech__lead {
+  opacity: 1;
+  transition-delay: 0.25s;
+}
+
+.tech__viewer:not(.is-3d) .tech__loupe,
+.tech__viewer:not(.is-3d) .tech__lead {
+  display: none;
+}
+
+.tech__caption {
+  position: absolute;
+  left: 0;
+  bottom: 3%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--ink-3);
-  white-space: nowrap;
-  transition: opacity 0.8s var(--ease);
 }
 
-.tech__hint::before,
-.tech__hint::after {
-  content: '';
-  width: 28px;
-  height: 1px;
-  background: currentColor;
-  opacity: 0.5;
-}
-
-.tech__viewer.was-dragged .tech__hint {
-  opacity: 0;
-}
-
-.tech__viewer {
-  container-type: size;
+.tech__caption span:first-child {
+  font-family: var(--serif);
+  font-size: 17px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink);
 }
 
 .tech__dims {
@@ -1917,5 +1990,17 @@ figcaption {
 @media (max-width: 600px) {
   .footer__word {
     white-space: normal;
+  }
+}
+
+@media (max-width: 899px) {
+  .tech__loupe {
+    width: 33%;
+  }
+
+  .tech__loupe-label {
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    text-transform: none;
   }
 }
