@@ -19,7 +19,8 @@ run() {
   grep -E "Saved|Error|Traceback" "$OUT/$name.log" | tail -2
 }
 
-run sosny_hero      sosny     --w 2560 --h 1440 --samples 128 --view hero --depth 1
+run sosny_hero      sosny     --w 2560 --h 1440 --samples 128 --view hero_centered
+run sosny_hero_v2   sosny     --w 2560 --h 1440 --samples 128 --view hero --depth 1 --fx -30 --fy -6
 run sosny_portrait  sosny     --w 1080 --h 1920 --samples 128 --view portrait --depth 1
 run interior        interior  --w 1800 --h 1200 --samples 192
 run block_wall      blocks    --w 1200 --h 960 --samples 128 --shot wall

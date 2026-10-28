@@ -20,7 +20,8 @@ const only = process.argv[2]
 
 // crop: fractions of the source (left, top, width, height)
 const JOBS = [
-  { name: 'sosny_hero', src: 'sosny_hero.png', widths: [960, 1440, 1920, 2560] },
+  // the hero uses the off-centre framing (house on the right, forest under the headline)
+  { name: 'sosny_hero', src: 'sosny_hero_v2.png', widths: [960, 1440, 1920, 2560] },
   { name: 'sosny_portrait', src: 'sosny_portrait.png', widths: [640, 828, 1080] },
   { name: 'sosny_card', src: 'sosny_hero.png', crop: [0.16, 0.0, 0.75, 1.0], aspect: 4 / 3, widths: [640, 960, 1440] },
   { name: 'interior', src: 'interior.png', widths: [800, 1200, 1800] },
@@ -37,7 +38,7 @@ const JOBS = [
 ]
 
 const DEPTH = [
-  { name: 'sosny_hero_depth', src: 'sosny_hero_depth_0001.png', width: 1280 },
+  { name: 'sosny_hero_depth', src: 'sosny_hero_v2_depth_0001.png', width: 1280 },
   { name: 'sosny_portrait_depth', src: 'sosny_portrait_depth_0001.png', width: 720 },
 ]
 
