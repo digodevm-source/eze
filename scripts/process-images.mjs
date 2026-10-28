@@ -63,11 +63,43 @@ async function source(job) {
     height = ch
   }
   if (job.alpha) {
-    // trim transparent margins, then pad evenly so every product sits alike
-    const buf = await img.png().toBuffer()
-    const trimmed = sharp(buf).trim({ threshold: 2 })
-    const tb = await trimmed.png().toBuffer({ resolveWithObject: true })
-    const pad = Math.round(Math.max(tb.info.width, tb.info.height) * 0.06)
+    // crop to the visible product (the soft catcher shadow fades to almost
+    // nothing far away, so ignore near-transparent pixels), then pad evenly
+    const { data, info } = await img.clone().ensureAlpha().raw().toBuffer({ resolveWithObject: true })
+    const ch = info.channels
+    const bps = data.length / (info.width * info.height * ch) // bytes per sample
+    const alphaAt = (i) => (bps === 2 ? data.readUInt16LE((i * ch + ch - 1) * 2) / 257 : data[i * ch + ch - 1])
+    let x0 = info.width, y0 = info.height, x1 = 0, y1 = 0
+    for (let y = 0; y < info.height; y++) {
+      for (let x = 0; x < info.width; x++) {
+        if (alphaAt(y * info.width + x) > 48) {
+          if (x < x0) x0 = x
+          if (x > x1) x1 = x
+          if (y < y0) y0 = y
+          if (y > y1) y1 = y
+        }
+      }
+    }
+    // grow the box a little so the feathered rim falls outside the product
+    const m = Math.round(Math.max(x1 - x0, y1 - y0) * 0.07)
+    x0 = Math.max(0, x0 - m)
+    y0 = Math.max(0, y0 - m)
+    x1 = Math.min(info.width - 1, x1 + m)
+    y1 = Math.min(info.height - 1, y1 + m)
+    const cw = x1 - x0 + 1
+    const chh = y1 - y0 + 1
+    // feather the crop edges so the cut-off shadow never shows a hard line
+    const f = Math.round(m * 0.45)
+    const mask = Buffer.from(
+      `<svg xmlns="http://www.w3.org/2000/svg" width="${cw}" height="${chh}"><defs><filter id="b"><feGaussianBlur stdDeviation="${f / 2}"/></filter></defs>` +
+        `<rect x="${f}" y="${f}" width="${cw - 2 * f}" height="${chh - 2 * f}" fill="#fff" filter="url(#b)"/></svg>`
+    )
+    const cropped = await sharp(await img.clone().extract({ left: x0, top: y0, width: cw, height: chh }).png().toBuffer())
+      .composite([{ input: mask, blend: 'dest-in' }])
+      .png()
+      .toBuffer()
+    const tb = { data: cropped, info: { width: cw, height: chh } }
+    const pad = Math.round(Math.max(tb.info.width, tb.info.height) * 0.02)
     const padded = await sharp(tb.data)
       .extend({ top: pad, bottom: pad, left: pad, right: pad, background: { r: 0, g: 0, b: 0, alpha: 0 } })
       .png()

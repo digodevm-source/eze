@@ -1,4 +1,14 @@
 {
+  "block_wall": {
+    "widths": [
+      480,
+      720,
+      979
+    ],
+    "width": 979,
+    "height": 728,
+    "alpha": true
+  },
   "interior": {
     "widths": [
       800,
