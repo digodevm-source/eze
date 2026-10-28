@@ -1,4 +1,14 @@
 {
+  "interior": {
+    "widths": [
+      800,
+      1200,
+      1800
+    ],
+    "width": 1800,
+    "height": 1200,
+    "alpha": false
+  },
   "sosny_card": {
     "widths": [
       640,
