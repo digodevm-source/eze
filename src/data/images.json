@@ -1,4 +1,14 @@
 {
+  "block_macro": {
+    "widths": [
+      960,
+      1440,
+      1800
+    ],
+    "width": 1800,
+    "height": 1200,
+    "alpha": false
+  },
   "block_partition": {
     "widths": [
       480,
