@@ -8,9 +8,9 @@ const money = (v) => `${v.toFixed(1).replace('.', ',')} млн ₽`
 export function picture(name, alt = '', sizes = '(min-width: 920px) 920px, 100vw') {
   const img = images[name]
   if (!img) return ''
-  const set = (fmt) => img.widths.map((w) => `/img/${name}-${w}.${fmt} ${w}w`).join(', ')
+  const set = (fmt) => img.widths.map((w) => `${import.meta.env.BASE_URL}img/${name}-${w}.${fmt} ${w}w`).join(', ')
   const mid = img.widths.find((w) => w >= 1280) || img.widths[img.widths.length - 1]
-  return `<picture><source type="image/avif" srcset="${set('avif')}" sizes="${sizes}"><source type="image/webp" srcset="${set('webp')}" sizes="${sizes}"><img src="/img/${name}-${mid}.jpg" srcset="${set('jpg')}" sizes="${sizes}" width="${img.width}" height="${img.height}" alt="${alt}" decoding="async"></picture>`
+  return `<picture><source type="image/avif" srcset="${set('avif')}" sizes="${sizes}"><source type="image/webp" srcset="${set('webp')}" sizes="${sizes}"><img src="${import.meta.env.BASE_URL}img/${name}-${mid}.jpg" srcset="${set('jpg')}" sizes="${sizes}" width="${img.width}" height="${img.height}" alt="${alt}" decoding="async"></picture>`
 }
 
 function projectHTML(id) {

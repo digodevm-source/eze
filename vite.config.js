@@ -12,6 +12,7 @@ const root = path.dirname(new URL(import.meta.url).pathname)
  *        src/data/images.json (written by `npm run images`).
  */
 function htmlPartials() {
+  let base = '/'
   const manifestPath = path.join(root, 'src/data/images.json')
 
   const readManifest = () =>
@@ -31,7 +32,7 @@ function htmlPartials() {
     const img = manifest[name]
     if (!img) return ''
     const media = mq.join(' ')
-    const set = (fmt) => img.widths.map((w) => `/img/${name}-${w}.${fmt} ${w}w`).join(', ')
+    const set = (fmt) => img.widths.map((w) => `${base}img/${name}-${w}.${fmt} ${w}w`).join(', ')
     return ['avif', 'webp', img.alpha ? 'png' : 'jpg']
       .map((fmt) => `<source media="${media}" type="image/${fmt === 'jpg' ? 'jpeg' : fmt}" srcset="${set(fmt)}" sizes="${a.sizes || '100vw'}">`)
       .join('')
@@ -40,7 +41,7 @@ function htmlPartials() {
   const picture = (a, manifest) => {
     const img = manifest[a.name]
     if (!img) return `<!-- missing image ${a.name} -->`
-    const set = (fmt) => img.widths.map((w) => `/img/${a.name}-${w}.${fmt} ${w}w`).join(', ')
+    const set = (fmt) => img.widths.map((w) => `${base}img/${a.name}-${w}.${fmt} ${w}w`).join(', ')
     const fallback = img.alpha ? 'png' : 'jpg'
     const largest = img.widths[img.widths.length - 1]
     const mid = img.widths.find((w) => w >= 1280) || largest
@@ -54,7 +55,7 @@ function htmlPartials() {
       artSources(a, manifest) +
       `<source type="image/avif" srcset="${set('avif')}" sizes="${sizes}">` +
       `<source type="image/webp" srcset="${set('webp')}" sizes="${sizes}">` +
-      `<img src="/img/${a.name}-${mid}.${fallback}" srcset="${set(fallback)}" sizes="${sizes}"` +
+      `<img src="${base}img/${a.name}-${mid}.${fallback}" srcset="${set(fallback)}" sizes="${sizes}"` +
       ` width="${img.width}" height="${img.height}" alt="${a.alt || ''}"` +
       `${a.class ? ` class="${a.class}"` : ''} loading="${a.loading || 'lazy'}" decoding="async"` +
       `${a.fetchpriority ? ` fetchpriority="${a.fetchpriority}"` : ''}${extra}>` +
@@ -72,6 +73,9 @@ function htmlPartials() {
 
   return {
     name: 'html-partials',
+    configResolved(config) {
+      base = config.base
+    },
     transformIndexHtml: {
       order: 'pre',
       handler(html) {
@@ -88,6 +92,8 @@ function htmlPartials() {
 }
 
 export default defineConfig({
+  // relative paths: the build works from any folder or sub-path of a host
+  base: './',
   plugins: [htmlPartials()],
   build: {
     target: 'es2020',

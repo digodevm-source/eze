@@ -46,7 +46,7 @@ export function initHeroDepth(hero, scroll) {
   const src = img.currentSrc || img.src
   if (!src) return
   const tall = src.includes('sosny_portrait')
-  const depthSrc = `/img/${tall ? 'sosny_portrait' : 'sosny_hero'}_depth.webp`
+  const depthSrc = `${import.meta.env.BASE_URL}img/${tall ? 'sosny_portrait' : 'sosny_hero'}_depth.webp`
 
   const gl = canvas.getContext('webgl', { antialias: false, alpha: false, premultipliedAlpha: false })
   if (!gl) return
