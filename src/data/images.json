@@ -9,6 +9,16 @@
     "height": 728,
     "alpha": true
   },
+  "block_wall300": {
+    "widths": [
+      480,
+      720,
+      891
+    ],
+    "width": 891,
+    "height": 691,
+    "alpha": true
+  },
   "interior": {
     "widths": [
       800,
