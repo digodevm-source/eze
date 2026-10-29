@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Карточка GGD на сайте GGH</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* Mock-up of the "Группа компаний GGH" block (Tilda T1196) on ggholding.ru
+       with the Global Group Development card added at the end. */
+    * { box-sizing: border-box; }
+    html, body { margin: 0; }
+    body {
+      font-family: 'Montserrat', Arial, sans-serif;
+      background: #2c2e31;
+      color: #fff;
+    }
+    .note {
+      padding: 14px 20px;
+      font-size: 13px;
+      background: #f3efe6;
+      color: #2c2e31;
+      text-align: center;
+    }
+    .group {
+      position: relative;
+      padding: 90px 0 110px;
+      background: #26282b url('https://static.tildacdn.com/tild3930-3638-4639-b965-306661643936/Group_55-2.png') center / cover;
+      overflow: hidden;
+    }
+    .group__title {
+      max-width: 1200px;
+      margin: 0 auto 90px;
+      padding: 0 20px;
+      font-size: 28px;
+      line-height: 40px;
+      font-weight: 400;
+    }
+    .slider {
+      position: relative;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    .track {
+      display: flex;
+      gap: 40px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      scrollbar-width: none;
+      padding: 0 0 40px;
+    }
+    .track::-webkit-scrollbar { display: none; }
+    .card {
+      position: relative;
+      flex: 0 0 360px;
+      min-height: 540px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 10px;
+      background: #fff center / cover no-repeat;
+      box-shadow: 0 15px 30px -10px rgba(0, 11, 48, 0.2);
+      scroll-snap-align: start;
+      color: inherit;
+      text-decoration: none;
+      transition: box-shadow 0.2s ease-in-out;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(44, 46, 49, 0));
+      pointer-events: none;
+    }
+    .card:hover { box-shadow: 0 10px 20px rgba(0, 11, 48, 0.25); }
+    .card__body {
+      position: relative;
+      padding: 20px;
+      background: #2c2e31;
+    }
+    .card__title { font-size: 18px; font-weight: 500; line-height: 1.35; }
+    .card__descr { margin-top: 12px; font-size: 14px; line-height: 1.55; color: #f7f3f3; }
+    .card__btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: color 0.2s ease-in-out;
+    }
+    .card__btn::after { content: '→'; font-weight: 400; font-size: 16px; }
+    a.card:hover .card__btn { color: #a39d65; }
+    .card--new::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: 3px solid #b39a5c;
+      pointer-events: none;
+    }
+    .ctrl {
+      position: absolute;
+      top: 270px;
+      width: 40px;
+      height: 40px;
+      border: 1px solid transparent;
+      border-radius: 50%;
+      background: #2c2e31;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transform: translateY(-50%);
+      transition: background-color 0.2s, border-color 0.2s;
+    }
+    .ctrl svg path { stroke: #fff; }
+    .ctrl:hover { background: #fff; border-color: #2c2e31; }
+    .ctrl:hover svg path { stroke: #2c2e31; }
+    .ctrl--prev { left: 0; }
+    .ctrl--next { right: 0; }
+    @media (max-width: 960px) {
+      .group { padding: 60px 0 80px; }
+      .group__title { margin-bottom: 45px; }
+      .track { gap: 10px; }
+      .card { flex-basis: 280px; min-height: 420px; }
+    }
+  </style>
+</head>
+<body>
+  <p class="note">Макет: так карточка Global Group Development будет выглядеть в блоке «Группа компаний GGH» на ggholding.ru. Новая карточка выделена рамкой — нажмите на неё, чтобы перейти на сайт.</p>
+
+  <section class="group">
+    <h2 class="group__title">ГРУППА КОМПАНИЙ GGH</h2>
+    <div class="slider">
+      <div class="track" data-track>
+        <div class="card" style="background-image:url('https://static.tildacdn.com/tild6434-3535-4439-b639-373962653936/Frame_3.png')">
+          <div class="card__body"><div class="card__title">ООО «ТрансЛайн Памир»</div><div class="card__descr">Республика Узбекистан</div><div class="card__btn">Подробнее</div></div>
+        </div>
+        <div class="card" style="background-image:url('https://static.tildacdn.com/tild6138-3562-4862-a635-396465366662/Frame_2-12.png')">
+          <div class="card__body"><div class="card__title">ТОО «ФЛК»</div><div class="card__descr">Республика Казахстан</div><div class="card__btn">Подробнее</div></div>
+        </div>
+        <div class="card" style="background-image:url('https://static.tildacdn.com/tild6464-3264-4436-b836-373332316637/Frame_4.png')">
+          <div class="card__body"><div class="card__title">ООО «Русжелдор агентство»</div><div class="card__descr">Российская Федерация</div><div class="card__btn">Подробнее</div></div>
+        </div>
+        <div class="card" style="background-image:url('https://static.tildacdn.com/tild3038-3166-4138-b264-393531623464/Frame_5.png')">
+          <div class="card__body"><div class="card__title">ТОО «СаудаСев»</div><div class="card__descr">Республика Казахстан</div><div class="card__btn">Подробнее</div></div>
+        </div>
+        <div class="card" style="background-image:url('https://static.tildacdn.com/tild3338-6632-4363-b834-313231343461/Frame_6.png')">
+          <div class="card__body"><div class="card__title">ООО «Глобал Групп АПК»</div><div class="card__descr">Российская Федерация</div><div class="card__btn">Подробнее</div></div>
+        </div>
+        <div class="card" style="background-image:url('https://static.tildacdn.com/tild3136-3135-4462-b261-383063636135/Frame_7-2.png')">
+          <div class="card__body"><div class="card__title">ООО «Глобал Групп Консалтинг»</div><div class="card__descr">Российская Федерация</div><div class="card__btn">Подробнее</div></div>
+        </div>
+        <!-- NEW: Global Group Development. Until the domain is bought the link
+             opens the local build; on the real site it will be https://<домен>/ -->
+        <a class="card card--new" href="../dist/index.html" style="background-image:url('ggd-card.png')" data-new>
+          <div class="card__body"><div class="card__title">ООО «Глобал Групп Девелопмент»</div><div class="card__descr">Российская Федерация</div><div class="card__btn">Подробнее</div></div>
+        </a>
+      </div>
+      <button class="ctrl ctrl--prev" type="button" aria-label="Назад" data-dir="-1"><svg width="10" height="16" viewBox="0 0 10 16" fill="none"><path d="M8.5 1 1.5 8l7 7" stroke-width="2"/></svg></button>
+      <button class="ctrl ctrl--next" type="button" aria-label="Вперёд" data-dir="1"><svg width="10" height="16" viewBox="0 0 10 16" fill="none"><path d="M1.5 1l7 7-7 7" stroke-width="2"/></svg></button>
+    </div>
+  </section>
+
+  <script>
+    const track = document.querySelector('[data-track]')
+    document.querySelectorAll('[data-dir]').forEach((b) =>
+      b.addEventListener('click', () => track.scrollBy({ left: Number(b.dataset.dir) * 400 }))
+    )
+    // open on the new card so it is visible right away
+    track.style.scrollBehavior = 'auto'
+    track.scrollLeft = track.scrollWidth
+    track.style.scrollBehavior = ''
+  </script>
+</body>
+</html>

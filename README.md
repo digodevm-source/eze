@@ -53,8 +53,8 @@ scripts/                обработка фото и рендеров в из�
 
 | Что | Где |
 | --- | --- |
-| Телефон `+7 (000) 000-00-00`, почта `info@ggdevelopment.ru`, адрес, часы работы | `partials/header.html`, `partials/contact.html`, `partials/footer.html` |
-| Ссылки на Telegram, WhatsApp, ВКонтакте, YouTube (сейчас `#`) | `partials/contact.html` |
+| Часы работы (телефоны, почта и адрес взяты с сайта Global Group Holding) | `partials/header.html`, `partials/contact.html` |
+| Ссылки на Telegram и WhatsApp — блок закомментирован, раскомментируйте и вставьте ссылки | `partials/contact.html` |
 | Статистика компании: 12 лет, 340+ домов, 60 000 м³ в год, гарантия 10 лет | `partials/about.html`, `partials/process.html` |
 | Цены на блоки, размеры поддонов, условия доставки | `partials/blocks.html` и `src/js/calc.js` (константы `BLOCKS`, `GLUE_BAG`) |
 | Проекты домов: площади, цены комплектаций, сроки, описания, планировки | `src/data/projects.js` и карточки в `partials/projects.html` |

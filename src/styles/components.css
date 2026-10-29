@@ -213,28 +213,33 @@
 }
 
 .logo__mark {
-  width: 30px;
-  height: 30px;
+  width: 46px;
+  height: 35px;
   flex: none;
+  margin-top: -4px;
+  background: linear-gradient(135deg, #e6cb8c 0%, var(--gold) 48%, #dcbb78 72%, #a17a3a 100%);
+  -webkit-mask: url('../assets/mark.svg') center / contain no-repeat;
+  mask: url('../assets/mark.svg') center / contain no-repeat;
 }
 
 .logo__type {
   display: grid;
+  justify-items: start;
   line-height: 1;
 }
 
 .logo__name {
-  font-family: var(--serif);
-  font-size: 17.6px;
-  font-weight: 400;
-  letter-spacing: 0.04em;
+  font-size: 14.5px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
 }
 
 .logo__sub {
-  margin-top: 5px;
-  font-size: 8.5px;
-  font-weight: 600;
-  letter-spacing: 0.52em;
+  margin-top: 6px;
+  font-size: 8.4px;
+  font-weight: 500;
+  letter-spacing: 0.6em;
   text-transform: uppercase;
   opacity: 0.8;
 }

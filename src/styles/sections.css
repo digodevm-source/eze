@@ -1677,6 +1677,12 @@ figcaption {
   transition: color 0.4s var(--ease);
 }
 
+.contact__phones {
+  display: grid;
+  justify-items: start;
+  gap: 6px;
+}
+
 @media (hover: hover) {
   .contact__list a:hover {
     color: var(--sand);
