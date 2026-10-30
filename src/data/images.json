@@ -1,0 +1,131 @@
+{
+  "block_macro": {
+    "widths": [
+      960,
+      1440,
+      1800
+    ],
+    "width": 1800,
+    "height": 1200,
+    "alpha": false
+  },
+  "block_partition": {
+    "widths": [
+      480,
+      692
+    ],
+    "width": 692,
+    "height": 610,
+    "alpha": true
+  },
+  "block_stack": {
+    "widths": [
+      800,
+      1200,
+      1800
+    ],
+    "width": 1800,
+    "height": 1200,
+    "alpha": false
+  },
+  "block_ublock": {
+    "widths": [
+      480,
+      720,
+      844
+    ],
+    "width": 844,
+    "height": 635,
+    "alpha": true
+  },
+  "block_wall": {
+    "widths": [
+      480,
+      720,
+      979
+    ],
+    "width": 979,
+    "height": 728,
+    "alpha": true
+  },
+  "block_wall300": {
+    "widths": [
+      480,
+      720,
+      891
+    ],
+    "width": 891,
+    "height": 691,
+    "alpha": true
+  },
+  "construction": {
+    "widths": [
+      800,
+      1200,
+      1800
+    ],
+    "width": 1800,
+    "height": 1200,
+    "alpha": false
+  },
+  "hero": {
+    "widths": [
+      960,
+      1440,
+      1918
+    ],
+    "width": 1918,
+    "height": 820,
+    "alpha": false
+  },
+  "house_linia": {
+    "widths": [
+      640,
+      960,
+      1536
+    ],
+    "width": 1536,
+    "height": 1024,
+    "alpha": false
+  },
+  "house_sever": {
+    "widths": [
+      640,
+      960,
+      1536
+    ],
+    "width": 1536,
+    "height": 1024,
+    "alpha": false
+  },
+  "house_sosny": {
+    "widths": [
+      640,
+      960,
+      1536
+    ],
+    "width": 1536,
+    "height": 1024,
+    "alpha": false
+  },
+  "house_yasen": {
+    "widths": [
+      640,
+      960,
+      1536
+    ],
+    "width": 1536,
+    "height": 1024,
+    "alpha": false
+  },
+  "interior": {
+    "widths": [
+      800,
+      1200,
+      1800
+    ],
+    "width": 1800,
+    "height": 1200,
+    "alpha": false
+  }
+}

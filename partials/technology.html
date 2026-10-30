@@ -1,0 +1,87 @@
+<section class="tech section section--linen" id="technology" aria-labelledby="tech-title">
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow" data-reveal><span class="eyebrow__num">02</span>Технология</p>
+      <h2 class="h2" id="tech-title" data-reveal>Цемент и воздух — <em>тёплый камень</em></h2>
+      <p class="section-head__lead" data-reveal>Полистиролбетон — лёгкий бетон, внутри которого равномерно распределены гранулы вспененного полистирола. Цемент даёт прочность и огнестойкость, гранулы — тепло и малый вес. Выпускаем блоки по <span class="nw">ГОСТ 33929-2016</span>.</p>
+    </div>
+
+    <div class="tech__stage">
+      <ol class="tech__points" data-points>
+        <li class="tech__point is-active" data-point="0" data-reveal>
+          <button type="button" aria-pressed="true">
+            <span class="tech__num">01</span>
+            <span class="tech__ptitle">Точная геометрия</span>
+          </button>
+          <p>Отклонение размеров — не больше ±1,5&nbsp;мм. Кладём на клей со швом 2–3&nbsp;мм: стена получается ровной, без мостиков холода в швах.</p>
+        </li>
+        <li class="tech__point" data-point="1" data-reveal>
+          <button type="button" aria-pressed="false">
+            <span class="tech__num">02</span>
+            <span class="tech__ptitle">Гранулы пенополистирола</span>
+          </button>
+          <p>Замкнутые ячейки удерживают неподвижный воздух. Отсюда низкая теплопроводность и малый вес: блок 600×300×200&nbsp;мм весит около 18&nbsp;кг.</p>
+        </li>
+        <li class="tech__point" data-point="2" data-reveal>
+          <button type="button" aria-pressed="false">
+            <span class="tech__num">03</span>
+            <span class="tech__ptitle">Цементная матрица</span>
+          </button>
+          <p>Обволакивает каждую гранулу и держит нагрузку. Не горит, не гниёт, не интересна грызунам и не боится перепадов влажности.</p>
+        </li>
+        <li class="tech__point" data-point="3" data-reveal>
+          <button type="button" aria-pressed="false">
+            <span class="tech__num">04</span>
+            <span class="tech__ptitle">Низкое водопоглощение</span>
+          </button>
+          <p>Гранулы не впитывают воду, поэтому блок набирает влагу в несколько раз меньше газобетона и сохраняет теплозащиту в сырой сезон.</p>
+        </li>
+      </ol>
+
+      <div class="tech__viewer" data-block-viewer data-reveal="fade">
+        <x-img name="block_wall" picture-class="tech__fallback" class="tech__fallback-img" alt="Стеновой блок из полистиролбетона 600×300×400 мм" sizes="(min-width: 900px) 50vw, 100vw">
+        <canvas class="tech__canvas" role="img" aria-label="Трёхмерная модель стенового блока из полистиролбетона на каменном постаменте"></canvas>
+        <svg class="tech__lead" data-lead aria-hidden="true"><line x1="0" y1="0" x2="0" y2="0"/><circle r="3.5" cx="0" cy="0"/></svg>
+        <div class="tech__loupe" aria-hidden="true">
+          <div class="tech__loupe-lens" data-loupe>
+            <x-img name="block_macro" class="tech__loupe-img" alt="" sizes="640px">
+          </div>
+          <span class="tech__loupe-label" data-loupe-label></span>
+        </div>
+        <div class="tech__dims" aria-hidden="true">
+          <span>600 мм</span><span>300 мм</span><span>400 мм</span>
+        </div>
+        <p class="tech__caption"><span>Стеновой блок D400</span><span>600 × 300 × 400 мм</span></p>
+      </div>
+    </div>
+
+    <dl class="specs" data-reveal-group>
+      <div class="spec" data-reveal><dt>Теплопроводность</dt><dd>0,105–0,125</dd><dd class="spec__note">Вт/(м·°С), марки D400–D500</dd></div>
+      <div class="spec" data-reveal><dt>Плотность</dt><dd>D300–D600</dd><dd class="spec__note">кг/м³, под стены, перегородки и утепление</dd></div>
+      <div class="spec" data-reveal><dt>Прочность</dt><dd>B1,0–B2,5</dd><dd class="spec__note">класс по прочности на сжатие</dd></div>
+      <div class="spec" data-reveal><dt>Морозостойкость</dt><dd>F100</dd><dd class="spec__note">циклов замораживания и оттаивания</dd></div>
+      <div class="spec" data-reveal><dt>Горючесть</dt><dd>Г1</dd><dd class="spec__note">слабогорючий материал</dd></div>
+      <div class="spec" data-reveal><dt>Вес блока</dt><dd>≈ 18 кг</dd><dd class="spec__note">600×300×200 мм, марка D500</dd></div>
+    </dl>
+
+    <div class="compare" data-compare>
+      <div class="compare__head">
+        <h3 class="h3" data-reveal>Толщина стены с одинаковым теплосопротивлением</h3>
+        <p data-reveal>Сколько материала нужно, чтобы стена без утеплителя держала тепло так же, как 380&nbsp;мм полистиролбетона.</p>
+      </div>
+      <ul class="compare__bars" role="list">
+        <li class="bar bar--accent" style="--v:0.38" data-reveal><span class="bar__name">Полистиролбетон D400</span><span class="bar__track"><i></i></span><span class="bar__val">0,38 м</span></li>
+        <li class="bar" style="--v:0.46" data-reveal><span class="bar__name">Газобетон D500</span><span class="bar__track"><i></i></span><span class="bar__val">0,46 м</span></li>
+        <li class="bar" style="--v:0.57" data-reveal><span class="bar__name">Брус, сосна</span><span class="bar__track"><i></i></span><span class="bar__val">0,57 м</span></li>
+        <li class="bar" style="--v:0.95" data-reveal><span class="bar__name">Керамзитобетон D900</span><span class="bar__track"><i></i></span><span class="bar__val">0,95 м</span></li>
+        <li class="bar" style="--v:2.2" data-reveal><span class="bar__name">Кирпич полнотелый</span><span class="bar__track"><i></i></span><span class="bar__val">2,2 м</span></li>
+      </ul>
+      <p class="compare__note" data-reveal>Ориентировочный расчёт для R₀ = 3,15 м²·°С/Вт, теплопроводность материалов в условиях эксплуатации «Б». Точный теплотехнический расчёт делаем для вашего региона и проекта.</p>
+    </div>
+  </div>
+
+  <figure class="tech__band" data-reveal="mask">
+    <x-img name="block_macro" class="tech__band-img" alt="Край блока крупным планом: белые гранулы пенополистирола в серой цементной матрице" sizes="100vw">
+    <figcaption class="container"><span>Срез блока D500. Гранулы 2–5&nbsp;мм распределены равномерно по всему объёму — у блока нет «слабой» стороны.</span></figcaption>
+  </figure>
+</section>
