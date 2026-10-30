@@ -31,9 +31,10 @@ export function initScroll() {
     to(target, opts = {}) {
       const el = typeof target === 'string' ? document.querySelector(target) : target
       if (!el && target !== 0) return
-      const offset = opts.offset ?? -parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-h') || '76', 10) + 1
-      if (lenis) lenis.scrollTo(el ?? 0, { offset, duration: opts.duration ?? 1.4, immediate: opts.immediate })
-      else if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY + offset, behavior: reducedMotion() ? 'auto' : 'smooth' })
+      // the header gap comes from scroll-padding-top on <html> (and any
+      // scroll-margin-top on the target); Lenis and scrollIntoView both apply it
+      if (lenis) lenis.scrollTo(el ?? 0, { offset: opts.offset ?? 0, duration: opts.duration ?? 1.4, immediate: opts.immediate })
+      else if (el) el.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth' })
       else window.scrollTo({ top: 0 })
     },
     stop() {

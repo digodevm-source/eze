@@ -11,8 +11,15 @@ export function initForm() {
   const done = form.querySelector('[data-form-done]')
   const btn = form.querySelector('[type="submit"]')
 
-  phone?.addEventListener('input', () => {
+  phone?.addEventListener('input', (e) => {
     let d = phone.value.replace(/\D/g, '')
+    // deleting: let the user erase the mask's own characters, otherwise the
+    // closing bracket or hyphen grows back and the number can't be cleared
+    if (e.inputType?.startsWith('delete')) {
+      if (d.length <= 1) phone.value = ''
+      return
+    }
+    if (!d) return
     if (d.startsWith('8')) d = '7' + d.slice(1)
     if (!d.startsWith('7')) d = '7' + d
     d = d.slice(0, 11)

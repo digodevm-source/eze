@@ -14,6 +14,7 @@ export function planSVG(plan) {
   const H = h + pad * 2
   const k = 1 // 1 svg unit = 1 m
   const out = []
+  const labels = []
   out.push(`<svg viewBox="${-pad} ${-pad} ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="План: ${plan.label}" font-family="Manrope Variable, Manrope, sans-serif">`)
 
   // outline
@@ -58,19 +59,38 @@ export function planSVG(plan) {
     const rw = x1 - x0
     const rh = y1 - y0
     const area = rw * rh
+    // stair opening on an upper floor: floor-coloured, no name, not counted
+    if (room.open) {
+      out.push(`<rect x="${x0}" y="${y0}" width="${rw}" height="${rh}" fill="${ROOM}"/>`)
+      continue
+    }
     if (!room.void) total += area
     out.push(`<rect x="${x0}" y="${y0}" width="${rw}" height="${rh}" fill="${ROOM}"/>`)
     if (room.void) {
       out.push(`<path d="M${x0} ${y0} L${x1} ${y1} M${x1} ${y0} L${x0} ${y1}" stroke="${MUTED}" stroke-width="0.03" stroke-dasharray="0.15 0.12"/>`)
     }
-    const cx = x0 + rw / 2
-    const cy = y0 + rh / 2
-    const small = rw < 2.6 || rh < 2.4
-    const fs = small ? 0.34 : Math.min(0.5, rw / 9 + 0.2)
-    const label = small && room.n.length > 6 ? '' : room.n
-    if (label) out.push(`<text x="${cx}" y="${cy - (small ? 0.05 : 0.12)}" font-size="${fs}" fill="${INK}" text-anchor="middle">${label}</text>`)
+    // centre the name in the part of the room the stair treads leave free
+    let [lx0, ly0, lx1, ly1] = [x0, y0, x1, y1]
+    const st = plan.stairs
+    if (st && st[0] < x1 && st[2] > x0 && st[1] < y1 && st[3] > y0) {
+      const vertical = st[3] - st[1] > st[2] - st[0]
+      if (vertical) {
+        if (st[0] - x0 > x1 - st[2]) lx1 = st[0]
+        else lx0 = st[2]
+      } else if (st[1] - y0 > y1 - st[3]) ly1 = st[1]
+      else ly0 = st[3]
+    }
+    const lw = lx1 - lx0
+    const cx = lx0 + lw / 2
+    const cy = ly0 + (ly1 - ly0) / 2
+    const small = lw < 2.6 || ly1 - ly0 < 2.4
+    // shrink long names until they fit the room instead of dropping them
+    const fit = (len, size) => Math.min(size, (lw * 0.86) / (len * 0.56))
+    const fs = Math.max(0.24, fit(room.n.length, small ? 0.34 : Math.min(0.5, lw / 9 + 0.2)))
+    const label = room.n
+    if (label) labels.push(`<text x="${cx}" y="${cy - (small ? 0.05 : 0.12)}" font-size="${fs.toFixed(3)}" fill="${room.void ? MUTED : INK}" text-anchor="middle">${label}</text>`)
     if (!room.void) {
-      out.push(`<text x="${cx}" y="${cy + (label ? fs + 0.1 : 0.12)}" font-size="${fs * 0.86}" fill="${MUTED}" text-anchor="middle">${fmt(area)} м²</text>`)
+      labels.push(`<text x="${cx}" y="${cy + (label ? fs + 0.1 : 0.12)}" font-size="${(Math.min(fs, 0.36) * 0.86).toFixed(3)}" fill="${MUTED}" text-anchor="middle">${fmt(area)} м²</text>`)
     }
   }
 
@@ -90,6 +110,9 @@ export function planSVG(plan) {
     }
     out.push(`<rect x="${x0}" y="${y0}" width="${x1 - x0}" height="${y1 - y0}" fill="none" stroke="${MUTED}" stroke-width="0.03"/>`)
   }
+
+  // room names on top of the stair treads, with a halo in the floor colour
+  out.push(`<g stroke="${ROOM}" stroke-width="0.14" stroke-linejoin="round" paint-order="stroke">${labels.join('')}</g>`)
 
   // dimension line along the top
   const dy = -0.9

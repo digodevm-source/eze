@@ -210,6 +210,9 @@ figcaption {
 
 .tech__viewer.is-3d .tech__fallback-img {
   opacity: 0;
+  /* the photo and the 3D block stand at different angles: hand over quickly
+     so they never show as a double image */
+  transition-duration: 0.35s;
 }
 
 .tech__canvas {
@@ -219,6 +222,7 @@ figcaption {
 
 .tech__viewer.is-3d .tech__canvas {
   opacity: 1;
+  transition-delay: 0.25s;
 }
 
 /* magnifier: a macro photo of the cut, tied to the block by a hairline */
@@ -342,7 +346,7 @@ figcaption {
   position: absolute;
   left: 0;
   top: 0;
-  font-size: 12px;
+  font-size: clamp(10px, 2.6cqw, 12px);
   font-weight: 500;
   letter-spacing: 0.06em;
   color: var(--ink-2);
@@ -378,12 +382,15 @@ figcaption {
 .spec dd {
   font-family: var(--serif);
   font-weight: 400;
-  font-size: clamp(25.2px, 2.5vw, 37px);
+  font-size: clamp(23px, 2.5vw, 37px);
   line-height: 1.05;
   font-variant-numeric: lining-nums;
+  white-space: nowrap;
 }
 
-.spec > span {
+.spec dd.spec__note {
+  font-family: var(--sans);
+  white-space: normal;
   font-size: 13px;
   line-height: 1.5;
   color: var(--ink-2);
@@ -989,6 +996,33 @@ figcaption {
   margin-left: 2px;
 }
 
+/* phones: the catalogue becomes a swipeable row instead of four screens of cards */
+@media (max-width: 639px) {
+  .products {
+    display: flex;
+    gap: 12px;
+    margin-inline: calc(var(--gutter) * -1);
+    padding: 0 var(--gutter) 6px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--gutter);
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    background: none;
+    border: 0;
+  }
+
+  .products::-webkit-scrollbar {
+    display: none;
+  }
+
+  .product {
+    flex: 0 0 84%;
+    scroll-snap-align: start;
+    border: 1px solid var(--line-light);
+  }
+}
+
 @media (min-width: 640px) {
   .products {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1128,7 +1162,7 @@ figcaption {
   font-variant-numeric: lining-nums tabular-nums;
 }
 
-.calc__result dl span {
+.calc__result dd.calc__note {
   font-size: 12px;
   color: var(--on-dark-3);
 }
@@ -1382,7 +1416,7 @@ figcaption {
   .step {
     min-height: 62vh;
     align-content: center;
-    opacity: 0.32;
+    opacity: 0.42;
   }
 
   .step.is-active {
@@ -1405,6 +1439,16 @@ figcaption {
     padding-bottom: 8px;
   }
 
+  /* when the header slides back in, the stage moves down with it instead of
+     hiding its top under the header */
+  .process__stage {
+    transition: top 0.7s var(--ease-out);
+  }
+
+  html:has(.header:not(.is-hidden)) .process__stage {
+    top: calc(var(--header-h) - 1px);
+  }
+
   .process__sticky {
     position: static;
   }
@@ -1414,7 +1458,7 @@ figcaption {
   }
 
   .step {
-    opacity: 0.42;
+    opacity: 0.5;
   }
 
   .step.is-active {
@@ -1546,6 +1590,21 @@ figcaption {
 
   .acard__btn:hover .acard__more svg {
     transform: translateX(4px);
+  }
+}
+
+/* tablets: two columns, the first article runs across both */
+@media (min-width: 640px) and (max-width: 899px) {
+  .articles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .acard:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .acard:first-child .acard__media {
+    aspect-ratio: 16 / 8;
   }
 }
 

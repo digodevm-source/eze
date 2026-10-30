@@ -1,12 +1,16 @@
 import * as THREE from 'three'
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js'
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js'
 import { createPSBTextures, boxUVs } from './psb-texture.js'
 import { clamp, smoothstep, lerp, visibility, webglAvailable } from '../js/utils.js'
 
 /*
- * "Architectural model" of a single-storey house that builds itself as the
- * visitor scrolls through the six construction steps (progress 0…6):
- * plot → slab → block walls course by course → roof & windows → facade → lights.
+ * An architectural maquette: a single-storey house on a model base board that
+ * builds itself as the visitor scrolls through the six construction steps
+ * (progress 0…6): plot → slab → block walls course by course → roof & windows
+ * → facade → landscaping and lights. Everything is matte and pale, the way a
+ * physical presentation model is, so the block texture is the only "real"
+ * material in the frame.
  */
 
 const HX = 6 // half length, m
@@ -18,19 +22,24 @@ const COURSES = 10
 const SLAB = 0.3
 
 const C = {
-  bg: 0xeae4da,
-  sand: new THREE.Color(0xd8cdbd),
-  lawn: new THREE.Color(0xa7aa8c),
-  slab: 0xb8b1a7,
-  plaster: 0xf1ece4,
-  roof: 0xe9e3da,
-  fascia: 0x2b2825,
-  frame: 0x2b2825,
-  wood: 0x93704f,
+  board: 0xe8e6e1,
+  lawn: 0xc3c8b6,
+  hedge: 0xaeb4a0,
+  paving: 0xd9d5cd,
+  slab: 0xc4c0b8,
+  plaster: 0xf6f4ef,
+  roof: 0xeeebe5,
+  fascia: 0x3a3631,
+  frame: 0x3a3631,
+  glass: 0x7c878c,
+  wood: 0xa98361,
+  deck: 0xc2a688,
   glow: 0xffc98f,
-  crown: 0xb9bda9,
-  trunk: 0x9a8d7d,
+  pine: 0xe9e8e2,
+  trunk: 0xc9bfb0,
 }
+// the model base board (top face at y = 0)
+const BOARD = { w: 50, d: 38, h: 0.6 }
 
 // openings: wall id, from, to (along the wall), first course, last course (exclusive)
 const OPENINGS = [
@@ -101,23 +110,22 @@ export function initBuildScene(wrap) {
   renderer.toneMappingExposure = 1.0
   renderer.shadowMap.enabled = true
   renderer.shadowMap.type = THREE.PCFShadowMap
-  renderer.setClearColor(C.bg, 0)
+  renderer.setClearColor(0x000000, 0)
 
   const scene = new THREE.Scene()
-  scene.fog = new THREE.Fog(C.bg, 34, 78)
   const pmrem = new THREE.PMREMGenerator(renderer)
   scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture
   scene.environmentIntensity = 0.35
 
   const camera = new THREE.PerspectiveCamera(30, 1, 0.5, 200)
 
-  const hemi = new THREE.HemisphereLight(0xfff7ee, 0xd8cfc2, 0.9)
+  const hemi = new THREE.HemisphereLight(0xffffff, 0xdcd8d0, 1.05)
   scene.add(hemi)
-  const sun = new THREE.DirectionalLight(0xfff0dc, 2.3)
-  sun.position.set(-14, 20, 12)
+  const sun = new THREE.DirectionalLight(0xfff7ee, 2.1)
+  sun.position.set(-16, 22, 13)
   sun.castShadow = true
   sun.shadow.mapSize.set(mobile ? 1024 : 2048, mobile ? 1024 : 2048)
-  Object.assign(sun.shadow.camera, { left: -14, right: 14, top: 14, bottom: -14, near: 1, far: 70 })
+  Object.assign(sun.shadow.camera, { left: -30, right: 30, top: 30, bottom: -30, near: 1, far: 90 })
   sun.shadow.radius = 6
   sun.shadow.blurSamples = 16
   sun.shadow.bias = -0.0005
@@ -125,11 +133,67 @@ export function initBuildScene(wrap) {
   scene.add(sun)
 
   // ---------------------------------------------------------------- ground & plot
-  const groundMat = new THREE.MeshStandardMaterial({ color: C.sand.clone(), roughness: 1 })
-  const ground = new THREE.Mesh(new THREE.CircleGeometry(80, 64), groundMat)
-  ground.rotation.x = -Math.PI / 2
-  ground.receiveShadow = true
-  scene.add(ground)
+  const board = new THREE.Mesh(
+    new RoundedBoxGeometry(BOARD.w, BOARD.h, BOARD.d, 4, 0.14),
+    new THREE.MeshStandardMaterial({ color: C.board, roughness: 0.92 })
+  )
+  board.position.y = -BOARD.h / 2
+  board.receiveShadow = true
+  board.castShadow = true
+  scene.add(board)
+  // the "table" under the model only catches its soft shadow
+  const table = new THREE.Mesh(new THREE.PlaneGeometry(120, 120), new THREE.ShadowMaterial({ opacity: 0.1 }))
+  table.rotation.x = -Math.PI / 2
+  table.position.y = -BOARD.h
+  table.receiveShadow = true
+  scene.add(table)
+
+  // landscaping, faded in at handover: lawn sheet with a cut-out for the
+  // house and the path, and stone slabs from the gate to the door
+  const lawnShape = new THREE.Shape()
+  const GX = 15.5
+  const GZ = 11.5
+  lawnShape.moveTo(-GX, -GZ)
+  lawnShape.lineTo(GX, -GZ)
+  lawnShape.lineTo(GX, GZ)
+  lawnShape.lineTo(-GX, GZ)
+  lawnShape.closePath()
+  const cut = new THREE.Path()
+  cut.moveTo(-HX - 0.8, -HZ - 0.8)
+  cut.lineTo(-HX - 0.8, HZ + 0.8)
+  cut.lineTo(-0.9, HZ + 0.8)
+  cut.lineTo(-0.9, GZ)
+  cut.lineTo(0.9, GZ)
+  cut.lineTo(0.9, HZ + 0.8)
+  cut.lineTo(HX + 0.8, HZ + 0.8)
+  cut.lineTo(HX + 0.8, -HZ - 0.8)
+  cut.closePath()
+  lawnShape.holes.push(cut)
+  const lawnMat = new THREE.MeshStandardMaterial({ color: C.lawn, roughness: 1, transparent: true, opacity: 0 })
+  const lawn = new THREE.Mesh(new THREE.ShapeGeometry(lawnShape), lawnMat)
+  lawn.rotation.x = -Math.PI / 2
+  lawn.position.y = 0.015
+  lawn.receiveShadow = true
+  scene.add(lawn)
+  const pavingMat = new THREE.MeshStandardMaterial({ color: C.paving, roughness: 0.9, transparent: true, opacity: 0 })
+  const paving = new THREE.Group()
+  for (let z = HZ + 1.1; z < GZ - 0.3; z += 0.95) {
+    const slabStone = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.05, 0.75), pavingMat)
+    slabStone.position.set(0, 0.03, z)
+    slabStone.receiveShadow = true
+    paving.add(slabStone)
+  }
+  // a paved strip around the house (the blind area)
+  for (const [w, d, x, z] of [
+    [HX * 2 + 1.6, 0.8, 0, HZ + 0.4 + 0.02], [HX * 2 + 1.6, 0.8, 0, -HZ - 0.4],
+    [0.8, HZ * 2, HX + 0.4, 0], [0.8, HZ * 2, -HX - 0.4, 0],
+  ]) {
+    const strip = new THREE.Mesh(new THREE.BoxGeometry(w, 0.04, d), pavingMat)
+    strip.position.set(x, 0.02, z)
+    strip.receiveShadow = true
+    paving.add(strip)
+  }
+  scene.add(paving)
 
   const plotMat = new THREE.LineDashedMaterial({ color: 0x5b554c, dashSize: 0.35, gapSize: 0.25, transparent: true })
   const P = [[-HX - 3, -HZ - 3], [HX + 3, -HZ - 3], [HX + 3, HZ + 4], [-HX - 3, HZ + 4]]
@@ -153,30 +217,56 @@ export function initBuildScene(wrap) {
   stakes.add(strings)
   scene.add(stakes)
 
-  // model trees: soft spheres on thin trunks, like a physical maquette
+  // model trees: slender pines in white foam, as on a presentation model
   const trees = new THREE.Group()
-  const crownMat = new THREE.MeshStandardMaterial({ color: C.crown, roughness: 1 })
+  const pineMat = new THREE.MeshStandardMaterial({ color: C.pine, roughness: 0.95 })
   const trunkMat = new THREE.MeshStandardMaterial({ color: C.trunk, roughness: 1 })
-  const crownGeo = new THREE.IcosahedronGeometry(1, 3)
-  const trunkGeo = new THREE.CylinderGeometry(0.06, 0.09, 1, 8)
-  const spots = [
-    [-11, -5, 1.6], [-12.5, 1, 1.9], [-10, 6.5, 1.3], [11.5, -6, 2.0], [13, 0.5, 1.5], [10.5, 7, 1.7],
-    [-4, -10, 1.8], [3, -11, 2.1], [8, -9.5, 1.4], [-8, -9, 1.2], [-15, -8, 2.2], [16, -4, 1.9],
+  const trunkGeo = new THREE.CylinderGeometry(0.05, 0.08, 1, 10)
+  const coneGeo = new THREE.ConeGeometry(1, 1, 24, 1)
+  const pines = [
+    [-12.6, -7.8, 7.0], [-10.4, -9.6, 5.4], [-13.6, -3.4, 6.2], [-8.0, -10.6, 6.6], [-4.4, -11.2, 5.0],
+    [9.4, -9.8, 6.8], [12.4, -8.0, 5.6], [13.4, -3.0, 7.2], [6.2, -10.8, 5.2], [13.8, 4.6, 5.8],
+    [-14.0, 5.0, 5.4], [-17.5, -9.5, 7.6], [17.8, -10.5, 7.0], [1.2, -12.4, 6.0], [-19.0, 1.0, 6.4],
+    [19.2, 1.5, 6.6], [-16.5, 10.5, 5.2], [16.8, 10.0, 5.6],
   ]
-  for (const [x, z, r] of spots) {
+  for (const [x, z, h] of pines) {
     const g = new THREE.Group()
     const trunk = new THREE.Mesh(trunkGeo, trunkMat)
-    trunk.scale.y = r * 1.6
-    trunk.position.y = r * 0.8
-    const crown = new THREE.Mesh(crownGeo, crownMat)
-    crown.scale.set(r, r * 1.25, r)
-    crown.position.y = r * 1.6 + r * 0.9
-    trunk.castShadow = crown.castShadow = true
+    trunk.scale.y = h * 0.4
+    trunk.position.y = h * 0.2
+    trunk.castShadow = true
+    // one slim cone: the silhouette of a pine, without toy-like tiers
+    const crown = new THREE.Mesh(coneGeo, pineMat)
+    crown.scale.set(h * 0.17, h * 0.82, h * 0.17)
+    crown.position.y = h * 0.18 + (h * 0.82) / 2
+    crown.castShadow = true
     g.add(trunk, crown)
     g.position.set(x, 0, z)
     trees.add(g)
   }
   scene.add(trees)
+  // clipped hedges and a timber deck, grown in at handover
+  const shrubMat = new THREE.MeshStandardMaterial({ color: C.hedge, roughness: 1, transparent: true, opacity: 0 })
+  const shrubs = new THREE.Group()
+  for (const [x, z, w, d] of [
+    [-3.9, HZ + 1.55, 3.6, 0.55], [-GX + 0.5, 0, 0.6, GZ * 2 - 1], [GX - 0.5, 0, 0.6, GZ * 2 - 1], [0, -GZ + 0.5, GX * 2 - 1, 0.6],
+  ]) {
+    const m = new THREE.Mesh(new RoundedBoxGeometry(w, 0.7, d, 3, 0.12), shrubMat)
+    m.position.set(x, 0.35, z)
+    m.castShadow = m.receiveShadow = true
+    m.userData.h = 0.7
+    shrubs.add(m)
+  }
+  scene.add(shrubs)
+  const deckMat = new THREE.MeshStandardMaterial({ color: C.deck, roughness: 0.8, transparent: true, opacity: 0 })
+  const deck = new THREE.Group()
+  for (let x = 1.6; x < HX + 0.4; x += 0.22) {
+    const plank = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.08, 2.4), deckMat)
+    plank.position.set(x, 0.12, HZ + 1.6)
+    plank.castShadow = plank.receiveShadow = true
+    deck.add(plank)
+  }
+  scene.add(deck)
 
   // ---------------------------------------------------------------- slab
   const slab = new THREE.Mesh(
@@ -248,14 +338,18 @@ export function initBuildScene(wrap) {
     new THREE.MeshStandardMaterial({ color: C.fascia, roughness: 0.5 })
   )
   fascia.position.y = 0.1
-  roof.add(roofSlab, fascia)
+  // thin canopy over the entrance, part of the roof package
+  const canopy = new THREE.Mesh(new THREE.BoxGeometry(3.4, 0.12, 1.5), roofSlab.material)
+  canopy.position.set(0, -H + SLAB + 8 * BH + 0.35 - 0.16, HZ + 0.75)
+  canopy.castShadow = canopy.receiveShadow = true
+  roof.add(roofSlab, fascia, canopy)
   scene.add(roof)
 
   const glassMat = new THREE.MeshStandardMaterial({
-    color: 0x2a3236, metalness: 0.5, roughness: 0.06, transparent: true, opacity: 0,
+    color: C.glass, metalness: 0.55, roughness: 0.04, envMapIntensity: 1.7, transparent: true, opacity: 0,
   })
   const frameMat = new THREE.MeshStandardMaterial({ color: C.frame, roughness: 0.45, transparent: true, opacity: 0 })
-  const glowMat = new THREE.MeshStandardMaterial({ color: 0x000000, emissive: C.glow, emissiveIntensity: 0 })
+  const glowMat = new THREE.MeshStandardMaterial({ color: 0x6b675f, roughness: 1, emissive: C.glow, emissiveIntensity: 0 })
   const windows = new THREE.Group()
   for (const [w, o0, o1, c0, c1] of OPENINGS) {
     const y0 = SLAB + c0 * BH
@@ -273,6 +367,7 @@ export function initBuildScene(wrap) {
       [len, 0.06, 0, -(y1 - y0) / 2 + 0.03],
       [0.06, y1 - y0, -len / 2 + 0.03, 0],
       [0.06, y1 - y0, len / 2 - 0.03, 0],
+      ...(len > 1.6 ? [[0.05, y1 - y0, 0, 0]] : []),
     ]
     for (const [bw, bh, bx, by] of bars) {
       const bar = new THREE.Mesh(new THREE.BoxGeometry(bw, bh, 0.06), frameMat)
@@ -413,7 +508,7 @@ export function initBuildScene(wrap) {
     fascia.material.opacity = roof01
 
     const win01 = smoothstep(3.4, 3.95, p)
-    glassMat.opacity = win01 * 0.78
+    glassMat.opacity = win01 * 0.92
     frameMat.opacity = win01
     windows.visible = win01 > 0.001
 
@@ -427,7 +522,18 @@ export function initBuildScene(wrap) {
     slats.visible = wood01 > 0.001
     door.visible = win01 > 0.001
 
-    groundMat.color.copy(C.sand).lerp(C.lawn, smoothstep(4.2, 5.2, p))
+    const garden01 = smoothstep(4.6, 5.4, p)
+    lawnMat.opacity = garden01
+    pavingMat.opacity = garden01
+    shrubMat.opacity = garden01
+    lawn.visible = paving.visible = shrubs.visible = garden01 > 0.001
+    shrubs.children.forEach((m, i) => {
+      const k = smoothstep(4.7 + i * 0.06, 5.25 + i * 0.06, p)
+      m.scale.y = Math.max(0.001, k)
+      m.position.y = (m.userData.h * m.scale.y) / 2
+    })
+    deckMat.opacity = garden01
+    deck.visible = garden01 > 0.001
 
     const light01 = smoothstep(5.0, 5.6, p)
     glowMat.emissiveIntensity = light01 * 1.6
@@ -452,7 +558,7 @@ export function initBuildScene(wrap) {
     camera.aspect = r.width / r.height
     camera.fov = camera.aspect < 1.2 ? 36 : 30
     // wider-than-4:3 frames (phones) can come closer: the house fills the width
-    zoom = camera.aspect > 1.4 ? 0.8 : 1
+    zoom = camera.aspect > 1.4 ? 0.95 : 1
     camera.updateProjectionMatrix()
   }
   new ResizeObserver(resize).observe(host)

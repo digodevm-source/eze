@@ -11,7 +11,7 @@
   --taupe: #7b7266;
   --ink: #22201c;
   --ink-2: #57514a;
-  --ink-3: #8a8277;
+  --ink-3: #70685d;
   --espresso: #1d1a17;
   --espresso-2: #262220;
   --espresso-3: #322d29;
@@ -21,8 +21,8 @@
   --line-light: rgba(243, 239, 232, 0.16);
   --gold: #c39b55;
   --on-dark: #efe9df;
-  --on-dark-2: rgba(239, 233, 223, 0.66);
-  --on-dark-3: rgba(239, 233, 223, 0.42);
+  --on-dark-2: rgba(239, 233, 223, 0.72);
+  --on-dark-3: rgba(239, 233, 223, 0.56);
 
   --serif: 'Prata', Georgia, 'Times New Roman', serif;
   --sans: 'Manrope Variable', 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -288,4 +288,10 @@ button {
     grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
     gap: 64px;
   }
+}
+
+/* keep short phrases (phone numbers, hours, codes) on one line */
+.nw,
+a[href^='tel:'] {
+  white-space: nowrap;
 }

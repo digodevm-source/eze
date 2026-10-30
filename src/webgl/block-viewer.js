@@ -232,11 +232,14 @@ export function initBlockViewer(root) {
   seg([-L / 2 - o - t, 0.002, W / 2], [-L / 2 - o + t, 0.002, W / 2])
   stage.add(dims)
   const labels = root.querySelectorAll('.tech__dims span')
+  // each label sits on its dimension line and is pushed off it in screen
+  // space, so it never overlaps the line however small the viewer gets
   const labelPos = [
-    new THREE.Vector3(0, 0.002, W / 2 + o + 0.045),
-    new THREE.Vector3(L / 2 + o + 0.06, Hh / 2, W / 2),
-    new THREE.Vector3(-L / 2 - o - 0.07, 0.002, 0),
+    new THREE.Vector3(0, 0.002, W / 2 + o),
+    new THREE.Vector3(L / 2 + o, Hh / 2, W / 2),
+    new THREE.Vector3(-L / 2 - o, 0.002, 0),
   ]
+  const labelAnchor = ['translate(-50%, 0.5em)', 'translate(0.7em, -50%)', 'translate(calc(-100% - 0.7em), -50%)']
 
   // water droplets beading on the top face
   const drops = new THREE.Group()
@@ -340,7 +343,7 @@ export function initBlockViewer(root) {
 
     labels.forEach((el, i) => {
       tmp.copy(labelPos[i]).applyMatrix4(stage.matrixWorld).project(camera)
-      el.style.transform = `translate(-50%, -50%) translate(${(tmp.x * 0.5 + 0.5) * 100}cqw, ${(-tmp.y * 0.5 + 0.5) * 100}cqh)`
+      el.style.transform = `translate(${(tmp.x * 0.5 + 0.5) * 100}cqw, ${(-tmp.y * 0.5 + 0.5) * 100}cqh) ${labelAnchor[i]}`
       el.style.opacity = String(dims01)
     })
 

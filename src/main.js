@@ -20,15 +20,23 @@ document.documentElement.classList.add('js')
 const scroll = initScroll()
 initHeader(scroll)
 initReveal()
-initCarousel()
-initDrawers(scroll)
-initCalc(scroll)
-initFaq()
-initForm()
-initTech()
-initProcess(scroll)
-
 initIntro()
+
+// everything below the first screen starts once the browser is idle, so the
+// hero gets the main thread to itself on slow phones
+const idle = window.requestIdleCallback || ((fn) => setTimeout(fn, 200))
+idle(
+  () => {
+    initCarousel()
+    initDrawers(scroll)
+    initCalc(scroll)
+    initFaq()
+    initForm()
+    initTech()
+    initProcess(scroll)
+  },
+  { timeout: 1200 }
+)
 
 const viewer = document.querySelector('[data-block-viewer]')
 if (viewer) {

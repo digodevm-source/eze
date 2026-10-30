@@ -237,10 +237,6 @@
 }
 
 /* article */
-.article {
-  max-width: 720px;
-}
-
 .article__media {
   margin: 0 calc(clamp(28px, 5vw, 72px) * -1) 40px;
   margin-top: calc(clamp(24px, 4vw, 48px) * -1 - 70px);
@@ -368,9 +364,9 @@
   .js [data-reveal],
   .js [data-reveal='mask'],
   .js [data-reveal='mask'] img,
-  [data-intro],
-  .hero__title .line > span,
-  .hero__img {
+  .js [data-intro],
+  .js .hero__title .line > span,
+  .js .hero__img {
     opacity: 1;
     transform: none;
     clip-path: none;
