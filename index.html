@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en" class="is-loading">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>FORMLESS® — Beyond the Form</title>
+  <meta name="description" content="Independent creative studio exploring the space between nature, art & technology.">
+  <meta name="theme-color" content="#010309">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23010309'/%3E%3Ccircle cx='32' cy='32' r='9' fill='%23dfe8ff'/%3E%3Ccircle cx='32' cy='32' r='18' fill='none' stroke='%237fa3f5' stroke-opacity='.6' stroke-width='2'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Preloader -->
+  <div class="preloader" aria-hidden="true">
+    <div class="preloader__inner">
+      <span class="preloader__logo">FORMLESS®</span>
+      <span class="preloader__bar"><i></i></span>
+    </div>
+  </div>
+
+  <!-- WebGL butterflies -->
+  <canvas id="scene" aria-hidden="true"></canvas>
+
+  <!-- Specimen annotations that track the butterflies -->
+  <div class="hud" aria-hidden="true">
+    <svg class="hud__lines" width="100%" height="100%">
+      <polyline class="hud__line" data-line="0" points="0,0 0,0 0,0"></polyline>
+      <polyline class="hud__line" data-line="1" points="0,0 0,0 0,0"></polyline>
+    </svg>
+    <div class="specimen" data-specimen="0" data-target="0" data-offset="70,-120">
+      <span class="specimen__tag">SPECIMEN 001</span>
+      <div class="specimen__box">
+        <p>LEPIDOPTERA VITREA.<br>BIOLUMINESCENT FORM<br>OBSERVED BETWEEN<br>NATURE &amp; CODE.</p>
+      </div>
+    </div>
+    <div class="specimen" data-specimen="1" data-target="-1" data-offset="30,150">
+      <div class="specimen__box">
+        <p>SUBJECT IN MOTION.<br>FOLLOWS THE VIEWER<br>ACROSS ALL<br>DIMENSIONS.</p>
+      </div>
+      <span class="specimen__tag">SPECIMEN 002</span>
+    </div>
+  </div>
+
+  <div class="cursor" aria-hidden="true"><span class="cursor__dot"></span><span class="cursor__ring"></span></div>
+
+  <!-- Navigation -->
+  <header class="nav">
+    <a href="#top" class="nav__mark" aria-label="Back to top"><span>FORMLESS®</span> / CREATIVE STUDIO</a>
+    <nav class="nav__links" aria-label="Main">
+      <a href="#work" class="nav__link"><span data-text="WORK">WORK</span></a>
+      <a href="#studio" class="nav__link"><span data-text="STUDIO">STUDIO</span></a>
+      <a href="#contact" class="nav__link"><span data-text="CONTACT">CONTACT</span></a>
+    </nav>
+    <a href="#top" class="nav__logo" aria-label="FORMLESS home">FORMLESS<sup>®</sup></a>
+  </header>
+
+  <aside class="progress" aria-hidden="true">
+    <span class="progress__num"><span class="progress__current">01</span> / <span class="progress__total">07</span></span>
+    <span class="progress__track"><i class="progress__fill"></i></span>
+  </aside>
+
+  <main>
+    <!-- 01 — HERO -->
+    <section class="hero" id="top" data-section="Intro" data-bf="0.45,0.31,1.0,0.55,-0.28,0.16" data-bf-m="0.55,0.5,1.05,0.3,-0.25,0.05">
+      <i class="bf-companion" style="left:20%;top:63%" data-companion="0.62,0.92,-0.35,-0.1"></i>
+      <i class="bf-companion" style="left:64%;top:8%" data-companion="0.28,0.75,0.5,0.15" data-desktop-only></i>
+      <i class="bf-companion" style="left:47%;top:97%" data-companion="0.36,1.08,0.1,0.2"></i>
+
+      <div class="hero__card glass" data-intro>
+        <p class="eyebrow">FORMLESS® / CREATIVE STUDIO</p>
+        <p class="hero__count">01 <span class="slash">/</span> <span class="inf">∞</span></p>
+        <p class="hero__lead">EXPLORING NEW DIMENSIONS<br>OF DIGITAL CREATIVITY.</p>
+        <div class="hero__more">
+          <div>
+            <p>A small independent team of designers, artists and creative technologists. Currently accepting new projects.</p>
+          </div>
+        </div>
+        <div class="hero__actions">
+          <a href="#studio" class="pill magnetic">DISCOVER STUDIO <span class="arr">↗</span></a>
+          <button class="round magnetic hero__toggle" type="button" aria-expanded="false" aria-label="More about the studio"><span></span><span></span></button>
+        </div>
+      </div>
+
+      <div class="hero__title" data-intro>
+        <h1 class="pixel-title"><span class="line"><span>BEYOND</span></span><span class="line"><span>THE FORM</span></span></h1>
+        <p class="hero__sub">INDEPENDENT CREATIVE STUDIO EXPLORING THE SPACE <br>BETWEEN NATURE, ART &amp; TECHNOLOGY.</p>
+      </div>
+
+      <div class="hero__scroll" data-intro>
+        <span class="hero__scroll-line"><i></i></span>
+        <span>SCROLL TO EXPLORE</span>
+      </div>
+
+      <a href="#work" class="pill pill--lg hero__cta magnetic" data-intro>EXPLORE WORK <span class="arr">↗</span></a>
+    </section>
+
+    <!-- 02 — SERVICES -->
+    <section class="services" id="services" data-section="Services" data-bf="0.67,0.42,1.12,-0.55,-0.22,-0.16" data-bf-m="0.62,0.3,0.95,-0.3,-0.2,-0.05">
+      <div class="wrap">
+        <p class="label" data-reveal>(01) — WHAT WE DO</p>
+        <h2 class="statement" data-reveal>
+          <span class="line"><span>WE TRANSFORM <span class="orbs" aria-hidden="true"><i></i><i></i></span> <em>BOLD IDEAS</em></span></span>
+          <span class="line indent"><span>INTO DISTINCTIVE VISUAL IDENTITIES</span></span>
+          <span class="line"><span>AND <em>IMMERSIVE DIGITAL</em> EXPERIENCES.</span></span>
+        </h2>
+
+        <div class="cards">
+          <article class="card glass" data-reveal style="--d:.05s">
+            <header class="card__head"><span>01</span><span>BRANDING</span></header>
+            <h3 class="card__title">IDENTITIES<br>THAT LAST.</h3>
+            <p class="card__text">Strategic branding and visual systems for forward-thinking brands.</p>
+            <a href="#contact" class="card__arrow" aria-label="Start a branding project">↗</a>
+          </article>
+          <article class="card glass" data-reveal style="--d:.15s">
+            <header class="card__head"><span>02</span><span>DIGITAL</span></header>
+            <h3 class="card__title">EXPERIENCES<br>THAT MOVE.</h3>
+            <p class="card__text">Interactive websites and digital worlds that create emotional connections.</p>
+            <a href="#contact" class="card__arrow" aria-label="Start a digital project">↗</a>
+          </article>
+          <article class="card glass" data-reveal style="--d:.25s">
+            <header class="card__head"><span>03</span><span>3D &amp; MOTION</span></header>
+            <h3 class="card__title">IDEAS<br>IN MOTION.</h3>
+            <p class="card__text">3D visuals, motion design and experimental storytelling.</p>
+            <a href="#contact" class="card__arrow" aria-label="Start a 3D and motion project">↗</a>
+          </article>
+          <article class="card glass" data-reveal style="--d:.35s">
+            <header class="card__head"><span>04</span><span>STRATEGY</span></header>
+            <h3 class="card__title">CREATIVITY<br>WITH PURPOSE.</h3>
+            <p class="card__text">Creative strategy that transforms ideas into meaningful experiences.</p>
+            <a href="#contact" class="card__arrow" aria-label="Start a strategy project">↗</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 — VISION -->
+    <section class="vision" id="vision" data-section="Vision" data-bf="0.3,0.5,1.38,0.62,-0.22,0.24" data-bf-m="0.5,0.27,1.1,0.3,-0.2,0.08">
+      <div class="wrap vision__wrap">
+        <article class="vision__card glass" data-reveal>
+          <h2 class="vision__title">Our Vision</h2>
+          <div class="vision__body">
+            <p class="vision__kicker">NO FIXED FORM. NO LIMITS.</p>
+            <p>We believe the best ideas are never static. They evolve, shift and challenge expectations.</p>
+            <p>Through art, design and technology, we create digital experiences that move beyond the expected.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- 04 — WORK -->
+    <section class="work" id="work" data-section="Work" data-bf="0.84,0.3,0.6,-0.4,-0.26,-0.12" data-bf-m="0.8,0.16,0.55,-0.35,-0.25,-0.1">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="label" data-reveal>(02) — SELECTED WORK</p>
+          <h2 class="big-title" data-reveal><span class="line"><span>SELECTED</span></span><span class="line"><span><em>WORK</em> <sup>(05)</sup></span></span></h2>
+          <p class="section-head__text" data-reveal style="--d:.1s">A collection of identities, digital worlds and experiments — each one shaped by curiosity and refined with care.</p>
+        </div>
+
+        <ul class="projects">
+          <li class="project" data-reveal data-variant="1">
+            <a href="#contact">
+              <span class="project__idx">01</span>
+              <span class="project__name">Lumen Botanica</span>
+              <span class="project__tags">Brand Identity · WebGL</span>
+              <span class="project__year">2026</span>
+              <span class="project__arrow">↗</span>
+            </a>
+          </li>
+          <li class="project" data-reveal data-variant="2">
+            <a href="#contact">
+              <span class="project__idx">02</span>
+              <span class="project__name">Noctiluca</span>
+              <span class="project__tags">Immersive Website</span>
+              <span class="project__year">2026</span>
+              <span class="project__arrow">↗</span>
+            </a>
+          </li>
+          <li class="project" data-reveal data-variant="3">
+            <a href="#contact">
+              <span class="project__idx">03</span>
+              <span class="project__name">Aether Sound</span>
+              <span class="project__tags">3D &amp; Motion</span>
+              <span class="project__year">2025</span>
+              <span class="project__arrow">↗</span>
+            </a>
+          </li>
+          <li class="project" data-reveal data-variant="4">
+            <a href="#contact">
+              <span class="project__idx">04</span>
+              <span class="project__name">Glasshouse Atelier</span>
+              <span class="project__tags">Visual Identity</span>
+              <span class="project__year">2025</span>
+              <span class="project__arrow">↗</span>
+            </a>
+          </li>
+          <li class="project" data-reveal data-variant="5">
+            <a href="#contact">
+              <span class="project__idx">05</span>
+              <span class="project__name">Silent Bloom</span>
+              <span class="project__tags">Installation · Interactive</span>
+              <span class="project__year">2024</span>
+              <span class="project__arrow">↗</span>
+            </a>
+          </li>
+        </ul>
+
+        <div class="work__foot" data-reveal>
+          <a href="#contact" class="pill magnetic">VIEW ALL PROJECTS <span class="arr">↗</span></a>
+        </div>
+      </div>
+      <div class="work-preview" aria-hidden="true"><div class="work-preview__art"></div><span class="work-preview__label">VIEW CASE</span></div>
+    </section>
+
+    <!-- 05 — STUDIO / PROCESS -->
+    <section class="studio" id="studio" data-section="Studio" data-bf="0.16,0.36,0.62,0.45,-0.26,0.1" data-bf-m="0.2,0.14,0.55,0.4,-0.25,0.1">
+      <i class="bf-companion" style="left:86%;top:62%" data-companion="0.3,0.85,-0.4,-0.1" data-desktop-only></i>
+      <div class="wrap">
+        <div class="section-head section-head--right">
+          <p class="label" data-reveal>(03) — PROCESS</p>
+          <h2 class="big-title" data-reveal><span class="line"><span>FROM SEED</span></span><span class="line"><span>TO <em>FORM.</em></span></span></h2>
+          <p class="section-head__text" data-reveal style="--d:.1s">Every project grows organically — guided by research, shaped through experimentation and finished with obsessive attention to detail.</p>
+        </div>
+
+        <ol class="steps">
+          <li class="step" data-reveal style="--d:.05s">
+            <span class="step__num">01</span>
+            <h3 class="step__title">LISTEN</h3>
+            <p>We start with questions, not answers — understanding your world, your audience and your ambition.</p>
+          </li>
+          <li class="step" data-reveal style="--d:.15s">
+            <span class="step__num">02</span>
+            <h3 class="step__title">IMAGINE</h3>
+            <p>Concepts, moodboards and prototypes that explore everything your idea could become.</p>
+          </li>
+          <li class="step" data-reveal style="--d:.25s">
+            <span class="step__num">03</span>
+            <h3 class="step__title">CRAFT</h3>
+            <p>Design, motion and code refined in close collaboration — detail by detail, frame by frame.</p>
+          </li>
+          <li class="step" data-reveal style="--d:.35s">
+            <span class="step__num">04</span>
+            <h3 class="step__title">EVOLVE</h3>
+            <p>Launch is only the beginning. We help your brand keep growing, shifting and surprising.</p>
+          </li>
+        </ol>
+      </div>
+
+      <div class="marquee" aria-hidden="true">
+        <div class="marquee__track">
+          <span>BRAND IDENTITY</span><i>✦</i><span>CREATIVE DIRECTION</span><i>✦</i><span>WEB DESIGN</span><i>✦</i><span>WEBGL</span><i>✦</i><span>3D &amp; MOTION</span><i>✦</i><span>ART DIRECTION</span><i>✦</i><span>INTERACTIVE INSTALLATIONS</span><i>✦</i>
+        </div>
+      </div>
+    </section>
+
+    <!-- 06 — CONTACT -->
+    <section class="contact" id="contact" data-section="Contact" data-bf="0.74,0.36,0.95,-0.5,-0.22,-0.14" data-bf-m="0.72,0.18,0.75,-0.3,-0.22,-0.08">
+      <div class="wrap">
+        <p class="label" data-reveal>(04) — CONTACT</p>
+        <h2 class="contact__title" data-reveal>
+          <span class="line"><span>LET'S CREATE</span></span>
+          <span class="line"><span>SOMETHING <em>BEYOND</em></span></span>
+          <span class="line"><span>THE FORM.</span></span>
+        </h2>
+        <div class="contact__grid">
+          <a class="contact__mail" href="mailto:hello@dgd.studio" data-reveal>
+            <span class="contact__mail-label">WRITE TO US</span>
+            <span class="contact__mail-addr">hello@dgd.studio <span class="arr">↗</span></span>
+          </a>
+          <div class="contact__info glass" data-reveal style="--d:.12s">
+            <p class="eyebrow">NEW PROJECTS &amp; COLLABORATIONS</p>
+            <p>Tell us about your idea — a brand, a website, an installation or something without a name yet. We usually reply within two working days.</p>
+            <a href="mailto:hello@dgd.studio?subject=New%20project" class="pill magnetic">START A PROJECT <span class="arr">↗</span></a>
+          </div>
+        </div>
+        <ul class="socials" data-reveal>
+          <li><a href="#" target="_blank" rel="noopener">INSTAGRAM</a></li>
+          <li><a href="#" target="_blank" rel="noopener">BEHANCE</a></li>
+          <li><a href="#" target="_blank" rel="noopener">DRIBBBLE</a></li>
+          <li><a href="#" target="_blank" rel="noopener">LINKEDIN</a></li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <!-- 07 — FOOTER -->
+  <footer class="footer" id="footer" data-section="Footer" data-bf="0.5,0.5,0.62,0.1,-0.3,0" data-bf-m="0.5,0.6,0.62,0.1,-0.3,0">
+    <div class="wrap">
+      <div class="footer__grid" data-reveal>
+        <div class="footer__brand">
+          <span class="footer__logo">FORMLESS<sup>®</sup></span>
+          <p>Independent creative studio exploring the space between nature, art &amp; technology.</p>
+        </div>
+        <div class="footer__col">
+          <p class="footer__head">NAVIGATION</p>
+          <a href="#work">Work</a>
+          <a href="#studio">Studio</a>
+          <a href="#vision">Vision</a>
+          <a href="#contact">Contact</a>
+        </div>
+        <div class="footer__col">
+          <p class="footer__head">SOCIAL</p>
+          <a href="#" target="_blank" rel="noopener">Instagram</a>
+          <a href="#" target="_blank" rel="noopener">Behance</a>
+          <a href="#" target="_blank" rel="noopener">Dribbble</a>
+          <a href="#" target="_blank" rel="noopener">LinkedIn</a>
+        </div>
+        <div class="footer__col">
+          <p class="footer__head">CONTACT</p>
+          <a href="mailto:hello@dgd.studio">hello@dgd.studio</a>
+          <span>Available worldwide</span>
+        </div>
+      </div>
+      <div class="footer__bar">
+        <span>© <span class="year">2026</span> FORMLESS®. All rights reserved.</span>
+        <a href="#top" class="footer__top">BACK TO TOP <span class="arr">↑</span></a>
+      </div>
+    </div>
+    <div class="signature" data-reveal>
+      <p class="signature__text">
+        <span class="sr-only">dgd studio</span>
+        <span class="signature__letters" aria-hidden="true"><span>d</span><span>g</span><span>d</span><span class="sp"> </span><span>s</span><span>t</span><span>u</span><span>d</span><span>i</span><span>o</span></span>
+      </p>
+    </div>
+  </footer>
+
+  <script src="js/vendor/lenis.min.js"></script>
+  <script src="js/scene.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
