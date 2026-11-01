@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Solis Art — La Victoire de Samothrace</title>
+  <meta name="description" content="La Victoire de Samothrace : description de l'oeuvre, sa découverte par Charles Champoiseau et où la voir au Musée du Louvre.">
+  <meta name="theme-color" content="#000000">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23000'/%3E%3Ctext x='32' y='44' font-family='Arial' font-weight='700' font-size='34' fill='%23e9e8e0' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E">
+  <link rel="preload" href="assets/fonts/outfit-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/img/nike-01.webp" as="image" fetchpriority="high">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="is-loading">
+
+  <!-- Preloader: waits until every image is decoded so scenes never stutter -->
+  <div class="loader" aria-hidden="true">
+    <div class="loader__brand"><span>Solis</span><b>Art</b></div>
+    <div class="loader__bar"><i class="js-loader-bar"></i></div>
+    <div class="loader__count"><span class="js-loader-count">0</span>%</div>
+  </div>
+
+  <div class="progress" aria-hidden="true"><i class="js-progress"></i></div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <header class="nav">
+    <a class="nav__logo" href="#top" aria-label="Solis Art — accueil"><span>Solis</span><b>Art</b></a>
+    <nav class="nav__links" aria-label="Navigation principale">
+      <a href="#oeuvre">Oeuvres</a>
+      <a href="#chronologie">Peinture</a>
+      <a href="#description">Sculpture</a>
+      <a href="#champoiseau">Artistes</a>
+    </nav>
+    <form class="nav__search js-search" role="search">
+      <input type="search" name="q" placeholder="Rechercher..." aria-label="Rechercher sur la page" autocomplete="off">
+      <button type="submit" aria-label="Rechercher">
+        <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </button>
+    </form>
+    <button class="nav__burger js-burger" type="button" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="menu">
+      <span></span><span></span>
+    </button>
+  </header>
+
+  <div class="menu" id="menu" aria-hidden="true">
+    <nav class="menu__links" aria-label="Menu mobile">
+      <a href="#oeuvre"><small>01</small>La Victoire</a>
+      <a href="#description"><small>02</small>Description</a>
+      <a href="#champoiseau"><small>03</small>Champoiseau</a>
+      <a href="#chronologie"><small>04</small>Chronologie</a>
+      <a href="#louvre"><small>05</small>Le Louvre</a>
+    </nav>
+  </div>
+
+  <aside class="rail" aria-label="Chapitres">
+    <a href="#oeuvre" class="rail__item"><span class="rail__num">01</span><span class="rail__label">La Victoire</span><i></i></a>
+    <a href="#description" class="rail__item"><span class="rail__num">02</span><span class="rail__label">Description</span><i></i></a>
+    <a href="#champoiseau" class="rail__item"><span class="rail__num">03</span><span class="rail__label">Champoiseau</span><i></i></a>
+    <a href="#chronologie" class="rail__item"><span class="rail__num">04</span><span class="rail__label">Chronologie</span><i></i></a>
+    <a href="#louvre" class="rail__item"><span class="rail__num">05</span><span class="rail__label">Le Louvre</span><i></i></a>
+  </aside>
+
+  <main id="top">
+
+    <!-- 01 — HERO: pinned "turntable". The slide stays, the view of the statue changes as you scroll -->
+    <section class="scene hero" id="oeuvre" data-scene="hero" data-steps="4" style="--len: 5">
+      <div class="scene__sticky">
+        <div class="hero__glow" aria-hidden="true"></div>
+
+        <div class="hero__stage js-hero-stage">
+          <div class="hero__frames">
+            <img class="hero__img" src="assets/img/nike-01.webp" width="1100" height="1375" alt="La Victoire de Samothrace, vue de profil, ailes déployées" fetchpriority="high">
+            <img class="hero__img" src="assets/img/nike-02.webp" width="1100" height="1375" alt="La Victoire de Samothrace, vue de trois-quarts gauche">
+            <img class="hero__img" src="assets/img/nike-03.webp" width="1100" height="1375" alt="La Victoire de Samothrace, vue rapprochée du drapé">
+            <img class="hero__img" src="assets/img/nike-04.webp" width="1100" height="1375" alt="La Victoire de Samothrace de face, posée sur la proue du navire">
+          </div>
+          <svg class="hero__lines js-hero-lines" viewBox="0 0 100 125" aria-hidden="true"></svg>
+          <div class="hero__labels js-hero-labels" aria-hidden="true"></div>
+        </div>
+
+        <h1 class="hero__title js-split">La Victoire de Samothrace</h1>
+
+        <div class="hero__meta">
+          <div class="hero__count"><span class="js-hero-num">01</span><em>/ 04</em></div>
+          <div class="hero__caption js-hero-caption">Vue de profil</div>
+          <div class="hero__segments" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+        </div>
+
+        <div class="hero__ref">Musée du Louvre<br><span>Ma 2369</span></div>
+
+        <div class="scroll-hint" aria-hidden="true"><div class="scroll-hint__in js-hint"><span>Scroll</span><i></i></div></div>
+      </div>
+    </section>
+
+    <!-- 02 — DESCRIPTION: pinned, a slow "camera" travels over one image -->
+    <section class="scene detail" id="description" data-scene="detail" data-steps="4" style="--len: 5">
+      <div class="scene__sticky">
+        <div class="container detail__wrap">
+          <div class="detail__stage js-detail-stage">
+            <img class="detail__img js-detail-img" src="assets/img/nike-detail.webp" width="1400" height="2196" alt="La Victoire de Samothrace, détails de la sculpture">
+            <div class="detail__zoom"><span class="js-detail-zoom">×1.0</span></div>
+          </div>
+
+          <div class="detail__copy">
+            <p class="eyebrow">Chapitre 02 — L'oeuvre</p>
+            <h2 class="h2">Description de l'oeuvre</h2>
+
+            <div class="detail__texts">
+              <article class="detail__text is-active">
+                <h3>Vue d'ensemble</h3>
+                <p><strong>La Victoire de Samothrace</strong> est un monument de sculpture grecque de l'époque hellénistique trouvé dans l'île de Samothrace. Il est composé d'une statue représentant la <strong>déesse Niké (la Victoire)</strong> terminant son vol pour se poser sur la proue d'un navire de guerre.</p>
+              </article>
+              <article class="detail__text">
+                <h3>Les ailes</h3>
+                <p>Les grandes ailes déployées vers l'arrière donnent à la figure tout son élan. <strong>Seule l'aile gauche est antique</strong> : l'aile droite est une restitution en plâtre, réalisée en symétrie de l'originale.</p>
+              </article>
+              <article class="detail__text">
+                <h3>Le chitôn</h3>
+                <p>Il manque la tête et les bras. La Victoire est vêtue d'une longue tunique (chitôn) en tissu très fin. <strong>Le sculpteur a multiplié les effets de draperies</strong>, entre les endroits où le tissu est plaqué contre le corps en en révélant les formes.</p>
+              </article>
+              <article class="detail__text">
+                <h3>Les drapés</h3>
+                <p>Le vent semble plaquer l'étoffe <strong>en particulier sur le ventre</strong>, tandis qu'ailleurs elle s'accumule en plis profondément creusés d'ombre, comme entre les jambes, où le manteau s'envole derrière la déesse.</p>
+              </article>
+            </div>
+
+            <div class="detail__thumbs">
+              <button class="thumb js-thumb" type="button" data-step="1">
+                <span class="thumb__img"><img src="assets/img/crop-wing.webp" width="700" height="564" alt=""></span>
+                <span class="thumb__label">Les ailes</span>
+                <i class="thumb__bar"><b></b></i>
+              </button>
+              <button class="thumb js-thumb" type="button" data-step="2">
+                <span class="thumb__img"><img src="assets/img/crop-torso.webp" width="700" height="696" alt=""></span>
+                <span class="thumb__label">Le chitôn</span>
+                <i class="thumb__bar"><b></b></i>
+              </button>
+              <button class="thumb js-thumb" type="button" data-step="3">
+                <span class="thumb__img"><img src="assets/img/crop-drapery.webp" width="700" height="604" alt=""></span>
+                <span class="thumb__label">Les drapés</span>
+                <i class="thumb__bar"><b></b></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 — CHARLES CHAMPOISEAU -->
+    <section class="section champ" id="champoiseau">
+      <div class="container champ__grid">
+        <header class="champ__head reveal">
+          <p class="eyebrow">Chapitre 03 — Le découvreur</p>
+          <h2 class="h2">Charles Champoiseau</h2>
+        </header>
+        <p class="champ__col reveal" style="--d: .08s">
+          <strong>Charles-François-Noël Champoiseau</strong> (1er mai 1830, Tours – 29 juin 1909, Paris) est un diplomate et archéologue français. On lui doit la découverte de la Victoire de Samothrace en 1863. <strong>Alors en poste à Andrinople, il décide d'entreprendre des fouilles en Samothrace en 1862 et y fit la découverte de la Victoire de Samothrace l'année suivante.</strong>
+        </p>
+        <p class="champ__col reveal" style="--d: .16s">
+          <strong>Il l'expédia au Musée du Louvre pour en enrichir la collection</strong>, qu'il compléta encore en 1867 avec deux torses découverts à Actium. Il fait partie de la première liste des donateurs et missionnaires inscrits sur la plaque commémorative de ceux ayant le plus concouru à l'enrichissement du musée du Louvre.
+        </p>
+        <figure class="champ__portrait reveal reveal--clip" style="--d: .1s">
+          <div class="champ__frame"><img class="js-parallax" data-speed="-0.08" src="assets/img/champoiseau.webp" width="500" height="780" alt="Portrait photographique de Charles Champoiseau"></div>
+          <figcaption>Charles Champoiseau — photographie, XIX<sup>e</sup> siècle</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- Scroll-driven band -->
+    <div class="band" aria-hidden="true">
+      <div class="band__row js-band" data-speed="0.35">Samothrace — Niké — 1863 — Louvre — Samothrace — Niké — 1863 — Louvre —</div>
+      <div class="band__row band__row--ghost js-band" data-speed="-0.35">Marbre de Paros — 190 av. J.-C. — Escalier Daru — Marbre de Paros — 190 av. J.-C. —</div>
+    </div>
+
+    <!-- 04 — TIMELINE: pinned, scrolls sideways while you scroll down -->
+    <section class="scene chrono" id="chronologie" data-scene="chrono" style="--len: 5.5">
+      <div class="scene__sticky">
+        <div class="container chrono__head">
+          <div>
+            <p class="eyebrow">Chapitre 04 — Histoire</p>
+            <h2 class="h2">Chronologie</h2>
+          </div>
+          <div class="chrono__year" aria-hidden="true"><span class="js-chrono-year">190</span><em class="js-chrono-era">av. J.-C.</em></div>
+        </div>
+
+        <div class="chrono__viewport">
+          <ol class="chrono__track js-chrono-track">
+            <li class="chrono__card" data-year="190" data-era="av. J.-C.">
+              <span class="chrono__date">vers 190 av. J.-C.</span>
+              <h3>Une offrande aux Grands Dieux</h3>
+              <p>Sculptée à l'époque hellénistique, la statue est dressée dans le sanctuaire des Grands Dieux de Samothrace, probablement pour commémorer une victoire navale.</p>
+            </li>
+            <li class="chrono__card" data-year="1830">
+              <span class="chrono__date">1830</span>
+              <h3>Naissance à Tours</h3>
+              <p>Naissance de Charles Champoiseau, futur diplomate et archéologue, à Tours.</p>
+            </li>
+            <li class="chrono__card" data-year="1863">
+              <span class="chrono__date">15 avril 1863</span>
+              <h3>La découverte</h3>
+              <p>Alors en poste à Andrinople, Champoiseau met au jour à Samothrace le corps de la Victoire, brisé en de nombreux fragments.</p>
+            </li>
+            <li class="chrono__card" data-year="1864">
+              <span class="chrono__date">1864</span>
+              <h3>Arrivée à Paris</h3>
+              <p>Les fragments de la statue rejoignent les collections du Musée du Louvre.</p>
+            </li>
+            <li class="chrono__card" data-year="1879">
+              <span class="chrono__date">1879</span>
+              <h3>Le navire</h3>
+              <p>Champoiseau retourne à Samothrace et fait expédier à Paris les blocs de marbre gris formant la proue du navire.</p>
+            </li>
+            <li class="chrono__card" data-year="1884">
+              <span class="chrono__date">1884</span>
+              <h3>L'escalier Daru</h3>
+              <p>Réunie à sa base, la Victoire est installée au sommet de l'escalier Daru, où elle domine toujours la perspective.</p>
+            </li>
+            <li class="chrono__card" data-year="1950">
+              <span class="chrono__date">1950</span>
+              <h3>La main droite</h3>
+              <p>Des fouilles à Samothrace mettent au jour la main droite de la statue, aujourd'hui présentée dans une vitrine voisine.</p>
+            </li>
+            <li class="chrono__card" data-year="2014">
+              <span class="chrono__date">2014</span>
+              <h3>Restaurée</h3>
+              <p>Après une restauration de près d'un an, la Victoire retrouve, lumineuse, le haut de l'escalier Daru.</p>
+            </li>
+          </ol>
+        </div>
+
+        <div class="container chrono__foot">
+          <div class="chrono__line"><i class="js-chrono-line"></i></div>
+          <span class="chrono__hint">Faites défiler</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 05 — LOUVRE: pinned, the camera pulls back over the Cour Napoléon -->
+    <section class="scene louvre" id="louvre" data-scene="louvre" style="--len: 3.2">
+      <div class="scene__sticky">
+        <div class="louvre__bg js-louvre-bg">
+          <img src="assets/img/louvre-night.webp" width="1920" height="1280" alt="La pyramide et la cour Napoléon du Louvre, la nuit">
+        </div>
+        <div class="louvre__shade js-louvre-shade" aria-hidden="true"></div>
+        <div class="louvre__fade" aria-hidden="true"></div>
+
+        <div class="container louvre__content">
+          <figure class="louvre__photo js-louvre-photo">
+            <img src="assets/img/louvre-square.webp" width="896" height="900" alt="La pyramide du Louvre et ses reflets sur le pavé mouillé">
+          </figure>
+          <div class="louvre__text js-louvre-text">
+            <p class="eyebrow">Chapitre 05 — Visite</p>
+            <h2 class="h2">Où retrouver l'oeuvre ?</h2>
+            <p>Il est donc possible de retrouver cette oeuvre au Musée du Louvre à Paris, la statue est exposée en haut de l'escalier principal.</p>
+            <dl class="louvre__facts">
+              <div><dt>Lieu</dt><dd>Aile Denon, escalier Daru</dd></div>
+              <div><dt>Ville</dt><dd>Paris, 1<sup>er</sup> arr.</dd></div>
+              <div><dt>Inventaire</dt><dd>Ma 2369</dd></div>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__grid">
+      <div class="footer__col reveal">
+        <h4>Contactez nous</h4>
+        <a href="mailto:contact@solisart.fr">contact@solisart.fr</a>
+      </div>
+      <div class="footer__col reveal" style="--d: .08s">
+        <h4>Catégories</h4>
+        <ul class="footer__cats">
+          <li><a href="#oeuvre">Oeuvres</a></li>
+          <li><a href="#description">Sculpture</a></li>
+          <li><a href="#chronologie">Peinture</a></li>
+          <li><a href="#champoiseau">Artistes</a></li>
+        </ul>
+      </div>
+      <div class="footer__col reveal" style="--d: .16s">
+        <h4>Social</h4>
+        <ul class="footer__social">
+          <li><a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" aria-label="Facebook">FB</a></li>
+          <li><a href="https://x.com/" target="_blank" rel="noopener noreferrer" aria-label="Twitter / X">TW</a></li>
+          <li><a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">IG</a></li>
+          <li><a href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer" aria-label="YouTube">YT</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="container footer__credits">
+      Photographies via Wikimedia Commons, détourées et retouchées : domaine public ; Livioandronico2013 et Lyokoï88 (CC BY-SA 4.0) ; kuhnmi (CC BY 2.0) ; Shubhagata Sengupta (CC0). Détails dans <a href="CREDITS.md">CREDITS.md</a>.
+    </p>
+
+    <div class="signature">
+      <span class="signature__rule" aria-hidden="true"></span>
+      <p class="signature__text js-split-sign">dgd project</p>
+    </div>
+  </footer>
+
+  <script src="assets/js/vendor/lenis.min.js"></script>
+  <script src="assets/js/main.js"></script>
+</body>
+</html>
