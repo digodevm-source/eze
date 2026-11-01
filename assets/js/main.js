@@ -125,25 +125,25 @@
 
   /* ---------- 01 Hero: turntable with call-outs ---------- */
 
-  const HERO_CAPTIONS = ['Vue de profil', 'Trois-quarts gauche', 'Le drapé', 'Sur la proue'];
+  const HERO_CAPTIONS = ['Side view', 'Three-quarter left', 'The drapery', 'On the prow'];
   // a = anchor on the statue, e = elbow, x = end of the horizontal stroke.
   // Units follow the stage viewBox (0–100 wide, 0–125 high).
   const HERO_CALLOUTS = [
     [
-      { a: [77, 30], e: [87, 17], x: 99, t: '5,12 m', s: 'hauteur avec le navire' },
-      { a: [33, 22], e: [24, 38], x: 2, t: 'marbre blanc de Paros' },
+      { a: [77, 30], e: [87, 17], x: 99, t: '5.12 m', s: 'height with the ship' },
+      { a: [33, 22], e: [24, 38], x: 2, t: 'white Parian marble' },
     ],
     [
       { a: [53, 72], e: [66, 83], x: 99, t: '30 tonnes' },
-      { a: [21, 86], e: [11, 96], x: 0, t: '6 blocs de marbre' },
+      { a: [21, 86], e: [11, 96], x: 0, t: '6 blocks of marble' },
     ],
     [
-      { a: [72, 13], e: [83, 26], x: 100, t: 'vers 190 av. J.-C.', s: 'époque hellénistique' },
-      { a: [19, 80], e: [9, 91], x: 0, t: 'Île de Samothrace', s: 'mer Égée' },
+      { a: [72, 13], e: [83, 26], x: 100, t: 'c. 190 BC', s: 'Hellenistic period' },
+      { a: [19, 80], e: [9, 91], x: 0, t: 'Island of Samothrace', s: 'Aegean Sea' },
     ],
     [
-      { a: [62, 86], e: [76, 97], x: 99, t: 'Proue de navire', s: 'marbre gris de Lartos' },
-      { a: [37, 30], e: [24, 41], x: 1, t: 'Escalier Daru', s: 'Musée du Louvre' },
+      { a: [62, 86], e: [76, 97], x: 99, t: "Ship's prow", s: 'grey Lartos marble' },
+      { a: [37, 30], e: [24, 41], x: 1, t: 'Daru staircase', s: 'Louvre Museum' },
     ],
   ];
 
@@ -691,7 +691,7 @@
     menuOpen = open;
     body.classList.toggle('menu-open', open);
     burger.setAttribute('aria-expanded', String(open));
-    burger.setAttribute('aria-label', open ? 'Fermer le menu' : 'Ouvrir le menu');
+    burger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
     menu.setAttribute('aria-hidden', String(!open));
     if (lenis) (open ? lenis.stop() : lenis.start());
   }
@@ -719,11 +719,11 @@
   });
 
   const SEARCH = [
-    [/champ|d[ée]couv|arch[ée]o|diplomat|artiste|andrinople|tours/i, 'champoiseau'],
-    [/chrono|histoire|date|\b1[89]\d\d\b|\b20\d\d\b|restaur/i, 'chronologie'],
-    [/louvre|mus[ée]e|paris|visite|daru|pyramide|o[uù] /i, 'louvre'],
-    [/descr|aile|drap|chit|tunique|ventre|jambe/i, 'description'],
-    [/victoire|nik[ée]|samothrace|statue|oeuvre|œuvre|sculpt|marbre|paros/i, 'oeuvre'],
+    [/champ|discover|found|archaeolog|diplomat|artist|adrianople|tours/i, 'champoiseau'],
+    [/timeline|history|date|year|\b1[89]\d\d\b|\b20\d\d\b|restor/i, 'chronologie'],
+    [/louvre|museum|paris|visit|daru|pyramid|where|location/i, 'louvre'],
+    [/descr|wing|drap|chiton|tunic|belly|leg|fabric|cloth/i, 'description'],
+    [/victory|nike|samothrace|statue|work|art|sculpt|marble|paros/i, 'oeuvre'],
   ];
   const searchForm = $('.js-search');
   searchForm.addEventListener('submit', (e) => {
