@@ -33,7 +33,7 @@
   $$('a[href^="#"]').forEach(function (a) {
     a.addEventListener('click', function (e) {
       var id = a.getAttribute('href');
-      if (id === '#') return;
+      if (id === '#') { e.preventDefault(); return; }
       var target = id === '#top' ? 0 : $(id);
       if (target === null) return;
       e.preventDefault();
