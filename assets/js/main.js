@@ -1,10 +1,11 @@
 /* ==========================================================================
    Solis Art — scroll engine
-   - Lenis gives the page its soft, inertial scroll.
-   - One requestAnimationFrame loop reads the scroll position once per frame
-     and drives every pinned scene from cached measurements (no layout reads
-     while scrolling, only transform / opacity writes).
-   - Stepped scenes "hold" on each slide and gently snap to the closest one
+   - Lenis gives mouse / trackpad scrolling its soft inertia.
+   - On top of that every scene eases toward the scroll position (critically
+     damped), so finger scrolling on phones and tablets feels just as soft.
+   - One requestAnimationFrame loop drives every pinned scene from cached
+     measurements: no layout reads while scrolling, only transform / opacity.
+   - Stepped scenes "hold" on each slide and gently settle on the closest one
      when you stop halfway, so you always land on a clean image.
    ========================================================================== */
 (() => {
@@ -24,11 +25,12 @@
   };
   const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
   const easeInOutCubic = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  const easeInOutSine = (t) => -(Math.cos(Math.PI * t) - 1) / 2;
 
   /* ------------------------------------------------------------------------
      Stepped progress: every step owns an equal slice of the scene. Within
-     a slice the picture rests ("holds") and only blends to the next step in
-     the middle of the scroll between two steps.
+     a slice the picture rests ("holds") and only changes in the middle of
+     the scroll between two steps.
      ------------------------------------------------------------------------ */
   const HOLD = 0.46;
   function stepped(p, n, hold = HOLD) {
@@ -48,10 +50,10 @@
   let lenis = null;
   if (!reduceMotion && typeof window.Lenis === 'function') {
     lenis = new window.Lenis({
-      lerp: 0.085,
-      wheelMultiplier: 0.9,
+      lerp: 0.07,
+      wheelMultiplier: 0.85,
       smoothWheel: true,
-      syncTouch: false, // native touch momentum feels best on phones
+      syncTouch: false, // keep native touch momentum; scenes are damped instead
     });
     lenis.stop();
   }
@@ -66,6 +68,11 @@
       window.scrollTo({ top, behavior: reduceMotion ? 'auto' : 'smooth' });
     }
   }
+
+  // How long scenes take to catch up with the scroll (seconds). Touch input
+  // has no Lenis smoothing, so it gets a softer follow.
+  let inputIsTouch = false;
+  const followTime = () => (reduceMotion ? 0 : inputIsTouch ? 0.17 : 0.08);
 
   /* ------------------------------------------------------------------------
      Text splitting (title + signature)
@@ -91,8 +98,7 @@
       }
       el.append(w);
       if (wi < words.length - 1) {
-        const space = document.createTextNode(' ');
-        el.append(space);
+        el.append(document.createTextNode(' '));
         i++;
       }
     });
@@ -113,7 +119,9 @@
       top: 0,
       height: 0,
       dist: 1,
-      p: -1,
+      cur: null, // damped progress
+      p: -1, // last rendered progress
+      force: true,
       n: Number(el.dataset.steps) || 0,
       measure: null,
       update: null,
@@ -123,27 +131,26 @@
     return scene;
   }
 
-  /* ---------- 01 Hero: turntable with call-outs ---------- */
+  /* ---------- 01 Hero: one slide, the view changes through darkness ---------- */
 
-  const HERO_CAPTIONS = ['Side view', 'Three-quarter left', 'The drapery', 'On the prow'];
   // a = anchor on the statue, e = elbow, x = end of the horizontal stroke.
   // Units follow the stage viewBox (0–100 wide, 0–125 high).
   const HERO_CALLOUTS = [
     [
-      { a: [77, 30], e: [87, 17], x: 99, t: '5.12 m', s: 'height with the ship' },
-      { a: [33, 22], e: [24, 38], x: 2, t: 'white Parian marble' },
+      { a: [82, 22], e: [91, 11], x: 99, t: '5.12 m', s: 'height with the ship' },
+      { a: [30, 22], e: [20, 40], x: 3, t: 'white Parian marble' },
     ],
     [
-      { a: [53, 72], e: [66, 83], x: 99, t: '30 tonnes' },
-      { a: [21, 86], e: [11, 96], x: 0, t: '6 blocks of marble' },
+      { a: [55, 72], e: [68, 84], x: 99, t: '30 tonnes' },
+      { a: [20, 88], e: [8, 98], x: 0, t: '6 blocks of marble' },
     ],
     [
       { a: [72, 13], e: [83, 26], x: 100, t: 'c. 190 BC', s: 'Hellenistic period' },
       { a: [19, 80], e: [9, 91], x: 0, t: 'Island of Samothrace', s: 'Aegean Sea' },
     ],
     [
-      { a: [62, 86], e: [76, 97], x: 99, t: "Ship's prow", s: 'grey Lartos marble' },
-      { a: [37, 30], e: [24, 41], x: 1, t: 'Daru staircase', s: 'Louvre Museum' },
+      { a: [58, 88], e: [72, 97], x: 99, t: "Ship's prow", s: 'grey Lartos marble' },
+      { a: [34, 22], e: [22, 36], x: 1, t: 'Daru staircase', s: 'Louvre Museum' },
     ],
   ];
 
@@ -155,10 +162,6 @@
     const stage = $('.js-hero-stage', el);
     const svg = $('.js-hero-lines', el);
     const labelsBox = $('.js-hero-labels', el);
-    const num = $('.js-hero-num', el);
-    const caption = $('.js-hero-caption', el);
-    const segs = $$('.hero__segments i', el);
-    const hint = $('.js-hint', el);
     const NS = 'http://www.w3.org/2000/svg';
 
     const groups = HERO_CALLOUTS.map((list) =>
@@ -188,9 +191,7 @@
       })
     );
 
-    let lastIdx = 0;
-    let swapTimer = 0;
-    const imgState = imgs.map(() => ({ o: -1, hidden: false }));
+    const hidden = imgs.map(() => false);
 
     s.measure = () => {
       // ~1 screen pixel, whatever the stage size
@@ -216,31 +217,46 @@
     s.update = (p) => {
       const st = stepped(p, s.n);
 
-      // Images: cross-fade between views + a slow continuous "camera push"
+      // Images: the current view drifts closer and fades to black, then the
+      // next one emerges from the dark. The two never overlap, so there is
+      // no ghosting between different photographs.
       for (let k = 0; k < imgs.length; k++) {
         const img = imgs[k];
-        const state = imgState[k];
-        const o = clamp(1 - Math.abs(st.t - k));
-        if (o < 0.002) {
-          if (!state.hidden) {
+        const d = st.t - k; // 0 = this view is on screen
+        let o;
+        let sc;
+        let ty;
+        if (d >= 0) {
+          const f = easeInOutSine(clamp(d / 0.55));
+          o = 1 - f;
+          sc = 1 + 0.12 * f;
+          ty = -1.5 * f;
+        } else {
+          const f = easeInOutSine(clamp(-d / 0.55));
+          o = 1 - f;
+          sc = 1 - 0.07 * f;
+          ty = 2.5 * f;
+        }
+        if (o < 0.003) {
+          if (!hidden[k]) {
             img.style.opacity = '0';
             img.style.visibility = 'hidden';
-            state.hidden = true;
-            state.o = 0;
+            hidden[k] = true;
           }
           continue;
         }
-        if (state.hidden) {
+        if (hidden[k]) {
           img.style.visibility = '';
-          state.hidden = false;
+          hidden[k] = false;
         }
-        const d = clamp(st.raw - k, -1, 1) * MOTION;
+        // a slow, continuous push-in while resting on a view
+        const drift = clamp(st.raw - k, -0.5, 0.5) * MOTION;
+        sc *= 1 + drift * 0.04;
         img.style.opacity = o.toFixed(4);
-        img.style.transform = `translate3d(0, ${(-d * 1.4).toFixed(3)}%, 0) scale(${(1 + d * 0.05).toFixed(4)})`;
-        state.o = o;
+        img.style.transform = `translate3d(0, ${(ty * MOTION).toFixed(3)}%, 0) scale(${(1 + (sc - 1) * MOTION).toFixed(4)})`;
       }
 
-      // Call-outs: draw in on their own slide only
+      // Call-outs: draw in on their own view only
       for (let k = 0; k < groups.length; k++) {
         let v = clamp(1 - Math.abs(st.t - k) * 2.6);
         if (k === 0) v *= heroIntro;
@@ -259,23 +275,6 @@
           c.lab.style.transform = `translate(${c.tx}, calc(${c.ty} + ${((1 - lo) * 10).toFixed(2)}px))`;
         }
       }
-
-      for (let k = 0; k < segs.length; k++) {
-        segs[k].style.setProperty('--f', clamp(p * s.n - k).toFixed(3));
-      }
-
-      if (hint) hint.style.opacity = (1 - smoothstep(0.01, 0.06, p)).toFixed(3);
-
-      if (st.idx !== lastIdx) {
-        lastIdx = st.idx;
-        num.textContent = String(st.idx + 1).padStart(2, '0');
-        caption.classList.add('is-swap');
-        clearTimeout(swapTimer);
-        swapTimer = setTimeout(() => {
-          caption.textContent = HERO_CAPTIONS[lastIdx];
-          caption.classList.remove('is-swap');
-        }, 220);
-      }
     };
   });
 
@@ -288,7 +287,6 @@
     const texts = $$('.detail__text', el);
     const thumbs = $$('.js-thumb', el);
     const bars = thumbs.map((t) => $('.thumb__bar b', t));
-    const zoomEl = $('.js-detail-zoom', el);
 
     const IW = 1400;
     const IH = 2196;
@@ -305,7 +303,6 @@
     let W = 1;
     let H = 1;
     let s0 = 1;
-    let lastZoom = '';
     let lastActive = -1;
 
     s.measure = () => {
@@ -351,12 +348,6 @@
         thumbs.forEach((t, j) => t.classList.toggle('is-active', j + 1 === st.idx));
         texts.forEach((t, k) => t.setAttribute('aria-hidden', k === st.idx ? 'false' : 'true'));
       }
-
-      const zt = `×${z.toFixed(1)}`;
-      if (zt !== lastZoom) {
-        lastZoom = zt;
-        zoomEl.textContent = zt;
-      }
     };
 
     thumbs.forEach((t) => {
@@ -367,7 +358,7 @@
     });
   });
 
-  /* ---------- 04 Chronologie: horizontal track ---------- */
+  /* ---------- 04 Timeline: horizontal track, continuous glide ---------- */
 
   addScene($('#chronologie'), (s) => {
     const el = s.el;
@@ -375,7 +366,6 @@
     const cards = $$('.chrono__card', el);
     const yearEl = $('.js-chrono-year', el);
     const eraEl = $('.js-chrono-era', el);
-    const line = $('.js-chrono-line', el);
 
     let centers = [];
     let shift = 0;
@@ -392,11 +382,9 @@
     };
 
     s.update = (p) => {
-      // each date rests for a moment before the track glides to the next one
-      const q = stepped(p, cards.length, 0.32).t / (cards.length - 1);
+      const q = easeInOutSine(clamp((p - 0.04) / 0.92));
       const x = -q * shift;
       track.style.transform = `translate3d(${x.toFixed(2)}px, 0, 0)`;
-      line.style.transform = `scaleX(${q.toFixed(4)})`;
 
       let nearest = 0;
       let best = Infinity;
@@ -437,37 +425,30 @@
     const text = $('.js-louvre-text', el);
 
     s.update = (p) => {
-      const z = lerp(1.38, 1, easeOutCubic(clamp(p / 0.85)));
+      const z = lerp(1.3, 1, easeOutCubic(clamp(p / 0.9)));
       bg.style.transform = `scale(${z.toFixed(4)})`;
-      shade.style.opacity = lerp(0.96, 0.12, smoothstep(0, 0.78, p)).toFixed(3);
+      shade.style.opacity = lerp(0.96, 0.12, easeInOutSine(clamp(p / 0.8))).toFixed(3);
 
-      const o1 = smoothstep(0.06, 0.36, p);
+      const o1 = easeInOutSine(clamp((p - 0.06) / 0.34));
       photo.style.opacity = o1.toFixed(3);
-      photo.style.transform = `translate3d(0, ${((1 - o1) * 70).toFixed(2)}px, 0) scale(${lerp(0.92, 1, o1).toFixed(4)})`;
+      photo.style.transform = `translate3d(0, ${((1 - o1) * 60).toFixed(2)}px, 0) scale(${lerp(0.94, 1, o1).toFixed(4)})`;
 
-      const o2 = smoothstep(0.14, 0.44, p);
+      const o2 = easeInOutSine(clamp((p - 0.14) / 0.34));
       text.style.opacity = o2.toFixed(3);
-      text.style.transform = `translate3d(0, ${((1 - o2) * 46).toFixed(2)}px, 0)`;
+      text.style.transform = `translate3d(0, ${((1 - o2) * 40).toFixed(2)}px, 0)`;
     };
   });
 
   /* ------------------------------------------------------------------------
-     Parallax (portrait, band) — cached positions, transform only
+     Portrait parallax — cached position, damped, transform only
      ------------------------------------------------------------------------ */
-  const parallax = [
-    ...$$('.js-parallax').map((el) => ({ el, anchor: el.parentElement, axis: 'y', speed: Number(el.dataset.speed) || 0 })),
-    ...$$('.js-band').map((el) => ({ el, anchor: el.parentElement, axis: 'x', speed: Number(el.dataset.speed) || 0 })),
-  ];
-
-  /* ------------------------------------------------------------------------
-     Chapter rail + page progress
-     ------------------------------------------------------------------------ */
-  const railItems = $$('.rail__item');
-  const railTargets = railItems.map((a) => $(a.getAttribute('href')));
-  let railTops = [];
-  let railActive = -1;
-  const progressBar = $('.js-progress');
-  let maxScroll = 1;
+  const parallax = $$('.js-parallax').map((el) => ({
+    el,
+    anchor: el.parentElement,
+    speed: Number(el.dataset.speed) || 0,
+    cur: null,
+    last: null,
+  }));
 
   /* ------------------------------------------------------------------------
      Measure (only on load / resize — never while scrolling)
@@ -483,63 +464,69 @@
       s.height = s.el.offsetHeight;
       s.dist = Math.max(1, s.height - s.sticky.offsetHeight);
       if (s.measure) s.measure();
-      s.p = -1;
+      s.force = true;
     }
 
     for (const it of parallax) {
       const r = it.anchor.getBoundingClientRect();
       it.top = r.top + y;
       it.h = r.height;
-      it.range = it.axis === 'y' ? r.height * 0.075 : Infinity;
+      it.range = r.height * 0.075;
     }
 
-    railTops = railTargets.map((t) => (t ? t.getBoundingClientRect().top + y : 0));
-    maxScroll = Math.max(1, document.documentElement.scrollHeight - vh);
     needsRender = true;
   }
 
   /* ------------------------------------------------------------------------
-     Render (once per frame, only when the scroll moved)
+     Render: once per frame, while the scroll moves or a scene is settling
      ------------------------------------------------------------------------ */
   let needsRender = true;
 
-  function render(scroll) {
+  function render(scroll, dt) {
+    const tau = followTime();
+    const a = tau > 0 ? 1 - Math.exp(-dt / tau) : 1;
+    let settling = false;
+
     for (const s of scenes) {
-      if (scroll < s.top - vh || scroll > s.top + s.height) continue; // off-screen
-      const p = clamp((scroll - s.top) / s.dist);
-      if (p === s.p) continue;
-      s.p = p;
-      s.update(p);
+      const target = clamp((scroll - s.top) / s.dist);
+      if (s.cur === null) s.cur = target;
+      else {
+        s.cur += (target - s.cur) * a;
+        if (Math.abs(target - s.cur) < 0.00004) s.cur = target;
+        else settling = true;
+      }
+      const onScreen = scroll > s.top - vh * 1.2 && scroll < s.top + s.height + vh * 0.2;
+      if (!onScreen && !s.force) continue;
+      if (s.cur === s.p && !s.force) continue;
+      s.force = false;
+      s.p = s.cur;
+      s.update(s.cur);
     }
 
     for (const it of parallax) {
-      if (scroll + vh < it.top - 200 || scroll > it.top + it.h + 200) continue;
-      const delta = it.top + it.h / 2 - (scroll + vh / 2);
-      let v = delta * it.speed * MOTION;
-      if (it.axis === 'y') {
-        v = clamp(v, -it.range, it.range);
-        it.el.style.transform = `translate3d(0, ${v.toFixed(2)}px, 0)`;
-      } else {
-        it.el.style.transform = `translate3d(${v.toFixed(2)}px, 0, 0)`;
+      const target = clamp((it.top + it.h / 2 - (scroll + vh / 2)) * it.speed * MOTION, -it.range, it.range);
+      if (it.cur === null) it.cur = target;
+      else {
+        it.cur += (target - it.cur) * a;
+        if (Math.abs(target - it.cur) < 0.05) it.cur = target;
+        else settling = true;
+      }
+      if (it.cur !== it.last) {
+        it.last = it.cur;
+        it.el.style.transform = `translate3d(0, ${it.cur.toFixed(2)}px, 0)`;
       }
     }
 
-    progressBar.style.transform = `scaleX(${clamp(scroll / maxScroll).toFixed(4)})`;
-
-    let active = 0;
-    for (let k = 0; k < railTops.length; k++) if (scroll + vh * 0.5 >= railTops[k]) active = k;
-    if (active !== railActive) {
-      railActive = active;
-      railItems.forEach((a, k) => a.classList.toggle('is-active', k === active));
-    }
+    return settling;
   }
 
   /* ------------------------------------------------------------------------
-     Soft snap: when you stop between two slides of a stepped scene, glide
-     to the nearest one so the picture is never left half-blended.
+     Soft settle: when you stop between two slides of a stepped scene, glide
+     to the nearest one so the picture is never left half-way.
      ------------------------------------------------------------------------ */
   let touching = false;
   let menuOpen = false;
+  let settlingTo = false;
 
   function trySnap(scroll) {
     if (!lenis || touching || menuOpen || reduceMotion) return;
@@ -551,17 +538,34 @@
       if (Math.abs(raw - nearest) < HOLD / 2) return; // already on a slide
       const target = s.top + ((nearest + 0.5) / s.n) * s.dist;
       const distance = Math.abs(target - scroll);
+      settlingTo = true;
       lenis.scrollTo(target, {
-        duration: clamp(distance / 900, 0.55, 1.1),
-        easing: easeInOutCubic,
+        duration: clamp(distance / 700, 0.7, 1.3),
+        easing: easeInOutSine,
+        onComplete: () => {
+          settlingTo = false;
+        },
       });
       return;
     }
   }
 
-  window.addEventListener('touchstart', () => { touching = true; }, { passive: true });
+  window.addEventListener(
+    'touchstart',
+    () => {
+      touching = true;
+      inputIsTouch = true;
+      // a new touch always wins over a settle animation
+      if (settlingTo && lenis) {
+        settlingTo = false;
+        lenis.scrollTo(window.scrollY, { immediate: true, force: true });
+      }
+    },
+    { passive: true }
+  );
   window.addEventListener('touchend', () => { touching = false; }, { passive: true });
   window.addEventListener('touchcancel', () => { touching = false; }, { passive: true });
+  window.addEventListener('wheel', () => { inputIsTouch = false; }, { passive: true });
 
   /* ------------------------------------------------------------------------
      Preloader — decode every image before the show starts
@@ -622,9 +626,12 @@
      ------------------------------------------------------------------------ */
   let lastScroll = -1;
   let lastMoveAt = 0;
+  let lastNow = 0;
   let idleHandled = true;
 
   function loop(now) {
+    const dt = lastNow ? Math.min(0.05, (now - lastNow) / 1000) : 1 / 60;
+    lastNow = now;
     if (lenis) lenis.raf(now);
 
     if (!started) {
@@ -635,20 +642,20 @@
 
     if (started && heroIntro < 1) {
       heroIntro = easeInOutCubic(clamp((now - introStart - 900) / 1500));
-      hero.p = -1;
+      hero.force = true;
       needsRender = true;
     }
 
     const scroll = getScroll();
-    if (scroll !== lastScroll || needsRender) {
-      if (scroll !== lastScroll) {
-        lastMoveAt = now;
-        idleHandled = false;
-      }
+    const moved = scroll !== lastScroll;
+    if (moved) {
+      lastMoveAt = now;
+      idleHandled = false;
       lastScroll = scroll;
-      needsRender = false;
-      if (started) render(scroll);
-    } else if (!idleHandled && now - lastMoveAt > 240) {
+    }
+    if (started && (moved || needsRender)) {
+      needsRender = render(scroll, dt);
+    } else if (!idleHandled && now - lastMoveAt > 260) {
       idleHandled = true;
       trySnap(scroll);
     }
@@ -679,7 +686,22 @@
     },
     { rootMargin: '0px 0px -10% 0px', threshold: 0.12 }
   );
-  $$('.reveal, .signature').forEach((el) => io.observe(el));
+  $$('.reveal').forEach((el) => io.observe(el));
+
+  // The signature sits at the very bottom of the page, so it reveals as soon
+  // as any part of it is on screen.
+  const signIo = new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting) {
+          e.target.classList.add('is-in');
+          signIo.unobserve(e.target);
+        }
+      }
+    },
+    { threshold: 0 }
+  );
+  $$('.signature').forEach((el) => signIo.observe(el));
 
   /* ------------------------------------------------------------------------
      Navigation: anchors, menu, search
