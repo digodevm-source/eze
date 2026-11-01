@@ -709,7 +709,13 @@
     e.preventDefault();
     if (menuOpen) setMenu(false);
     scrollToY(target, 1.8);
-    if (id && id !== 'top') history.replaceState(null, '', `#${id}`);
+    if (id && id !== 'top') {
+      try {
+        history.replaceState(null, '', `#${id}`);
+      } catch (err) {
+        /* some embedded frames refuse history changes; scrolling still works */
+      }
+    }
   });
 
   const SEARCH = [
