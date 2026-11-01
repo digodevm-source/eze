@@ -153,7 +153,8 @@
     '  float v1 = vein(t * 5.5 + wob, 0.03);',
     '  float v2 = vein(t * 11.0 + wob * 1.7 + 0.5, 0.045) * smoothstep(0.22, 0.5, s);',
     '  float v3 = vein(t * 23.0 + wob * 2.6 + 0.25 + 0.25 * sin(s * 13.0 + seed), 0.06) * smoothstep(0.45, 0.8, s);',
-    '  float veins = (v1 + v2 * 0.55 + v3 * 0.28) * (1.0 - 0.5 * smoothstep(0.9, 1.0, s));',
+    '  float veins = (v1 + v2 * 0.55 + v3 * 0.28) * (1.0 - 0.5 * smoothstep(0.9, 1.0, s)) * smoothstep(0.04, 0.22, s);',
+    '  float baseSoft = smoothstep(0.03, 0.3, s);',
     '  float frost = vnoise(vec2(t * 26.0, s * 34.0) + seed) * vnoise(vec2(t * 61.0, s * 83.0) - seed);',
     '  float folds = 0.5 + 0.5 * sin(t * 9.0 + wob * 6.0 + seed);',
     '  vec3 Lg = normalize(vec3(-0.45, 0.65, 0.62));',
@@ -169,10 +170,10 @@
     '  vec3 col = deep * (0.16 + 0.14 * diff) * body;',
     '  col += milk * (0.025 + 0.05 * folds * folds) * (1.0 - 0.5 * s);',
     '  col += ice * fres * 0.95;',
-    '  col += milk * rimSoft * rimSoft * 0.26;',
-    '  col += vec3(0.86, 0.93, 1.0) * rimLine * 1.0;',
+    '  col += milk * rimSoft * rimSoft * 0.26 * baseSoft;',
+    '  col += vec3(0.86, 0.93, 1.0) * rimLine * baseSoft;',
     '  col += mix(ice, milk, 0.7) * veins * (0.22 + 0.42 * (1.0 - s));',
-    '  col += warm * core * 0.75;',
+    '  col += warm * core * 0.45;',
     '  col += milk * spec * 0.7;',
     '  col += ice * frost * 0.08;',
     '  col += vec3(0.22, 0.08, 0.32) * fres * 0.25 * (0.5 + 0.5 * sin(t * 6.0 + s * 4.0 + uAnim.x * 0.4));',
@@ -219,9 +220,8 @@
     '    col *= fade;',
     '  } else {',
     '    float core = 1.0 - a * a;',
-    '    float tip = smoothstep(0.86, 1.0, along);',
-    '    col = mix(ice, white, 0.5 + 0.5 * tip) * core * (0.7 + 0.8 * tip);',
-    '    col *= smoothstep(0.0, 0.25, along);',
+    '    col = mix(ice, white, 0.45) * core * 0.75;',
+    '    col *= smoothstep(0.0, 0.25, along) * (1.0 - smoothstep(0.55, 1.0, along));',
     '  }',
     '  o = vec4(col * aa * vD.z, 0.0);',
     '}'
@@ -249,7 +249,7 @@
     NOISE,
     'void main(){',
     '  float r = length(vUv);',
-    '  float g = exp(-r * r * 70.0) * 1.05 + exp(-r * r * 16.0) * 0.26 + exp(-r * 4.5) * 0.07;',
+    '  float g = exp(-r * r * 38.0) * 0.62 + exp(-r * r * 12.0) * 0.26 + exp(-r * 4.5) * 0.07;',
     '  vec2 p = vUv * 9.0 + uSeed * 3.7;',
     '  vec2 ip = floor(p); vec2 fp = fract(p);',
     '  float f1 = 8.0;',
@@ -263,32 +263,8 @@
     '  float bub = (1.0 - smoothstep(0.0, 0.16, f1)) * (1.0 - smoothstep(0.08, 0.3, r));',
     '  float shell = smoothstep(0.1, 0.3, f1) * (1.0 - smoothstep(0.12, 0.3, r)) * 0.25;',
     '  vec3 warm = vec3(1.0, 0.95, 0.88); vec3 ice = vec3(0.48, 0.66, 1.0);',
-    '  vec3 col = mix(ice, warm, exp(-r * r * 20.0)) * g + warm * bub * 0.45 + ice * shell * 0.3;',
+    '  vec3 col = mix(ice, warm, exp(-r * r * 14.0) * 0.8) * g + warm * bub * 0.3 + ice * shell * 0.3;',
     '  o = vec4(col * uGain * (1.0 - smoothstep(0.8, 1.0, r)), 0.0);',
-    '}'
-  ].join('\n');
-
-  var PEARL_FS = [
-    '#version 300 es',
-    'precision highp float;',
-    'in vec2 vUv;',
-    'uniform float uGain;',
-    'out vec4 o;',
-    'void main(){',
-    '  float r2 = dot(vUv, vUv);',
-    '  float fw = fwidth(r2);',
-    '  float a = 1.0 - smoothstep(1.0 - fw * 1.5, 1.0, r2);',
-    '  if (a <= 0.0) discard;',
-    '  vec3 n = vec3(vUv, sqrt(max(0.0, 1.0 - r2)));',
-    '  vec3 L = normalize(vec3(-0.45, 0.62, 0.65));',
-    '  float diff = max(dot(n, L), 0.0);',
-    '  float spec = pow(max(dot(reflect(-L, n), vec3(0.0, 0.0, 1.0)), 0.0), 30.0);',
-    '  float fres = pow(1.0 - n.z, 2.0);',
-    '  vec3 base = mix(vec3(0.42, 0.50, 0.78), vec3(0.86, 0.85, 0.98), diff);',
-    '  vec3 irid = 0.5 + 0.5 * cos(6.2831 * (vec3(0.0, 0.33, 0.67) + n.x * 0.55 + n.y * 0.35 + 0.15));',
-    '  vec3 col = base * (0.3 + 0.7 * diff) + irid * fres * 0.4 + vec3(1.0) * spec * 1.25 + vec3(0.6, 0.75, 1.0) * fres * 0.45;',
-    '  col += vec3(1.0, 0.86, 0.82) * smoothstep(0.1, -0.9, n.y) * 0.35;',
-    '  o = vec4(col * a * uGain, a * 0.97 * uGain);',
     '}'
   ].join('\n');
 
@@ -506,6 +482,7 @@
     this.yaw = 0; this.pitch = -0.2; this.roll = 0;
     this.tYaw = 0; this.tPitch = -0.2; this.tRoll = 0;
     this.phase = r() * TAU;
+    this.freq = 1.05;
     this.lastPhi = 0;
     this.flex = 0;
     this.glide = 1;
@@ -551,8 +528,8 @@
 
   Butterfly.prototype.update = function (t, dt, env) {
     // Spring motion towards target
-    var k = this.kind === 'follower' ? 11 : 6;
-    var c = 2 * Math.sqrt(k) * 0.82;
+    var k = this.kind === 'follower' ? 6.5 : 4;
+    var c = 2 * Math.sqrt(k) * 0.97;
     for (var i = 0; i < 3; i++) {
       var acc = k * (this.target[i] - this.pos[i]) - c * this.vel[i];
       this.vel[i] += acc * dt;
@@ -566,32 +543,32 @@
     // Occasional glides keep the motion soft and natural
     var g = 0.5 + 0.5 * Math.sin(t * 0.23 + this.seed * 3.1) * Math.sin(t * 0.37 + this.seed);
     var glideTarget = clamp(0.6 + g * 0.5 + speed * 0.45, 0.55, 1.15);
-    this.glide += (glideTarget - this.glide) * (1 - Math.exp(-dt * 1.5));
+    this.glide += (glideTarget - this.glide) * (1 - Math.exp(-dt * 0.8));
 
-    var freq = (env.reduce ? 0.9 : 1.55) + Math.min(speed * 1.3, 2.4) + (this.kind === 'companion' ? 0.25 : 0);
-    this.phase += TAU * freq * dt;
-    var amp = (env.reduce ? 0.26 : 0.53) * this.glide;
+    var freqTarget = (env.reduce ? 0.75 : 1.05) + Math.min(speed * 0.55, 0.85) + (this.kind === 'companion' ? 0.15 : 0);
+    this.freq += (freqTarget - this.freq) * (1 - Math.exp(-dt * 1.2));
+    this.phase += TAU * this.freq * dt;
+    var amp = (env.reduce ? 0.24 : 0.5) * this.glide;
     var rest = 0.14;
-    var w = Math.sin(this.phase) + 0.2 * Math.sin(2 * this.phase + 0.7);
-    var ph2 = this.phase - 0.5;
-    var w2 = Math.sin(ph2) + 0.2 * Math.sin(2 * ph2 + 0.7);
+    var w = Math.sin(this.phase);
+    var w2 = Math.sin(this.phase - 0.5);
     var phiF = rest + amp * w;
     var phiH = rest * 0.85 + amp * 0.82 * w2;
     var dphi = dt > 0 ? (phiF - this.lastPhi) / dt : 0;
     this.lastPhi = phiF;
-    this.flex += (clamp(-dphi * 0.014, -0.16, 0.16) - this.flex) * (1 - Math.exp(-dt * 12));
+    this.flex += (clamp(-dphi * 0.012, -0.12, 0.12) - this.flex) * (1 - Math.exp(-dt * 6));
 
     // Orientation: base pose + banking from velocity + idle sway
     var vx = this.vel[0] / Math.max(span, 1e-3), vy = this.vel[1] / Math.max(span, 1e-3);
     var yaw = this.tYaw + clamp(vx * 0.18, -0.5, 0.5) + 0.09 * Math.sin(t * 0.31 + this.seed);
     var pitch = this.tPitch + clamp(-vy * 0.12, -0.35, 0.35) + 0.05 * Math.sin(t * 0.43 + this.seed * 2.0);
     var roll = this.tRoll + clamp(-vx * 0.22, -0.6, 0.6) + 0.07 * Math.sin(t * 0.27 + this.seed * 1.3);
-    var sm = 1 - Math.exp(-dt * 3);
+    var sm = 1 - Math.exp(-dt * 1.8);
     this.yaw += (yaw - this.yaw) * sm;
     this.pitch += (pitch - this.pitch) * sm;
     this.roll += (roll - this.roll) * sm;
 
-    var bob = -0.022 * span * w;
+    var bob = -0.012 * span * w;
     this.M = m4.chain(
       m4.t(this.pos[0], this.pos[1] + bob, this.pos[2]),
       m4.rz(this.roll), m4.ry(this.yaw), m4.rx(this.pitch),
@@ -608,7 +585,6 @@
       { def: W.tail, m: m4.chain(M, m4.t(W.tail.base[0], W.tail.base[1], W.tail.base[2]), m4.rx(0.18 * Math.sin(this.phase * 0.5) - 0.1), m4.rz(W.tail.theta)) }
     ];
     this.corePos = m4.pt(M, 0, -0.005, 0.03);
-    this.pearlPos = m4.pt(M, -0.032, 0.048, 0.085);
 
     // Tendrils (verlet + follow-the-leader)
     var steps = Math.min(3, Math.max(1, Math.round(dt * 60)));
@@ -781,7 +757,6 @@
       wing: compile(gl, WING_VS, WING_FS),
       ribbon: compile(gl, RIBBON_VS, RIBBON_FS),
       core: compile(gl, SPRITE_VS, CORE_FS),
-      pearl: compile(gl, SPRITE_VS, PEARL_FS),
       dust: compile(gl, DUST_VS, DUST_FS),
       down: compile(gl, FS_VS, DOWN_FS),
       up: compile(gl, FS_VS, UP_FS),
@@ -1201,7 +1176,7 @@
           sp[e * 3] = lp[0]; sp[e * 3 + 1] = lp[1]; sp[e * 3 + 2] = lp[2];
         }
         var sw = b.span * 0.0022;
-        rb.add(sp, 18, (function (sw) { return function (a) { return sw * (1 - 0.4 * a + 1.3 * smooth01((a - 0.9) / 0.1)); }; })(sw), 1.1 * b.gain, 1, ppu, minPx);
+        rb.add(sp, 18, (function (sw) { return function (a) { return sw * (1 - 0.6 * a); }; })(sw), 1.1 * b.gain, 1, ppu, minPx);
       }
     }
     void self;
@@ -1268,19 +1243,6 @@
       gl.uniform2f(P.core.u('uSize'), b.span * 0.45, b.span * 0.45);
       gl.uniform1f(P.core.u('uSeed'), b.seed);
       gl.uniform1f(P.core.u('uGain'), b.gain * clamp(b.screen.span / 420, 0.35, 1));
-      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-    }
-
-    // pearls (premultiplied over)
-    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-    gl.useProgram(P.pearl.p);
-    gl.uniformMatrix4fv(P.pearl.u('uPV'), false, this.PV);
-    for (i = 0; i < this.all.length; i++) {
-      b = this.all[i];
-      if (!b.screen.on) continue;
-      gl.uniform3fv(P.pearl.u('uCenter'), b.pearlPos);
-      gl.uniform2f(P.pearl.u('uSize'), b.span * 0.052, b.span * 0.042);
-      gl.uniform1f(P.pearl.u('uGain'), 1);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     }
 

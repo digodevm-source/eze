@@ -17,6 +17,7 @@
   --pad: clamp(20px, 4.2vw, 72px);
   --sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --pixel: 'Silkscreen', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  --serif: 'Instrument Serif', 'Cormorant Garamond', 'Playfair Display', Georgia, 'Times New Roman', serif;
   --radius: 18px;
 }
 
@@ -832,16 +833,20 @@ section { position: relative; }
   justify-content: center;
   padding: 0 var(--pad) clamp(20px, 4vh, 48px);
 }
-.signature__text { text-align: center; overflow: hidden; padding: 0.12em 0.2em 0.1em; margin: -0.12em -0.2em -0.1em; font-size: clamp(64px, 15.5vw, 260px); }
+.signature__text { text-align: center; overflow: hidden; padding: 0.12em 0.25em 0.1em; margin: -0.12em -0.25em -0.1em; font-size: clamp(72px, 17vw, 290px); }
 .signature__letters {
   display: inline-flex;
-  font-weight: 200;
-  line-height: 1.12;
-  letter-spacing: -0.045em;
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
   white-space: nowrap;
 }
 .signature__letters > span {
   display: inline-block;
+  padding: 0 0.1em;
+  margin: 0 -0.1em;
   background: linear-gradient(180deg, #f4f7ff 0%, #c4d4ff 45%, rgba(110, 145, 240, 0.35) 100%);
   -webkit-background-clip: text;
   background-clip: text;
@@ -851,7 +856,7 @@ section { position: relative; }
   opacity: 0;
   transition: transform 1.8s var(--ease), opacity 1.6s var(--ease);
 }
-.signature__letters > .sp { width: 0.28em; }
+.signature__letters > .sp { width: 0.24em; padding: 0; margin: 0; }
 .signature.is-in .signature__letters > span { transform: none; opacity: 1; }
 .signature.is-in .signature__letters > span:nth-child(1) { transition-delay: 0.05s; }
 .signature.is-in .signature__letters > span:nth-child(2) { transition-delay: 0.1s; }
