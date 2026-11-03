@@ -36,7 +36,7 @@
     const env = new THREE.Scene();
     const box = new THREE.BoxGeometry(1, 1, 1);
     const add = (color, sx, sy, sz, x, y, z, ry = 0, side) => {
-      const m = new THREE.Mesh(box, new THREE.MeshBasicMaterial({ color, side }));
+      const m = new THREE.Mesh(box, new THREE.MeshBasicMaterial({ color, side: side || THREE.FrontSide }));
       m.scale.set(sx, sy, sz);
       m.position.set(x, y, z);
       m.rotation.y = ry;
@@ -107,7 +107,7 @@
     camera.aspect = w / h;
     // the canvas spans 92% of the viewport height; keep the mark ~62% of it
     const portrait = window.innerHeight > window.innerWidth;
-    camera.position.z = portrait ? 380 * (h / w) * 0.75 : 413;
+    camera.position.z = portrait ? 270 : 413;
     camera.updateProjectionMatrix();
   }
   resize();

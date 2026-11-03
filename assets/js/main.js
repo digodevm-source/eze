@@ -8,6 +8,7 @@
   const EASE_IO = 'cubic-bezier(.7,0,.2,1)';
   const EASE_IN = 'cubic-bezier(.6,0,.9,.4)';
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const portrait = () => matchMedia('(max-aspect-ratio: 1/1)').matches;
   const wait = (ms) => new Promise((r) => setTimeout(r, ms));
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
   const lerp = (a, b, t) => a + (b - a) * t;
@@ -67,7 +68,7 @@
   function textIn(el, { delay = 0, stagger = 24, dur = 760, shift = 0.6 } = {}) {
     const cs = chars(el);
     stop(cs);
-    if (reduced) return 0;
+    if (reduced) { cs.forEach((c) => (c.style.opacity = '')); return 0; }
     cs.forEach((c, i) => {
       c.animate(
         [
@@ -82,7 +83,7 @@
   /* letters disappear from the end, like backspacing */
   function textOut(el, { delay = 0, stagger = 9, dur = 320 } = {}) {
     const cs = chars(el).reverse();
-    if (reduced) { cs.forEach((c) => (c.style.opacity = 0)); return 0; }
+    if (reduced) return 0;
     cs.forEach((c, i) => {
       c.getAnimations().forEach((a) => a.cancel());
       c.animate(
@@ -99,6 +100,7 @@
   function numIn(el, { delay = 0, stagger = 85, dur = 900 } = {}) {
     const cs = chars(el);
     stop(cs);
+    if (reduced) return 0;
     cs.forEach((c, i) => {
       c.style.transformOrigin = '0% 90%';
       c.animate(
@@ -113,6 +115,7 @@
   }
   function numOut(el, { delay = 0, stagger = 55, dur = 420 } = {}) {
     const cs = chars(el).reverse();
+    if (reduced) return 0;
     cs.forEach((c, i) => {
       c.getAnimations().forEach((a) => a.cancel());
       c.style.transformOrigin = '0% 90%';
@@ -130,6 +133,7 @@
   function linesIn(el, { delay = 0, step = 70, dur = 900 } = {}) {
     const ws = $$('.l', el);
     stop(ws);
+    if (reduced) return 0;
     const tops = [...new Set(ws.map((w) => w.offsetTop))].sort((a, b) => a - b);
     ws.forEach((w) => {
       const li = tops.indexOf(w.offsetTop);
@@ -145,6 +149,7 @@
   }
   function linesOut(el, { delay = 0, dur = 380 } = {}) {
     const ws = $$('.l', el);
+    if (reduced) return 0;
     ws.forEach((w) => {
       w.getAnimations().forEach((a) => a.cancel());
       w.animate([{ opacity: 1 }, { opacity: 0, transform: 'translateY(-30%)' }], {
@@ -155,7 +160,9 @@
   }
   function anim(el, frames, opts) {
     if (!el) return null;
-    return el.animate(frames, Object.assign({ fill: 'both', easing: EASE }, opts));
+    const o = Object.assign({ fill: 'both', easing: EASE }, opts);
+    if (reduced) { o.duration = 1; o.delay = 0; }
+    return el.animate(frames, o);
   }
   function clearAnims(root) {
     [root, ...$$('*', root)].forEach((e) => e.getAnimations().forEach((a) => a.cancel()));
@@ -206,8 +213,9 @@
       apply();
       setTimeout(() => { ctaLabel.textContent = m.label; cta.classList.remove('is-swap'); }, 450);
     }
-    const target = mode === 'read' ? '#premium' : '#flexible';
-    cta.setAttribute('href', target);
+    cta.setAttribute('href', mode === 'read' ? '#premium' : '#contact');
+    cta.classList.toggle('js-goto', mode === 'read');
+    cta.classList.toggle('js-contact', mode !== 'read');
   }
 
   /* -----------------------------------------------------------
@@ -270,9 +278,11 @@
           e.classList.toggle('is-current', k === this.i);
         })
       );
+      $$('#maxPager button').forEach((b, k) => b.classList.toggle('is-on', k === this.i));
     },
     setExpanded(v) {
       if (this.expanded === v) return;
+      if (v && portrait()) return;
       this.expanded = v;
       this.el.classList.toggle('is-expanded', v);
       this.cards[this.i].getAnimations().forEach((a) => a.cancel());
@@ -459,9 +469,10 @@
     },
   };
   (() => {
-    let sx = 0, st = 0, lx = 0, lt = 0;
+    let sx = 0, st = 0, lx = 0, lt = 0, moved = 0;
     PROJ.vp.addEventListener('pointerdown', (e) => {
       if (ids[cur] !== 'projects') return;
+      moved = 0;
       PROJ.measure();
       PROJ.drag = true; sx = lx = e.clientX; st = PROJ.target; lt = performance.now(); PROJ.v = 0;
       PROJ.vp.setPointerCapture(e.pointerId);
@@ -471,6 +482,7 @@
     PROJ.vp.addEventListener('pointermove', (e) => {
       if (!PROJ.drag) return;
       const dx = e.clientX - sx;
+      moved = Math.max(moved, Math.abs(dx));
       let t = st + dx;
       if (t > PROJ.max) t = PROJ.max + (t - PROJ.max) * 0.35;
       if (t < PROJ.min) t = PROJ.min + (t - PROJ.min) * 0.35;
@@ -480,9 +492,16 @@
       cursor.el.classList.toggle('dir-right', e.clientX - lx > 0);
       lx = e.clientX; lt = now;
     });
-    const end = () => {
+    const end = (e) => {
       if (!PROJ.drag) return;
       PROJ.drag = false;
+      if (e.type === 'pointerup' && moved < 6) {
+        const i = PROJ.cards.findIndex((c) => {
+          const r = c.getBoundingClientRect();
+          return e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+        });
+        if (i >= 0) openProject(i, PROJ.cards[i]);
+      }
       cursor.el.classList.remove('is-pressing');
       if (performance.now() - lt > 80) PROJ.v = 0;
       PROJ.loop();
@@ -536,7 +555,7 @@
   // 9 — FINAL
   D.final = {
     enter(dir, el) {
-      if (window.Logo3D) window.Logo3D.play(true);
+      loadLogo3D().then(() => { if (ids[cur] === 'final' && window.Logo3D) window.Logo3D.play(true); });
       const a = textIn($('.final__title', el), { delay: 700, stagger: 20 });
       textIn($('.final__sub', el), { delay: 1300, stagger: 6, dur: 500, shift: 0.3 });
       textIn($('.final__credit', el), { delay: 1700, stagger: 40, dur: 700, shift: 0.6 });
@@ -563,6 +582,10 @@
     body.classList.toggle('show-lines', el.hasAttribute('data-lines'));
     setCTA(el.dataset.cta || 'none');
     scrollBar.style.transform = `scaleY(${(slides.indexOf(el) + 1) / slides.length})`;
+    const isLast = slides.indexOf(el) === slides.length - 1;
+    $('#scrollLabel').textContent = isLast ? 'BACK TO TOP' : 'SCROLL DOWN';
+    $('#scrollInd').setAttribute('aria-label', isLast ? 'Back to top' : 'Next section');
+    $$('#menuList a').forEach((a) => a.classList.toggle('is-current', a.getAttribute('href') === '#' + el.id));
     navLinks.forEach((a) => a.classList.toggle('is-current', a.getAttribute('href') === '#' + el.id));
     if (el.id !== 'projects') cursor.el.classList.remove('is-drag', 'is-pressing');
     try { if (history.replaceState) history.replaceState(null, '', '#' + el.id); } catch (e) { /* sandboxed frame */ }
@@ -642,7 +665,7 @@
   (() => {
     let last = 0, lastAbs = 0, lastFire = 0;
     window.addEventListener('wheel', (e) => {
-      if ($('#search').classList.contains('is-open')) return;
+      if (overlayOpen()) return;
       e.preventDefault();
       const now = performance.now();
       const delta = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : (ids[cur] === 'projects' || ids[cur] === 'maximize' ? e.deltaX : 0);
@@ -657,9 +680,14 @@
     }, { passive: false });
 
     window.addEventListener('keydown', (e) => {
-      if (/INPUT|TEXTAREA/.test(document.activeElement.tagName)) return;
-      if ($('#search').classList.contains('is-open')) { if (e.key === 'Escape') closeSearch(); return; }
+      if (e.key === 'Escape' && overlayOpen()) { e.preventDefault(); closeOverlay(); return; }
+      if (overlayOpen()) {
+        if (openOv === lightbox && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) lbStep(e.key === 'ArrowRight' ? 1 : -1);
+        return;
+      }
+      if (/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) return;
       const k = e.key;
+      if ((k === ' ' || k === 'Enter') && e.target.closest && e.target.closest('button, a, [role="button"]')) return;
       if (['ArrowDown', 'PageDown', ' '].includes(k)) { e.preventDefault(); intent(1); }
       else if (['ArrowUp', 'PageUp'].includes(k)) { e.preventDefault(); intent(-1); }
       else if (k === 'ArrowRight' && D[ids[cur]].step) { e.preventDefault(); intent(1); }
@@ -674,6 +702,10 @@
       const t = e.changedTouches[0];
       const dy = ty - t.clientY, dx = tx - t.clientX;
       if (Date.now() - tt > 900) return;
+      if (overlayOpen()) {
+        if (openOv === lightbox && Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) lbStep(dx > 0 ? 1 : -1);
+        return;
+      }
       if (Math.abs(dy) > 45 && Math.abs(dy) > Math.abs(dx)) {
         if (e.target.closest('.calc')) return;
         intent(dy > 0 ? 1 : -1);
@@ -683,13 +715,16 @@
     }, { passive: true });
 
     document.addEventListener('click', (e) => {
+      const c = e.target.closest('.js-contact');
+      if (c) { e.preventDefault(); openOverlay(contactOv, c); return; }
       const a = e.target.closest('a.js-goto');
       if (!a) return;
       const id = a.getAttribute('href').slice(1);
       const i = ids.indexOf(id);
       if (i < 0) return;
       e.preventDefault();
-      goTo(i);
+      if (overlayOpen()) closeOverlay(true);
+      goWhenFree(i);
     });
   })();
 
@@ -710,6 +745,12 @@
     });
     el.addEventListener('pointerleave', () => MAX.setExpanded(false));
     $('#maxDot').addEventListener('click', () => MAX.setExpanded(!MAX.expanded));
+    $$('#maxPager button').forEach((b, k) => b.addEventListener('click', () => {
+      if (busy || ids[cur] !== 'maximize' || k === MAX.i) return;
+      MAX.go(k - MAX.i);
+      busy = true;
+      setTimeout(() => (busy = false), 1000);
+    }));
     MAX.cards.forEach((c) => c.addEventListener('click', (e) => { if (e.pointerType !== 'mouse') MAX.setExpanded(!MAX.expanded); }));
   })();
 
@@ -719,9 +760,10 @@
   whyItems.forEach((li) => {
     $('button', li).addEventListener('click', () => {
       const open = !li.classList.contains('is-open');
-      whyItems.forEach((o) => { o.classList.remove('is-open'); $('p', o).style.height = '0px'; });
+      whyItems.forEach((o) => { o.classList.remove('is-open'); $('p', o).style.height = '0px'; $('button', o).setAttribute('aria-expanded', 'false'); });
       if (open) {
         li.classList.add('is-open');
+        $('button', li).setAttribute('aria-expanded', 'true');
         const p = $('p', li);
         p.style.height = p.scrollHeight + 'px';
       }
@@ -797,16 +839,183 @@
   })();
 
   /* -----------------------------------------------------------
-     Search overlay
+     Overlays: search, menu, contact, project lightbox
   ----------------------------------------------------------- */
-  const search = $('#search');
-  function closeSearch() { search.classList.remove('is-open'); search.setAttribute('aria-hidden', 'true'); }
-  $('#searchBtn').addEventListener('click', () => {
-    search.classList.add('is-open'); search.setAttribute('aria-hidden', 'false');
-    setTimeout(() => $('input', search).focus(), 100);
+  const searchOv = $('#search'), menuOv = $('#menu'), contactOv = $('#contact'), lightbox = $('#lightbox');
+  let openOv = null, returnFocus = null;
+  function overlayOpen() { return !!openOv; }
+  function openOverlay(ov, from) {
+    if (openOv === ov) return;
+    if (openOv) closeOverlay(true);
+    openOv = ov;
+    returnFocus = from || document.activeElement;
+    ov.classList.add('is-open');
+    ov.setAttribute('aria-hidden', 'false');
+    cursor.el.classList.remove('is-drag', 'is-pressing');
+    if (ov === menuOv) $('#menuBtn').setAttribute('aria-expanded', 'true');
+    const first = ov === searchOv ? $('#searchInput') : ov === contactOv ? $('#cName') : $('[data-close]', ov);
+    setTimeout(() => { if (first) first.focus({ preventScroll: true }); }, 90);
+  }
+  function closeOverlay(silent) {
+    if (!openOv) return;
+    const ov = openOv;
+    openOv = null;
+    ov.classList.remove('is-open');
+    ov.setAttribute('aria-hidden', 'true');
+    if (ov === menuOv) $('#menuBtn').setAttribute('aria-expanded', 'false');
+    if (!silent && returnFocus && returnFocus.focus) returnFocus.focus({ preventScroll: true });
+  }
+  function goWhenFree(i) {
+    if (!busy) { goTo(i); return; }
+    const t = setInterval(() => { if (!busy) { clearInterval(t); goTo(i); } }, 120);
+  }
+  $$('[data-close]').forEach((b) => b.addEventListener('click', () => closeOverlay()));
+  [searchOv, menuOv, lightbox].forEach((ov) => ov.addEventListener('click', (e) => { if (e.target === ov) closeOverlay(); }));
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Tab' || !openOv) return;
+    const f = $$('a[href], button, input, select, textarea', openOv).filter((n) => !n.disabled && n.offsetParent !== null);
+    if (!f.length) return;
+    const first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
   });
-  $('#searchClose').addEventListener('click', closeSearch);
-  search.addEventListener('click', (e) => { if (e.target === search) closeSearch(); });
+
+  const pad2 = (n) => String(n).padStart(2, '0');
+  const esc = (t) => String(t).replace(/[&<>"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
+  const KEYWORDS = {
+    hero: 'home adu custom', investors: 'investor airbnb host rental', maximize: 'revenue income money airbnb occupancy daily rate price',
+    accelerate: 'fast quick deployment install timeline', flexible: 'calculator cost price estimate income zip size',
+    premium: 'premium luxury land lot interior', why: 'company permits team sustainable price', projects: 'portfolio gallery photos homes',
+    testimonials: 'reviews customers feedback', final: 'start begin',
+  };
+  const SECTIONS = slides.map((el, k) => ({
+    id: el.id, k, name: el.dataset.name || el.id, desc: el.dataset.desc || '',
+    hay: (el.dataset.name + ' ' + el.dataset.desc + ' ' + KEYWORDS[el.id] + ' ' + el.textContent).replace(/\s+/g, ' ').toLowerCase(),
+  }));
+  SECTIONS.push({ id: 'contact', name: 'Contact us', desc: 'Free consultation, phone and email', hay: 'contact phone email call consultation quote price cost free' });
+
+  // search
+  const results = $('#searchResults');
+  function renderResults(q) {
+    q = q.trim().toLowerCase();
+    const list = SECTIONS.filter((x) => !q || x.hay.includes(q));
+    if (!list.length) {
+      results.innerHTML = `<li class="search__empty">Nothing found for “${esc(q)}”. Try “calculator”, “projects” or “reviews”.</li>`;
+      return;
+    }
+    const hl = (t) => {
+      const i = q ? t.toLowerCase().indexOf(q) : -1;
+      return i < 0 ? esc(t) : esc(t.slice(0, i)) + '<mark>' + esc(t.slice(i, i + q.length)) + '</mark>' + esc(t.slice(i + q.length));
+    };
+    results.innerHTML = list.map((x, i) =>
+      `<li><a href="#${x.id}" class="${x.id === 'contact' ? 'js-contact' : 'js-goto'}${i === 0 && q ? ' is-active' : ''}">` +
+      `<span class="n">${x.id === 'contact' ? '—' : pad2(x.k + 1)}</span><span class="t">${hl(x.name)}</span><span class="d">${esc(x.desc)}</span></a></li>`
+    ).join('');
+  }
+  $('#searchInput').addEventListener('input', (e) => renderResults(e.target.value));
+  $('#searchForm').addEventListener('submit', (e) => { e.preventDefault(); const a = $('#searchResults a'); if (a) a.click(); });
+  $('#searchBtn').addEventListener('click', (e) => { $('#searchInput').value = ''; renderResults(''); openOverlay(searchOv, e.currentTarget); });
+
+  // menu (phones)
+  $('#menuList').innerHTML = SECTIONS.filter((x) => x.id !== 'contact')
+    .map((x) => `<a href="#${x.id}" class="js-goto"><span class="n">${pad2(x.k + 1)}</span>${esc(x.name)}</a>`).join('');
+  $$('#menuList a').forEach((a, k) => (a.style.transitionDelay = `${60 + k * 30}ms`));
+  $('#menuBtn').addEventListener('click', (e) => openOverlay(menuOv, e.currentTarget));
+
+  // contact form — set FORM_ENDPOINT (e.g. a Formspree URL) to receive requests by email
+  const FORM_ENDPOINT = '';
+  (() => {
+    const form = $('#contactForm'), msg = $('#contactMsg');
+    const name = $('#cName'), reach = $('#cReach'), zip = $('#cZip');
+    zip.addEventListener('input', () => (zip.value = zip.value.replace(/\D/g, '')));
+    form.addEventListener('input', (e) => { e.target.classList.remove('is-invalid'); msg.textContent = ''; });
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const errs = [];
+      if (name.value.trim().length < 2) errs.push([name, 'Please enter your name.']);
+      const r = reach.value.trim();
+      const okEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(r);
+      const okPhone = r.replace(/\D/g, '').length >= 10;
+      if (!okEmail && !okPhone) errs.push([reach, 'Enter an email or a phone number with area code.']);
+      if (zip.value && !/^\d{5}$/.test(zip.value)) errs.push([zip, 'A ZIP code has 5 digits.']);
+      errs.forEach(([f]) => f.classList.add('is-invalid'));
+      if (errs.length) { msg.classList.add('is-error'); msg.textContent = errs[0][1]; errs[0][0].focus(); return; }
+      msg.classList.remove('is-error');
+      const data = Object.fromEntries(new FormData(form).entries());
+      if (FORM_ENDPOINT) {
+        msg.textContent = 'Sending…';
+        try {
+          const res = await fetch(FORM_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(data) });
+          if (!res.ok) throw new Error(res.status);
+        } catch (err) {
+          msg.classList.add('is-error');
+          msg.textContent = 'The request did not go through. Please call or email us using the details below.';
+          return;
+        }
+      }
+      const first = name.value.trim().split(/\s+/)[0];
+      msg.textContent = `Thank you, ${first}! We'll reply within one business day.`;
+      form.reset();
+    });
+    $$('.copy').forEach((b) => b.addEventListener('click', () => {
+      const src = $('#' + b.dataset.copy);
+      const done = () => { b.textContent = 'Copied'; b.classList.add('is-done'); setTimeout(() => { b.textContent = 'Copy'; b.classList.remove('is-done'); }, 1600); };
+      const fallback = () => {
+        const range = document.createRange(); range.selectNodeContents(src);
+        const sel = getSelection(); sel.removeAllRanges(); sel.addRange(range);
+        b.textContent = 'Selected'; setTimeout(() => (b.textContent = 'Copy'), 1800);
+      };
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(src.textContent).then(done, fallback);
+        else fallback();
+      } catch (err) { fallback(); }
+    }));
+  })();
+
+  // project lightbox
+  let lbIndex = 0;
+  const lbFig = $('.lightbox__fig');
+  function lbShow(i) {
+    const n = PROJ.cards.length;
+    lbIndex = (i + n) % n;
+    const card = PROJ.cards[lbIndex];
+    const img = $('img', card);
+    $('#lbImg').src = img.src;
+    $('#lbImg').alt = img.alt;
+    $('#lbTitle').textContent = $('figcaption b', card).textContent;
+    $('#lbMeta').textContent = $('figcaption span', card).textContent;
+    $('#lbCount').textContent = `${pad2(lbIndex + 1)} / ${pad2(n)}`;
+  }
+  function lbStep(d) {
+    lbFig.classList.add('is-swap');
+    setTimeout(() => { lbShow(lbIndex + d); lbFig.classList.remove('is-swap'); }, 200);
+  }
+  function openProject(i, from) { lbShow(i); openOverlay(lightbox, from); }
+  $('#lbPrev').addEventListener('click', () => lbStep(-1));
+  $('#lbNext').addEventListener('click', () => lbStep(1));
+  PROJ.cards.forEach((c, i) => {
+    c.tabIndex = 0;
+    c.setAttribute('role', 'button');
+    c.setAttribute('aria-label', 'Open ' + $('figcaption b', c).textContent);
+    c.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openProject(i, c); } });
+  });
+
+  // scroll indicator: next section, or back to the top on the last one
+  $('#scrollInd').addEventListener('click', () => { if (cur === slides.length - 1) goWhenFree(0); else intent(1); });
+
+  // three.js only matters on the last slide — load it after the first screen is up
+  let logoPromise = null;
+  function loadScript(src) {
+    return new Promise((res, rej) => {
+      const el = document.createElement('script');
+      el.src = src; el.async = true; el.onload = res; el.onerror = rej;
+      (document.head || document.body).appendChild(el);
+    });
+  }
+  function loadLogo3D() {
+    if (!logoPromise) logoPromise = loadScript('assets/vendor/three.min.js').then(() => loadScript('assets/js/logo3d.js')).catch(() => {});
+    return logoPromise;
+  }
 
   /* -----------------------------------------------------------
      Custom cursor
@@ -821,8 +1030,8 @@
       if (!raf) raf = requestAnimationFrame(tick);
       c.el.classList.remove('is-hidden');
       const t = e.target;
-      c.el.classList.toggle('is-drag', !!t.closest('.proj__viewport') && ids[cur] === 'projects');
-      c.el.classList.toggle('is-hover', !!t.closest('a, button, input, .max__card'));
+      c.el.classList.toggle('is-drag', !openOv && !!t.closest('.proj__viewport') && ids[cur] === 'projects');
+      c.el.classList.toggle('is-hover', !!t.closest('a, button, input, select, textarea, label, .max__card'));
     });
     document.addEventListener('pointerleave', () => c.el.classList.add('is-hidden'));
     document.documentElement.addEventListener('mouseleave', () => c.el.classList.add('is-hidden'));
@@ -863,7 +1072,9 @@
   function startLoader() {
     const state = preload();
     requestAnimationFrame(() => loader.classList.add('is-in'));
-    const MIN = reduced ? 300 : 2600;
+    let seen = false;
+    try { seen = sessionStorage.getItem('cm-seen') === '1'; sessionStorage.setItem('cm-seen', '1'); } catch (e) { /* storage blocked */ }
+    const MIN = reduced ? 300 : seen ? 900 : 2600;
     const t0 = performance.now();
     let shown = 0;
     return new Promise((resolve) => {
@@ -893,18 +1104,24 @@
     await wait(250);
     body.classList.add('ui-in');
     navLinks.forEach((a, k) => textIn(a, { delay: 200 + k * 90, stagger: 22, dur: 600, shift: 0.8 }));
+    const wantContact = location.hash === '#contact';
     const fromHash = ids.indexOf(location.hash.slice(1));
     busy = false;
     goTo(fromHash > 0 ? fromHash : 0, { force: true });
+    if (wantContact) setTimeout(() => openOverlay(contactOv), 900);
     window.addEventListener('hashchange', () => {
+      if (location.hash === '#contact') { openOverlay(contactOv); return; }
       const i = ids.indexOf(location.hash.slice(1));
-      if (i >= 0 && i !== cur) goTo(i);
+      if (i >= 0 && i !== cur) goWhenFree(i);
     });
+    const idle = window.requestIdleCallback || ((f) => setTimeout(f, 1));
+    setTimeout(() => idle(() => loadLogo3D(), { timeout: 4000 }), 4500);
   }
 
   window.addEventListener('resize', () => {
     if (ids[cur] === 'projects') { PROJ.measure(); PROJ.target = clamp(PROJ.target, PROJ.min, PROJ.max); PROJ.loop(); }
     if (ctaMode !== 'none') { const m = ctaMode; ctaMode = 'none'; cta.classList.remove('is-on'); setCTA(m); }
+    if (MAX.expanded && portrait()) MAX.setExpanded(false);
   });
 
   // expose for debugging / tests

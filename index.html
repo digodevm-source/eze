@@ -3,16 +3,21 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>California Modulars — Custom ADUs</title>
+  <title>California Modulars</title>
   <meta name="description" content="California Modulars — custom designed ADUs built for your lifestyle. Extra space, extra possibilities.">
   <meta name="theme-color" content="#000000">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="California Modulars — Custom ADUs">
+  <meta property="og:description" content="Custom designed ADUs for homeowners, investors and Airbnb hosts. Extra space, extra possibilities.">
+  <meta property="og:image" content="assets/img/hero.jpg">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Jost:wght@200;300;400&family=Montserrat:wght@600&family=Roboto:wght@100;300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body class="is-loading theme-dark">
+<body class="theme-dark">
 
   <!-- Logo symbol -->
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -44,7 +49,7 @@
     <div class="loader__bar"><i id="loaderBar"></i></div>
   </div>
 
-  <!-- ============ BACKGROUND OUTLINE ============ -->
+  <!-- ============ BACKGROUND LINES ============ -->
   <svg class="bg-lines" viewBox="0 0 673 379" preserveAspectRatio="none" aria-hidden="true">
     <path d="M537 0L175 379"/>
     <path d="M550 0L190 379"/>
@@ -60,36 +65,101 @@
       <a href="#projects" class="js-goto split">HOMES</a>
       <a href="#premium" class="js-goto split">ADU</a>
       <a href="#why" class="js-goto split">COMPANY</a>
-      <a href="#flexible" class="js-goto split">CONTACT US</a>
+      <a href="#contact" class="js-contact split">CONTACT US</a>
     </nav>
     <div class="header__actions">
-      <button class="icon-btn" id="searchBtn" aria-label="Search">
+      <button class="icon-btn" id="searchBtn" type="button" aria-label="Search">
         <svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L20 20"/></svg>
       </button>
-      <a class="icon-btn" href="tel:+18005550123" aria-label="Call us">
+      <button class="icon-btn js-contact" id="contactBtn" type="button" aria-label="Contact us">
         <svg viewBox="0 0 24 24"><path d="M6.6 3.5l2.6 3.3-1.6 2.3a11 11 0 0 0 7.3 7.3l2.3-1.6 3.3 2.6-1.6 2.9C11.6 21 3 12.4 3.7 5.1z"/></svg>
-      </a>
+      </button>
+      <button class="icon-btn menu-btn" id="menuBtn" type="button" aria-label="Open menu" aria-expanded="false">
+        <svg viewBox="0 0 24 24"><path d="M5 9h14M5 15h14"/></svg>
+      </button>
     </div>
   </header>
 
-  <div class="search" id="search" aria-hidden="true">
-    <form class="search__form" onsubmit="return false">
-      <input type="search" placeholder="Search ADU models, projects…" aria-label="Search">
-      <button type="button" class="search__close" id="searchClose" aria-label="Close search">×</button>
-    </form>
+  <!-- ============ SEARCH ============ -->
+  <div class="ov search" id="search" role="dialog" aria-modal="true" aria-label="Search" aria-hidden="true">
+    <div class="search__inner">
+      <form class="search__form" id="searchForm" role="search" autocomplete="off">
+        <label class="sr-only" for="searchInput">Search the site</label>
+        <input type="search" id="searchInput" placeholder="Search ADU models, projects, prices…">
+        <button type="button" class="search__close" data-close aria-label="Close search">×</button>
+      </form>
+      <ul class="search__results" id="searchResults" aria-live="polite"></ul>
+    </div>
+  </div>
+
+  <!-- ============ MENU (phones) ============ -->
+  <div class="ov menu" id="menu" role="dialog" aria-modal="true" aria-label="Menu" aria-hidden="true">
+    <button type="button" class="ov__close" data-close aria-label="Close menu">×</button>
+    <nav class="menu__list" id="menuList" aria-label="Sections"></nav>
+    <div class="menu__foot">
+      <button type="button" class="btn-beige js-contact">Get a free consultation</button>
+    </div>
+  </div>
+
+  <!-- ============ CONTACT ============ -->
+  <div class="ov panel" id="contact" role="dialog" aria-modal="true" aria-labelledby="contactTitle" aria-hidden="true">
+    <div class="panel__backdrop" data-close></div>
+    <div class="panel__box">
+      <button type="button" class="ov__close" data-close aria-label="Close">×</button>
+      <p class="panel__eyebrow">California Modulars</p>
+      <h2 class="panel__title" id="contactTitle">Get a free consultation</h2>
+      <p class="panel__lead">Tell us about your lot and your plans. An ADU specialist replies within one business day.</p>
+
+      <form class="cform" id="contactForm" novalidate>
+        <label class="cform__field"><span>Name</span><input id="cName" name="name" type="text" autocomplete="name" required></label>
+        <label class="cform__field"><span>Phone or email</span><input id="cReach" name="reach" type="text" autocomplete="email" required></label>
+        <div class="cform__row">
+          <label class="cform__field"><span>ZIP code</span><input id="cZip" name="zip" type="text" inputmode="numeric" maxlength="5"></label>
+          <label class="cform__field"><span>Plan</span>
+            <select id="cGoal" name="goal">
+              <option>Rental income</option>
+              <option>Family / guests</option>
+              <option>Home office</option>
+              <option>Not sure yet</option>
+            </select>
+          </label>
+        </div>
+        <label class="cform__field"><span>Message <em>optional</em></span><textarea id="cMsg" name="message" rows="3"></textarea></label>
+        <button class="btn-beige cform__send" type="submit">Send request</button>
+        <p class="cform__msg" id="contactMsg" aria-live="polite"></p>
+      </form>
+
+      <dl class="panel__info">
+        <div><dt>Phone</dt><dd><span class="sel" id="cPhone">+1 (800) 555-0199</span><button type="button" class="copy" data-copy="cPhone">Copy</button></dd></div>
+        <div><dt>Email</dt><dd><span class="sel" id="cEmail">hello@californiamodulars.com</span><button type="button" class="copy" data-copy="cEmail">Copy</button></dd></div>
+        <div><dt>Hours</dt><dd>Mon–Sat, 8 am – 6 pm PT</dd></div>
+        <div><dt>Area</dt><dd>Bay Area, Central Coast &amp; Southern California</dd></div>
+      </dl>
+    </div>
+  </div>
+
+  <!-- ============ PROJECT LIGHTBOX ============ -->
+  <div class="ov lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Project photo" aria-hidden="true">
+    <button type="button" class="ov__close" data-close aria-label="Close">×</button>
+    <button type="button" class="lightbox__nav lightbox__prev" id="lbPrev" aria-label="Previous project"><svg><use href="#i-arrow-left"/></svg></button>
+    <figure class="lightbox__fig">
+      <img id="lbImg" src="assets/img/proj1.jpg" alt="">
+      <figcaption><b id="lbTitle"></b><span id="lbMeta"></span><i id="lbCount"></i></figcaption>
+    </figure>
+    <button type="button" class="lightbox__nav lightbox__next" id="lbNext" aria-label="Next project"><svg><use href="#i-arrow-left"/></svg></button>
   </div>
 
   <!-- ============ FLOATING CTA (morphs between slides) ============ -->
-  <a class="cta js-goto" id="cta" href="#flexible">
+  <a class="cta" id="cta" href="#contact">
     <svg class="cta__logo"><use href="#logo"/></svg>
     <span class="cta__label" id="ctaLabel">GET A FREE CONSULTATION</span>
   </a>
 
   <!-- ============ SCROLL INDICATOR ============ -->
-  <div class="scroll-ind" aria-hidden="true">
-    <span>SCROLL DOWN</span>
+  <button class="scroll-ind" id="scrollInd" type="button" aria-label="Next section">
+    <span id="scrollLabel">SCROLL DOWN</span>
     <i><b id="scrollBar"></b></i>
-  </div>
+  </button>
 
   <!-- ============ CURSOR ============ -->
   <div class="cursor" id="cursor" aria-hidden="true">
@@ -100,7 +170,7 @@
   <main class="slides" id="slides">
 
     <!-- 0. HERO -->
-    <section class="slide slide--hero" id="hero" data-theme="dark" data-cta="none">
+    <section class="slide slide--hero" id="hero" data-theme="dark" data-cta="none" data-name="Home" data-desc="Custom ADUs built for your lifestyle">
       <div class="media"><img src="assets/img/hero.jpg" alt="Modern ADU lit at night in a grass field"></div>
       <div class="hero__text">
         <h1 class="hero__title split">Create Your Dream ADU:<br>Extra Space, Extra Possibilities</h1>
@@ -109,13 +179,13 @@
     </section>
 
     <!-- 1. FOR INVESTORS -->
-    <section class="slide slide--investors" id="investors" data-theme="light" data-cta="card">
+    <section class="slide slide--investors" id="investors" data-theme="light" data-cta="card" data-name="For investors" data-desc="ADUs for investors and Airbnb hosts">
       <div class="media"><img src="assets/img/investors.jpg" alt="Dark timber ADU with gable roof at dusk"></div>
       <h2 class="t-big inv__title split">For<br>Investors<br>and Airbnb<br>Hosts!</h2>
     </section>
 
     <!-- 2. MAXIMIZE PROFITS (carousel) -->
-    <section class="slide slide--max" id="maximize" data-theme="dark" data-cta="none" data-lines>
+    <section class="slide slide--max" id="maximize" data-theme="dark" data-cta="none" data-lines data-name="Profits" data-desc="Revenue, daily rate and occupancy">
       <div class="max__cards" id="maxCards">
         <figure class="max__card" data-i="0"><div class="max__img"><img src="assets/img/lake.jpg" alt="Lakeside timber ADU"></div></figure>
         <figure class="max__card" data-i="1"><div class="max__img"><img src="assets/img/aframe.jpg" alt="A-frame ADU with lit windows at sunset"></div></figure>
@@ -124,41 +194,46 @@
       <div class="max__hit" id="maxHit" aria-hidden="true"></div>
       <h2 class="t-big max__title split">Maximize<br>Profits<br>Minimize<br>Stress</h2>
       <div class="max__notes">
-        <p class="max__note split" data-i="0">Occupancy rate is 81% Average monthly revenue is per month</p>
-        <p class="max__note split" data-i="1">According to AirDNA data on short term rentals in San Jose in July 2021: ADR is per night or</p>
-        <p class="max__note split" data-i="2">Average occupancy of our short-term rental ADUs across California</p>
+        <p class="max__note split" data-i="0">Average monthly revenue of an Airbnb ADU in San Jose</p>
+        <p class="max__note split" data-i="1">Average daily rate of short-term rentals in San Jose (AirDNA, July 2021)</p>
+        <p class="max__note split" data-i="2">Average occupancy of our short-term rental ADUs in California</p>
       </div>
       <div class="max__nums">
         <div class="max__num split-num" data-i="0">$2,800</div>
         <div class="max__num split-num" data-i="1">$193</div>
         <div class="max__num split-num" data-i="2">81%</div>
       </div>
-      <button class="max__dot" id="maxDot" aria-label="Expand photo"><i></i></button>
+      <button class="max__dot" id="maxDot" type="button" aria-label="Expand photo"><i></i></button>
+      <div class="max__pager" id="maxPager" aria-label="Figures">
+        <button type="button" class="is-on" aria-label="Monthly revenue"></button>
+        <button type="button" aria-label="Daily rate"></button>
+        <button type="button" aria-label="Occupancy"></button>
+      </div>
     </section>
 
     <!-- 3. ACCELERATE ROI -->
-    <section class="slide slide--acc" id="accelerate" data-theme="dark" data-cta="read">
+    <section class="slide slide--acc" id="accelerate" data-theme="dark" data-cta="read" data-name="Quick deployment" data-desc="Factory-built and installed fast">
       <div class="media"><img src="assets/img/accel.jpg" alt="Black modular cabin with curtains and warm interior light"></div>
       <h2 class="acc__title split">Accelerate Your ROI with Quick <br>Deployment</h2>
     </section>
 
     <!-- 4. FLEXIBLE ADU + CALCULATOR -->
-    <section class="slide slide--flex" id="flexible" data-theme="dark" data-cta="none">
+    <section class="slide slide--flex" id="flexible" data-theme="dark" data-cta="none" data-name="Income calculator" data-desc="Estimate rental income for your ADU">
       <div class="flex__media media"><img src="assets/img/flex.jpg" alt="Timber ADU next to a pond at dusk"></div>
       <h2 class="t-big flex__title split">Flexible ADU<br>Solutions for<br>Every Lot</h2>
       <p class="flex__text split-lines">A diverse range of ADUs in different architectural styles, sizes, and materials, fitting perfectly into various environments—urban, suburban, and rural. The ADUs are shown in different configurations, demonstrating their adaptability to small and large lots</p>
       <div class="flex__panel">
         <form class="calc" id="calc" autocomplete="off" novalidate>
-          <output class="calc__display" id="calcDisplay">120</output>
+          <output class="calc__display" id="calcDisplay" aria-label="ADU size, sq ft">120</output>
           <div class="calc__keys">
             <button type="button" data-k="1">1</button><button type="button" data-k="2">2</button><button type="button" data-k="3">3</button><button type="button" data-k="4">4</button>
             <button type="button" data-k="5">5</button><button type="button" data-k="6">6</button><button type="button" data-k="7">7</button><button type="button" data-k="8">8</button>
-            <button type="button" data-k="9">9</button><button type="button" data-k="0">0</button><button type="button" data-k="+" class="w2">+</button>
-            <button type="button" data-k="C" class="w2">C</button><button type="button" data-k="=" class="w2">=</button>
+            <button type="button" data-k="9">9</button><button type="button" data-k="0">0</button><button type="button" data-k="+" class="w2" aria-label="Plus">+</button>
+            <button type="button" data-k="C" class="w2" aria-label="Clear">C</button><button type="button" data-k="=" class="w2" aria-label="Equals">=</button>
           </div>
-          <label class="calc__field"><span id="calcIncome">Income: $30,000</span></label>
-          <label class="calc__field"><input type="text" inputmode="numeric" maxlength="5" placeholder="Your zip code" id="calcZip"></label>
-          <label class="calc__field"><input type="text" inputmode="numeric" maxlength="3" placeholder="Number of Days you want to rent:" id="calcDays"></label>
+          <div class="calc__field"><span id="calcIncome">Income: $30,000</span></div>
+          <label class="calc__field"><span class="sr-only">Your zip code</span><input type="text" inputmode="numeric" maxlength="5" placeholder="Your zip code" id="calcZip"></label>
+          <label class="calc__field"><span class="sr-only">Number of days you want to rent</span><input type="text" inputmode="numeric" maxlength="3" placeholder="Number of Days you want to rent:" id="calcDays"></label>
           <button class="calc__send" type="submit">Send</button>
           <p class="calc__msg" id="calcMsg" aria-live="polite"></p>
         </form>
@@ -166,76 +241,77 @@
     </section>
 
     <!-- 5. PREMIUM ADUS -->
-    <section class="slide slide--prem" id="premium" data-theme="dark" data-cta="none">
+    <section class="slide slide--prem" id="premium" data-theme="dark" data-cta="none" data-name="Premium ADUs" data-desc="High-end ADUs for unused land">
       <div class="prem__media"><img src="assets/img/iso.jpg" alt="Isometric cut-away of a premium ADU interior"></div>
       <h2 class="t-big prem__title split">Maximize Your<br>Land's Potential with<br>Premium ADUS</h2>
       <p class="prem__text split-lines">Unlock the hidden value of your underutilized lots by investing in our high-quality Accessory Dwelling Units (ADUs). Our expertly crafted ADUs are designed to generate maximum rental income, offering a lucrative opportunity to capitalize on unused spaces</p>
     </section>
 
     <!-- 6. WHY CHOOSE US -->
-    <section class="slide slide--why" id="why" data-theme="dark" data-cta="none" data-lines>
+    <section class="slide slide--why" id="why" data-theme="dark" data-cta="none" data-lines data-name="Why choose us" data-desc="Seven reasons to build with us">
       <div class="why__bg"><img src="assets/img/why.jpg" alt=""></div>
       <h2 class="t-jost why__title split">Why Choose Us for Your<br>ADU Construction</h2>
       <ol class="why__list" id="whyList">
-        <li><button type="button"><span class="n">01</span><span class="t">Rental income potential</span><svg class="a"><use href="#i-arrow-left"/></svg></button><p>Short-term and long-term rentals turn unused backyard space into reliable monthly cash flow.</p></li>
-        <li><button type="button"><span class="n">02</span><span class="t">Multigenerational living solutions</span><svg class="a"><use href="#i-arrow-left"/></svg></button><p>Keep parents, grown kids or guests close — with their own door, kitchen and privacy.</p></li>
-        <li><button type="button"><span class="n">03</span><span class="t">Sustainable living options</span><svg class="a"><use href="#i-arrow-left"/></svg></button><p>Solar-ready roofs, high-performance insulation and low-VOC materials as standard.</p></li>
-        <li><button type="button"><span class="n">04</span><span class="t">Sustainable living options</span><svg class="a"><use href="#i-arrow-left"/></svg></button><p>Factory precision means less waste on site and a smaller footprint for your build.</p></li>
-        <li><button type="button"><span class="n">05</span><span class="t">Custom design to match your needs</span><svg class="a"><use href="#i-arrow-left"/></svg></button><p>Layouts, finishes and facades tailored to your lot, your home and your lifestyle.</p></li>
-        <li><button type="button"><span class="n">06</span><span class="t">Experienced team and streamlined process</span><svg class="a"><use href="#i-arrow-left"/></svg></button><p>One team from design to installation, with a clear timeline at every step.</p></li>
-        <li><button type="button"><span class="n">07</span><span class="t">Permits and regulations handled for you</span><svg class="a"><use href="#i-arrow-left"/></svg></button><p>We prepare drawings, file permits and coordinate inspections with your city.</p></li>
+        <li><button type="button" aria-expanded="false"><span class="n">01</span><span class="t">Rental income potential</span><svg class="a"><use href="#i-arrow-left"/></svg></button><p>Short-term and long-term rentals turn unused backyard space into reliable monthly cash flow.</p></li>
+        <li><button type="button" aria-expanded="false"><span class="n">02</span><span class="t">Multigenerational living solutions</span><svg class="a"><use href="#i-arrow-left"/></svg></button><p>Keep parents, grown kids or guests close, each with their own door, kitchen and privacy.</p></li>
+        <li><button type="button" aria-expanded="false"><span class="n">03</span><span class="t">Sustainable living options</span><svg class="a"><use href="#i-arrow-left"/></svg></button><p>Solar-ready roofs, high-performance insulation and low-VOC materials come standard.</p></li>
+        <li><button type="button" aria-expanded="false"><span class="n">04</span><span class="t">Fixed price and factory-fast build</span><svg class="a"><use href="#i-arrow-left"/></svg></button><p>One transparent price up front. Your ADU is built in our factory while permits are processed.</p></li>
+        <li><button type="button" aria-expanded="false"><span class="n">05</span><span class="t">Custom design to match your needs</span><svg class="a"><use href="#i-arrow-left"/></svg></button><p>Layouts, finishes and facades tailored to your lot, your home and your lifestyle.</p></li>
+        <li><button type="button" aria-expanded="false"><span class="n">06</span><span class="t">Experienced team and streamlined process</span><svg class="a"><use href="#i-arrow-left"/></svg></button><p>One team from design to installation, with a clear timeline at every step.</p></li>
+        <li><button type="button" aria-expanded="false"><span class="n">07</span><span class="t">Permits and regulations handled for you</span><svg class="a"><use href="#i-arrow-left"/></svg></button><p>We prepare drawings, file permits and coordinate inspections with your city.</p></li>
       </ol>
     </section>
 
     <!-- 7. RECENT PROJECTS -->
-    <section class="slide slide--proj" id="projects" data-theme="dark" data-cta="none" data-lines>
+    <section class="slide slide--proj" id="projects" data-theme="dark" data-cta="none" data-lines data-name="Projects" data-desc="Recent ADU builds">
       <h2 class="t-jost proj__title split">Inspiring ADU Transformations:<br>Our Recent Projects</h2>
       <div class="proj__viewport" id="projViewport">
         <div class="proj__track" id="projTrack">
-          <figure class="proj__card"><img src="assets/img/proj1.jpg" alt="Bright ADU living room with kitchen" draggable="false"></figure>
-          <figure class="proj__card"><img src="assets/img/aframe.jpg" alt="A-frame backyard ADU at sunset" draggable="false"></figure>
-          <figure class="proj__card"><img src="assets/img/proj3.jpg" alt="ADU open-plan living room and kitchen" draggable="false"></figure>
-          <figure class="proj__card"><img src="assets/img/cube.jpg" alt="Two-storey modular home in the forest" draggable="false"></figure>
-          <figure class="proj__card"><img src="assets/img/lake.jpg" alt="Lakeside timber ADU" draggable="false"></figure>
+          <figure class="proj__card"><img src="assets/img/proj1.jpg" alt="Bright ADU living room with kitchen" draggable="false"><figcaption><b>Garden Studio</b><span>420 sq ft · Palo Alto</span></figcaption></figure>
+          <figure class="proj__card"><img src="assets/img/aframe.jpg" alt="A-frame backyard ADU at sunset" draggable="false"><figcaption><b>A-Frame Guest House</b><span>640 sq ft · San Jose</span></figcaption></figure>
+          <figure class="proj__card"><img src="assets/img/proj3.jpg" alt="ADU open-plan living room and kitchen" draggable="false"><figcaption><b>Open-Plan One-Bedroom</b><span>560 sq ft · Oakland</span></figcaption></figure>
+          <figure class="proj__card"><img src="assets/img/cube.jpg" alt="Two-storey modular home in the forest" draggable="false"><figcaption><b>Two-Storey Cube</b><span>1,100 sq ft · Lake Tahoe</span></figcaption></figure>
+          <figure class="proj__card"><img src="assets/img/lake.jpg" alt="Lakeside timber ADU" draggable="false"><figcaption><b>Lakeside Retreat</b><span>850 sq ft · Sonoma</span></figcaption></figure>
         </div>
       </div>
+      <p class="proj__hint">Drag to explore · click a photo to open it</p>
     </section>
 
     <!-- 8. TESTIMONIALS -->
-    <section class="slide slide--test" id="testimonials" data-theme="dark" data-cta="none" data-lines>
+    <section class="slide slide--test" id="testimonials" data-theme="dark" data-cta="none" data-lines data-name="Reviews" data-desc="What our customers say">
       <div class="test__bg"><img src="assets/img/testbg.jpg" alt=""></div>
       <h2 class="t-jost test__title split">Don't Just Take Our<br>Word For It:<br>Hear From Our Happy<br>Customers</h2>
       <div class="test__cards">
         <article class="tcard" style="--cx:6;--cy:185;--d:.6">
           <img src="assets/img/person1.jpg" alt="John K.">
-          <span class="tcard__plus">+</span>
-          <span class="tcard__btn"><svg viewBox="0 0 12 12"><path d="M9 3L3 9M3 4v5h5"/></svg></span>
-          <div class="tcard__body"><h3>John K.</h3><p>California Modulars built an amazing ADU for my aging parents. It's a safe and comfortable space that allows them to remain in their independence while being close to us. The team was compassionate and understanding throughout the process. The ADU is beautiful and functional, and my parents absolutely love it!</p></div>
+          <span class="tcard__plus" aria-hidden="true">+</span>
+          <span class="tcard__btn" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M9 3L3 9M3 4v5h5"/></svg></span>
+          <div class="tcard__body"><h3>John K.</h3><p>California Modulars built an amazing ADU for my aging parents. It's a safe and comfortable space that allows them to keep their independence while being close to us. The team was compassionate and understanding throughout the process. The ADU is beautiful and functional, and my parents absolutely love it!</p></div>
         </article>
         <article class="tcard" style="--cx:173;--cy:169;--d:1">
           <img src="assets/img/person2.jpg" alt="Sarah M.">
-          <span class="tcard__plus">+</span>
-          <span class="tcard__btn"><svg viewBox="0 0 12 12"><path d="M9 3L3 9M3 4v5h5"/></svg></span>
+          <span class="tcard__plus" aria-hidden="true">+</span>
+          <span class="tcard__btn" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M9 3L3 9M3 4v5h5"/></svg></span>
           <div class="tcard__body"><h3>Sarah M.</h3><p>California Modulars transformed our backyard into a beautiful and functional living space! The ADU they built is modern, stylish, and exceeded our expectations. We now have a comfortable guest suite for family and friends. The team was professional and efficient throughout the entire process.</p></div>
         </article>
         <article class="tcard" style="--cx:341;--cy:185;--d:.75">
           <img src="assets/img/person3.jpg" alt="Maria R.">
-          <span class="tcard__plus">+</span>
-          <span class="tcard__btn"><svg viewBox="0 0 12 12"><path d="M9 3L3 9M3 4v5h5"/></svg></span>
+          <span class="tcard__plus" aria-hidden="true">+</span>
+          <span class="tcard__btn" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M9 3L3 9M3 4v5h5"/></svg></span>
           <div class="tcard__body"><h3>Maria R.</h3><p>We're thrilled with our new ADU from California Modulars! It's a fantastic rental unit that generates extra income for us. The design is modern and appealing, and the construction is top-notch. The team was responsive and helpful throughout the process. We highly recommend them to anyone considering an ADU.</p></div>
         </article>
         <article class="tcard" style="--cx:509;--cy:168;--d:1.15">
           <img src="assets/img/person4.jpg" alt="David L.">
-          <span class="tcard__plus">+</span>
-          <span class="tcard__btn"><svg viewBox="0 0 12 12"><path d="M9 3L3 9M3 4v5h5"/></svg></span>
+          <span class="tcard__plus" aria-hidden="true">+</span>
+          <span class="tcard__btn" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M9 3L3 9M3 4v5h5"/></svg></span>
           <div class="tcard__body"><h3>David L.</h3><p>I'm so impressed with the quality and craftsmanship of my new ADU from California Modulars. It's the perfect home office and creative space. The design is sleek and the functionality is outstanding. The team was fantastic to work with, and the project was completed on time and within budget. I couldn't be happier!</p></div>
         </article>
       </div>
     </section>
 
-    <!-- 9. FINAL CTA -->
-    <section class="slide slide--final" id="final" data-theme="light" data-cta="none">
-      <canvas class="final__canvas" id="logo3d"></canvas>
+    <!-- 9. FINAL -->
+    <section class="slide slide--final" id="final" data-theme="light" data-cta="none" data-name="Get started" data-desc="Build an ADU for rental income">
+      <canvas class="final__canvas" id="logo3d" aria-hidden="true"></canvas>
       <h2 class="t-jost final__title split">Unlock Your Property's Potential:<br>Build an ADU for Rental Income<br>and Financial Freedom</h2>
       <p class="final__sub split">Maximize Your ROI with a Custom-Designed ADU Perfect for Airbnb and Short-Term Rentals</p>
       <p class="final__credit split">dgd studio</p>
@@ -243,8 +319,6 @@
 
   </main>
 
-  <script src="assets/vendor/three.min.js" defer></script>
-  <script src="assets/js/logo3d.js" defer></script>
   <script src="assets/js/main.js" defer></script>
 </body>
 </html>
