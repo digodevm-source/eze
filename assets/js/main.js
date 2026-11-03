@@ -558,7 +558,7 @@
     scrollBar.style.transform = `scaleY(${(slides.indexOf(el) + 1) / slides.length})`;
     navLinks.forEach((a) => a.classList.toggle('is-current', a.getAttribute('href') === '#' + el.id));
     if (el.id !== 'projects') cursor.el.classList.remove('is-drag', 'is-pressing');
-    if (history.replaceState) history.replaceState(null, '', '#' + el.id);
+    try { if (history.replaceState) history.replaceState(null, '', '#' + el.id); } catch (e) { /* sandboxed frame */ }
   }
 
   function enterSlide(el, dir) {
@@ -880,6 +880,10 @@
     const fromHash = ids.indexOf(location.hash.slice(1));
     busy = false;
     goTo(fromHash > 0 ? fromHash : 0, { force: true });
+    window.addEventListener('hashchange', () => {
+      const i = ids.indexOf(location.hash.slice(1));
+      if (i >= 0 && i !== cur) goTo(i);
+    });
   }
 
   window.addEventListener('resize', () => {
