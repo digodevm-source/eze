@@ -691,6 +691,18 @@ body.theme-light .scroll-ind { color: #222; }
   font-size: calc(7.1 * var(--p)); line-height: calc(8.6 * var(--p));
   color: #232323;
 }
+.final__credit {
+  position: absolute; left: 0; right: 0;
+  bottom: calc(5 * var(--y));
+  text-align: center;
+  font-family: var(--f-jost);
+  font-weight: 400;
+  font-size: calc(6.4 * var(--p));
+  line-height: 1;
+  letter-spacing: .14em;
+  color: #1c1c1c;
+  opacity: .75;
+}
 
 /* =========================================================
    SMALL / PORTRAIT SCREENS
@@ -752,6 +764,7 @@ body.theme-light .scroll-ind { color: #222; }
 
   .why__title, .proj__title, .test__title, .final__title { left: 50%; top: calc(80 * var(--y)); }
   .final__sub { left: 50%; }
+  .final__credit { bottom: calc(14 * var(--p)); font-size: calc(10 * var(--p)); }
   .why__list { left: calc(16 * var(--p)); width: calc(348 * var(--p)); top: calc(190 * var(--y)); }
   .why__list button { height: calc(46 * var(--y)); }
   .why__list .n { font-size: calc(10 * var(--p)); }

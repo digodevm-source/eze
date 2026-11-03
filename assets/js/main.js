@@ -176,7 +176,7 @@
   const CTA_MODES = {
     card: { label: 'Get a free consultation', x: 117, y: 307, w: 47, h: 71, wide: false },
     read: { label: 'Read more', x: 305, y: 349, w: 65, h: 23, wide: true },
-    calc: { label: 'Calculate cost', x: 304, y: 351, w: 67, h: 23, wide: true },
+    calc: { label: 'Calculate cost', x: 304, y: 334, w: 67, h: 23, wide: true },
   };
   let ctaMode = 'none';
   function setCTA(mode) {
@@ -189,7 +189,7 @@
     const apply = () => {
       if (portrait) {
         cta.style.left = `calc(50% - ${m.w / 2} * var(--p))`;
-        cta.style.top = `calc(100% - ${m.h + 18} * var(--p))`;
+        cta.style.top = `calc(100% - ${m.h + (mode === 'calc' ? 38 : 18)} * var(--p))`;
       } else {
         cta.style.left = `calc(${m.x} * var(--x))`;
         cta.style.top = `calc(${m.y} * var(--y))`;
@@ -540,11 +540,13 @@
       if (window.Logo3D) window.Logo3D.play(true);
       const a = textIn($('.final__title', el), { delay: 700, stagger: 20 });
       textIn($('.final__sub', el), { delay: 1300, stagger: 6, dur: 500, shift: 0.3 });
+      textIn($('.final__credit', el), { delay: 1700, stagger: 40, dur: 700, shift: 0.6 });
       return a - 400;
     },
     outro(dir, el) {
       textOut($('.final__title', el), { stagger: 5 });
       textOut($('.final__sub', el), { stagger: 2 });
+      textOut($('.final__credit', el), { stagger: 12 });
       return 400;
     },
     after() { if (window.Logo3D) window.Logo3D.play(false); },
