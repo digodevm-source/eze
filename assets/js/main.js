@@ -71,8 +71,8 @@
     cs.forEach((c, i) => {
       c.animate(
         [
-          { opacity: 0, transform: `translateX(${shift}em)`, filter: 'blur(4px)' },
-          { opacity: 1, transform: 'none', filter: 'blur(0px)' },
+          { opacity: 0, transform: `translate3d(${shift}em,0,0)` },
+          { opacity: 1, transform: 'translate3d(0,0,0)' },
         ],
         { duration: dur, delay: delay + i * stagger, easing: EASE, fill: 'both' }
       );
@@ -87,8 +87,8 @@
       c.getAnimations().forEach((a) => a.cancel());
       c.animate(
         [
-          { opacity: 1, transform: 'none', filter: 'blur(0px)' },
-          { opacity: 0, transform: 'translateX(-.15em)', filter: 'blur(2px)' },
+          { opacity: 1, transform: 'translate3d(0,0,0)' },
+          { opacity: 0, transform: 'translate3d(-.15em,0,0)' },
         ],
         { duration: dur, delay: delay + i * stagger, easing: EASE_IN, fill: 'both' }
       );
@@ -276,8 +276,7 @@
       if (this.expanded === v) return;
       this.expanded = v;
       this.el.classList.toggle('is-expanded', v);
-      const img = $('img', this.cards[this.i]);
-      img.getAnimations().forEach((a) => a.cancel());
+      this.cards[this.i].getAnimations().forEach((a) => a.cancel());
     },
     go(d) {
       const ni = this.i + d;
@@ -289,27 +288,33 @@
       this.layout();
       // inner parallax of photos while sliding
       this.cards.forEach((c) => {
-        const img = $('img', c);
-        anim(img, [
-          { transform: `translateX(${d * 14}%) scale(1.12)` },
-          { transform: 'none' },
-        ], { duration: 1200, easing: EASE_IO });
+        anim($('.max__img', c), [
+          { transform: `translate3d(${d * 14}%,0,0) scale(1.12)` },
+          { transform: 'translate3d(0,0,0)' },
+        ], { duration: 1200, easing: EASE_IO, fill: 'none' });
       });
       textIn(this.notes[ni], { delay: 650, stagger: 9, dur: 600, shift: 0.4 });
       return true;
     },
   };
   MAX.layout();
+  // card rectangle as clip-path insets (px); `line` = collapsed to its bottom edge
+  function maxClip(line) {
+    const r = $('#maxHit').getBoundingClientRect();
+    const W = MAX.el.clientWidth, H = MAX.el.clientHeight;
+    const top = line ? r.bottom - 1 : r.top;
+    return `inset(${top}px ${W - r.right}px ${H - r.bottom}px ${r.left}px)`;
+  }
   D.maximize = {
     enter(dir, el) {
       MAX.layout();
       anim(el, [{ opacity: 0 }, { opacity: 1 }], { duration: 400 });
       const card = MAX.cards[MAX.i];
-      anim(card, [{ clipPath: 'inset(99.4% 0 0 0)' }, { clipPath: 'inset(0% 0 0 0)' }], { duration: 1150, delay: 150, easing: EASE_IO });
-      anim($('img', card), [
-        { transform: 'scale(1.35)', filter: 'blur(14px)' },
-        { transform: 'none', filter: 'blur(0px)' },
-      ], { duration: 1500, delay: 150 });
+      anim(card, [{ clipPath: maxClip(true) }, { clipPath: maxClip(false) }], { duration: 1150, delay: 150, easing: EASE_IO, fill: 'backwards' });
+      anim($('.max__img', card), [
+        { transform: 'scale(1.3)', opacity: 0.4 },
+        { transform: 'scale(1)', opacity: 1 },
+      ], { duration: 1500, delay: 150, fill: 'backwards' });
       MAX.cards.forEach((c) => { if (c !== card) anim(c, [{ opacity: 0 }, { opacity: 1 }], { duration: 600, delay: 900 }); });
       const t1 = textIn($('.max__title', el), { delay: 250, stagger: 30 });
       MAX.nums.forEach((n, k) => (k === MAX.i ? numIn(n, { delay: 500 }) : anim(n, [{ opacity: 0 }, { opacity: 1 }], { duration: 800, delay: 1100 })));
@@ -325,10 +330,10 @@
       const t = numOut(MAX.nums[MAX.i]);
       MAX.nums.forEach((n, k) => k !== MAX.i && anim(n, [{ opacity: 1 }, { opacity: 0 }], { duration: 300 }));
       MAX.cards.forEach((c) => c !== card && anim(c, [{ opacity: 1 }, { opacity: 0 }], { duration: 300 }));
-      anim(card, [{ clipPath: 'inset(0% 0 0 0)' }, { clipPath: 'inset(99.4% 0 0 0)' }], { duration: 850, delay: 250, easing: EASE_IO });
-      anim($('img', card), [
-        { transform: 'none', filter: 'blur(0px)' },
-        { transform: 'scale(1.2)', filter: 'blur(10px)' },
+      anim(card, [{ clipPath: maxClip(false) }, { clipPath: maxClip(true) }], { duration: 850, delay: 250, easing: EASE_IO });
+      anim($('.max__img', card), [
+        { transform: 'scale(1)', opacity: 1 },
+        { transform: 'scale(1.2)', opacity: 0.4 },
       ], { duration: 850, delay: 250, easing: EASE_IO });
       anim($('#maxDot'), [{ transform: 'scale(1)' }, { transform: 'scale(0)' }], { duration: 400 });
       return Math.max(t, 1100);
@@ -510,6 +515,7 @@
   const tcards = $$('.tcard');
   D.testimonials = {
     enter(dir, el) {
+      setTimeout(() => window.CMparallax && window.CMparallax(), 0);
       anim(el, [{ opacity: 0 }, { opacity: 1 }], { duration: 400 });
       anim($('.test__bg img', el), [{ opacity: 0, transform: 'translateY(-6%) scale(1.05)' }, { opacity: 1, transform: 'none' }], { duration: 1800 });
       const a = textIn($('.test__title', el), { delay: 250, stagger: 22 });
@@ -580,6 +586,10 @@
     idx = clamp(idx, 0, slides.length - 1);
     if (idx === cur || (busy && !opts.force)) return;
     busy = true;
+    try { await runTransition(idx); } catch (err) { console.error(err); } finally { busy = false; }
+  }
+
+  async function runTransition(idx) {
     const dir = idx > cur ? 1 : -1;
     const fromEl = slides[cur];
     const toEl = slides[idx];
@@ -594,7 +604,7 @@
       if (toCover) {
         // the new slide covers the old one; push the old one away a bit (parallax)
         await wait(Math.min(outMs, 260));
-        anim(fromEl, [{ transform: 'none', filter: 'brightness(1)' }, { transform: `translateY(${-dir * 22}%)`, filter: 'brightness(.45)' }], { duration: 1150, easing: EASE_IO });
+        anim(fromEl, [{ transform: 'translate3d(0,0,0)' }, { transform: `translate3d(0,${-dir * 22}%,0)` }], { duration: 1150, easing: EASE_IO });
       } else {
         await wait(outMs * 0.85);
         anim(fromEl, [{ opacity: 1 }, { opacity: 0 }], { duration: 450, easing: EASE });
@@ -603,7 +613,7 @@
     }
     cur = idx;
     const inMs = enterSlide(toEl, dir);
-    const settle = Math.max(1150, Math.min(inMs, 1700));
+    const settle = Math.max(950, Math.min(inMs, 1300));
     setTimeout(() => {
       if (fromEl) {
         fromEl.classList.remove('is-leaving');
@@ -612,7 +622,6 @@
       }
     }, 1250);
     await wait(settle);
-    busy = false;
   }
 
   function intent(dir) {
@@ -620,7 +629,7 @@
     const d = D[ids[cur]];
     if (d.step && d.step(dir)) {
       busy = true;
-      setTimeout(() => (busy = false), ids[cur] === 'maximize' ? 1150 : 450);
+      setTimeout(() => (busy = false), ids[cur] === 'maximize' ? 1000 : 380);
       return;
     }
     goTo(cur + dir);
@@ -630,17 +639,19 @@
      Input: wheel / keys / touch / links
   ----------------------------------------------------------- */
   (() => {
-    let last = 0, lastAbs = 0;
+    let last = 0, lastAbs = 0, lastFire = 0;
     window.addEventListener('wheel', (e) => {
       if ($('#search').classList.contains('is-open')) return;
       e.preventDefault();
       const now = performance.now();
       const delta = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : (ids[cur] === 'projects' || ids[cur] === 'maximize' ? e.deltaX : 0);
-      const abs = Math.abs(delta);
+      const abs = Math.abs(delta) * (e.deltaMode === 1 ? 40 : 1);
       const gap = now - last;
-      const fresh = gap > 160 || abs > lastAbs * 1.6 + 4;
+      // new gesture: a pause, a stronger push, or a wheel that keeps turning
+      const fresh = gap > 140 || abs > lastAbs * 1.5 + 6 || (now - lastFire > 1250 && abs >= 20);
       last = now; lastAbs = abs;
       if (abs < 3 || busy || !fresh) return;
+      lastFire = now;
       intent(delta > 0 ? 1 : -1);
     }, { passive: false });
 
@@ -725,19 +736,19 @@
       mx = e.clientX / innerWidth - 0.5;
       my = e.clientY / innerHeight - 0.5;
     });
+    const depth = tcards.map((c) => parseFloat(c.style.getPropertyValue('--d')) || 1);
+    let raf = 0;
     const tick = (t) => {
-      requestAnimationFrame(tick);
-      if (ids[cur] !== 'testimonials') return;
+      if (ids[cur] !== 'testimonials') { raf = 0; return; }
+      raf = requestAnimationFrame(tick);
       sx = lerp(sx, mx, 0.06); sy = lerp(sy, my, 0.06);
       const u = innerWidth / 673;
       tcards.forEach((c, k) => {
-        const d = parseFloat(c.style.getPropertyValue('--d')) || 1;
         const fy = Math.sin(t / 1400 + k * 1.7) * 2.2;
-        c.style.setProperty('--mx', `${(-sx * 14 * d) * u}px`);
-        c.style.setProperty('--my', `${(-sy * 10 * d + fy) * u}px`);
+        c.style.translate = `${(-sx * 14 * depth[k] * u).toFixed(1)}px ${((-sy * 10 * depth[k] + fy) * u).toFixed(1)}px`;
       });
     };
-    requestAnimationFrame(tick);
+    window.CMparallax = () => { if (!raf) raf = requestAnimationFrame(tick); };
   })();
 
   /* -----------------------------------------------------------
@@ -802,9 +813,11 @@
   const cursor = { el: $('#cursor'), x: innerWidth / 2, y: innerHeight / 2, tx: innerWidth / 2, ty: innerHeight / 2 };
   (() => {
     const c = cursor;
+    let raf = 0;
     window.addEventListener('pointermove', (e) => {
       if (e.pointerType !== 'mouse') return;
       c.tx = e.clientX; c.ty = e.clientY;
+      if (!raf) raf = requestAnimationFrame(tick);
       c.el.classList.remove('is-hidden');
       const t = e.target;
       c.el.classList.toggle('is-drag', !!t.closest('.proj__viewport') && ids[cur] === 'projects');
@@ -812,12 +825,13 @@
     });
     document.addEventListener('pointerleave', () => c.el.classList.add('is-hidden'));
     document.documentElement.addEventListener('mouseleave', () => c.el.classList.add('is-hidden'));
-    const tick = () => {
-      c.x = lerp(c.x, c.tx, 0.28); c.y = lerp(c.y, c.ty, 0.28);
-      c.el.style.transform = `translate3d(${c.x}px,${c.y}px,0)`;
-      requestAnimationFrame(tick);
-    };
-    tick();
+    function tick() {
+      c.x = lerp(c.x, c.tx, 0.3); c.y = lerp(c.y, c.ty, 0.3);
+      if (Math.abs(c.tx - c.x) < 0.1 && Math.abs(c.ty - c.y) < 0.1) { c.x = c.tx; c.y = c.ty; raf = 0; }
+      else raf = requestAnimationFrame(tick);
+      c.el.style.transform = `translate3d(${c.x.toFixed(1)}px,${c.y.toFixed(1)}px,0)`;
+    }
+    c.el.style.transform = `translate3d(${c.x}px,${c.y}px,0)`;
   })();
 
   /* -----------------------------------------------------------
@@ -839,6 +853,7 @@
       im.onload = im.onerror = bump;
       im.src = s;
     });
+    $$('img').forEach((im) => { if (im.decode) im.decode().catch(() => {}); });
     (document.fonts ? document.fonts.ready : Promise.resolve()).then(bump);
     setTimeout(() => { state.p = 1; }, 9000); // never get stuck
     return state;
