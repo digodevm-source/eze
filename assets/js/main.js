@@ -283,6 +283,11 @@
     setExpanded(v) {
       if (this.expanded === v) return;
       if (v && portrait()) return;
+      if (v) {
+        const src = $('img', this.cards[this.i]).src;
+        const full = $('#maxFull img');
+        if (full.src !== src) full.src = src;
+      }
       this.expanded = v;
       this.el.classList.toggle('is-expanded', v);
       this.cards[this.i].getAnimations().forEach((a) => a.cancel());
@@ -290,7 +295,7 @@
     go(d) {
       const ni = this.i + d;
       if (ni < 0 || ni >= this.n) return false;
-      this.setExpanded(false);
+      this.snapClose();
       const old = this.i;
       textOut(this.notes[old], { stagger: 5 });
       this.i = ni;
@@ -305,6 +310,13 @@
       textIn(this.notes[ni], { delay: 650, stagger: 9, dur: 600, shift: 0.4 });
       return true;
     },
+  };
+  // drop the expanded layer instantly (used when the carousel moves or the slide leaves)
+  MAX.snapClose = function () {
+    if (!this.expanded) return;
+    this.el.classList.add('max-snap');
+    this.setExpanded(false);
+    requestAnimationFrame(() => requestAnimationFrame(() => this.el.classList.remove('max-snap')));
   };
   MAX.layout();
   // card rectangle as clip-path insets (px); `line` = collapsed to its bottom edge
@@ -332,7 +344,7 @@
       return Math.max(t1, 1500) - 300;
     },
     outro(dir, el) {
-      MAX.setExpanded(false);
+      MAX.snapClose();
       const card = MAX.cards[MAX.i];
       textOut($('.max__title', el), { stagger: 8 });
       textOut(MAX.notes[MAX.i], { stagger: 4 });
@@ -350,7 +362,7 @@
     step(dir) {
       return MAX.go(dir);
     },
-    reset() { MAX.setExpanded(false); },
+    reset() { MAX.snapClose(); },
   };
 
   // 3 — ACCELERATE
@@ -555,7 +567,8 @@
   // 9 — FINAL
   D.final = {
     enter(dir, el) {
-      loadLogo3D().then(() => { if (ids[cur] === 'final' && window.Logo3D) window.Logo3D.play(true); });
+      // start the 3D render once the wipe has done its heaviest frames
+      loadLogo3D().then(() => setTimeout(() => { if (ids[cur] === 'final' && window.Logo3D) window.Logo3D.play(true); }, 350));
       const a = textIn($('.final__title', el), { delay: 700, stagger: 20 });
       textIn($('.final__sub', el), { delay: 1300, stagger: 6, dur: 500, shift: 0.3 });
       textIn($('.final__credit', el), { delay: 1700, stagger: 40, dur: 700, shift: 0.6 });
@@ -598,7 +611,11 @@
     if (COVER.has(el.id)) {
       const from = el.id === 'final' ? 'inset(100% 0 0 0)' : dir > 0 ? 'translateY(100%)' : 'translateY(-100%)';
       if (el.id === 'final') {
-        anim(el, [{ clipPath: dir > 0 ? 'inset(100% 0 0 0)' : 'inset(0 0 100% 0)' }, { clipPath: 'inset(0 0 0 0)' }], { duration: 1150, easing: EASE_IO });
+        // wipe reveal done with transforms only: the panel slides in, its content counter-slides
+        const H = el.clientHeight || innerHeight;
+        const sgn = dir > 0 ? 1 : -1;
+        anim(el, [{ transform: `translate3d(0,${sgn * H}px,0)` }, { transform: 'translate3d(0,0,0)' }], { duration: 1150, easing: EASE_IO });
+        $$(':scope > *', el).forEach((c) => anim(c, [{ translate: `0 ${-sgn * H}px` }, { translate: '0 0' }], { duration: 1150, easing: EASE_IO }));
       } else {
         anim(el, [{ transform: from }, { transform: 'none' }], { duration: 1150, easing: EASE_IO });
       }
@@ -636,6 +653,11 @@
       }
     }
     cur = idx;
+    slides.forEach((s, k) => {
+      const near = Math.abs(k - idx) === 1;
+      s.classList.toggle('is-near', near);
+      if (near) $$('img', s).forEach((im) => { if (im.decode) im.decode().catch(() => {}); });
+    });
     const inMs = enterSlide(toEl, dir);
     const settle = Math.max(950, Math.min(inMs, 1300));
     setTimeout(() => {
@@ -1095,7 +1117,11 @@
   }
 
   async function boot() {
+    // three.js parses and compiles its shaders while the preloader is on screen,
+    // so that work never lands in the middle of an animation later on
+    const logoReady = loadLogo3D();
     await startLoader();
+    await Promise.race([logoReady, wait(4000)]);
     await wait(350);
     loader.classList.remove('is-in');
     await wait(500);
@@ -1114,8 +1140,7 @@
       const i = ids.indexOf(location.hash.slice(1));
       if (i >= 0 && i !== cur) goWhenFree(i);
     });
-    const idle = window.requestIdleCallback || ((f) => setTimeout(f, 1));
-    setTimeout(() => idle(() => loadLogo3D(), { timeout: 4000 }), 4500);
+
   }
 
   window.addEventListener('resize', () => {

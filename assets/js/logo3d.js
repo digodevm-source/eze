@@ -174,10 +174,13 @@
         introStart = performance.now();
         lastT = 0; acc = 0; frames = 0;
         resize();
+        render(introStart);
+        canvas.classList.add('is-live');
         raf = requestAnimationFrame(loop);
       } else if (!on && playing) {
         playing = false;
         cancelAnimationFrame(raf);
+        canvas.classList.remove('is-live');
       }
     },
   };
