@@ -176,7 +176,6 @@
   const CTA_MODES = {
     card: { label: 'Get a free consultation', x: 117, y: 307, w: 47, h: 71, wide: false },
     read: { label: 'Read more', x: 305, y: 349, w: 65, h: 23, wide: true },
-    calc: { label: 'Calculate cost', x: 304, y: 334, w: 67, h: 23, wide: true },
   };
   let ctaMode = 'none';
   function setCTA(mode) {
@@ -189,7 +188,7 @@
     const apply = () => {
       if (portrait) {
         cta.style.left = `calc(50% - ${m.w / 2} * var(--p))`;
-        cta.style.top = `calc(100% - ${m.h + (mode === 'calc' ? 38 : 18)} * var(--p))`;
+        cta.style.top = `calc(100% - ${m.h + 18} * var(--p))`;
       } else {
         cta.style.left = `calc(${m.x} * var(--x))`;
         cta.style.top = `calc(${m.y} * var(--y))`;
