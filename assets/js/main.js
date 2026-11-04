@@ -1,6 +1,14 @@
 /* ==========================================================================
    Altai Ridge — interactions
-   Smooth scroll (Lenis) + stacked slide transitions (GSAP ScrollTrigger)
+
+   Desktop ("stage" mode): every slide is a layer of one fixed scene and each
+   change of slide is its own short film — push from the left, a camera that
+   flies through the screen, an iris, a window opening onto the valley,
+   a 3D flip, shutters, a diagonal wipe, a card dealt from the corner,
+   doors opening into the house. Only transforms, opacity and clip-path are
+   animated, and only the two slides involved are rendered.
+
+   Phones / small screens: natural scrolling with scroll-linked card entrances.
    ========================================================================== */
 (() => {
   'use strict';
@@ -8,25 +16,31 @@
   const $ = (s, c = document) => c.querySelector(s);
   const $$ = (s, c = document) => Array.from(c.querySelectorAll(s));
   const root = document.documentElement;
+  const pad = (n) => String(n).padStart(2, '0');
 
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const finePointer = matchMedia('(hover: hover) and (pointer: fine)').matches;
-  const STACK_MQ = '(min-width: 1024px) and (min-height: 620px)';
+  const stageMQ = matchMedia('(min-width: 1024px) and (min-height: 620px)');
   const hasGsap = typeof window.gsap !== 'undefined' && typeof window.ScrollTrigger !== 'undefined';
   const motion = hasGsap && !reduce;
+  const stage = motion && stageMQ.matches;
 
   const slides = $$('.slide');
   const header = $('#header');
+  const preloader = $('.preloader');
   const easeInOutQuart = (t) => (t < 0.5 ? 8 * t * t * t * t : 1 - Math.pow(-2 * t + 2, 4) / 2);
-  const easeOutExpo = (t) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t));
 
   let lenis = null;
-  let isStack = false;
   let modalOpen = false;
   let menuOpen = false;
+  let current = 0;
+  let goToSlide = null; // set by the active engine
 
   if (hasGsap) gsap.registerPlugin(ScrollTrigger);
   if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  if (stage) root.classList.add('is-stage');
+  // the two layouts are built differently, so crossing the breakpoint rebuilds the page
+  if (motion && stageMQ.addEventListener) stageMQ.addEventListener('change', () => location.reload());
 
   /* ------------------------------------------------------------------------
      Text splitting (words / chars) for mask reveals
@@ -73,233 +87,72 @@
   }
 
   /* ------------------------------------------------------------------------
-     Smooth scroll
+     Content intro of a slide: hide (prepare) → play (run)
      ------------------------------------------------------------------------ */
-  if (motion && window.Lenis) {
-    lenis = new Lenis({ lerp: 0.085, smoothWheel: true, wheelMultiplier: 0.9, touchMultiplier: 1.4 });
-    lenis.on('scroll', ScrollTrigger.update);
-    gsap.ticker.add((t) => lenis.raf(t * 1000));
-    gsap.ticker.lagSmoothing(0);
-    lenis.stop();
-  }
-  const scrollY = () => (lenis ? lenis.scroll : window.scrollY);
-  function scrollToY(y, duration = 1.4) {
-    if (lenis) {
-      snap.busy = true;
-      lenis.scrollTo(y, { duration, easing: easeInOutQuart, force: true, onComplete: () => { snap.busy = false; } });
-    } else {
-      window.scrollTo({ top: y, behavior: reduce ? 'auto' : 'smooth' });
-    }
-  }
-  /* Document position of a slide that ignores pinning (pin-spacer keeps the natural flow) */
-  function slideTop(slide) {
-    const box = slide.parentElement && slide.parentElement.classList.contains('pin-spacer') ? slide.parentElement : slide;
-    return Math.round(box.getBoundingClientRect().top + scrollY());
-  }
+  const HERO_BITS = ['.hero__meta li', '.status', '.hero__facts li', '.hero__text', '.hero__cta', '.scroll-hint'];
+  const CLIP_IMG = ':scope > img:not(.pimg):not(.pside__img)';
 
-  /* ------------------------------------------------------------------------
-     Initial (hidden) states — set before the preloader lifts
-     ------------------------------------------------------------------------ */
-  const notHero = (el) => !el.closest('.slide--hero');
-  const CLIP_IMG = '[data-clip] > img:not(.pimg):not(.pside__img)';
-  if (motion) {
-    gsap.set('.wi', { yPercent: 110 });
-    gsap.set('.ch', { yPercent: 115 });
-    gsap.set('[data-reveal]', { autoAlpha: 0, y: 36 });
-    gsap.set('[data-clip]', { clipPath: 'inset(100% 0% 0% 0%)' });
-    gsap.set(CLIP_IMG, { scale: 1.25 });
-    gsap.set('[data-progress]', { scaleX: 0 });
-    gsap.set('.steps__draw', { strokeDashoffset: 1 });
-    gsap.set(['.hero__meta li', '.status', '.hero__facts li', '.hero__text', '.hero__cta', '.scroll-hint'], { autoAlpha: 0, y: 26 });
-    gsap.set([header, '.pager'], { autoAlpha: 0 });
-    $$('[data-count]').forEach((el) => { el.textContent = '0'; });
-  }
-
-  /* ------------------------------------------------------------------------
-     Scroll-triggered reveals (work in both stacked and flow layouts)
-     ------------------------------------------------------------------------ */
-  /* Each reveal runs once: either when its element scrolls in, or — for things
-     sitting at the very bottom of a slide — when the slide itself lands on screen. */
-  const revealed = new WeakSet();
-  const pendingReveals = [];
-  function onEnter(el, fn, start = 'top 88%') {
-    const run = () => {
-      if (revealed.has(el)) return;
-      revealed.add(el);
-      fn();
-    };
-    pendingReveals.push([el, run]);
-    ScrollTrigger.create({ trigger: el, start, once: true, onEnter: run });
-  }
-  function showReveal(els) {
-    const fresh = els.filter((e) => !revealed.has(e));
-    if (!fresh.length) return;
-    fresh.forEach((e) => revealed.add(e));
-    gsap.to(fresh, { autoAlpha: 1, y: 0, duration: 1.2, ease: 'expo.out', stagger: 0.09, overwrite: true, clearProps: 'transform' });
-  }
   function countUp(el, delay = 0) {
+    if (el._count) el._count.kill();
     const end = parseFloat(el.dataset.count);
     const o = { v: 0 };
-    gsap.to(o, { v: end, duration: 2.2, delay, ease: 'power3.out', onUpdate: () => { el.textContent = Math.round(o.v); } });
+    el.textContent = '0';
+    el._count = gsap.to(o, { v: end, duration: 2, delay, ease: 'power3.out', onUpdate: () => { el.textContent = Math.round(o.v); } });
   }
-  function initReveals() {
-    $$('[data-split]').filter(notHero).forEach((el) => onEnter(el, () => {
-      gsap.to($$('.wi', el), { yPercent: 0, duration: 1.3, ease: 'expo.out', stagger: 0.028 });
-    }));
-    ScrollTrigger.batch($$('[data-reveal]').filter(notHero), {
-      start: 'top 92%',
-      once: true,
-      onEnter: showReveal,
-    });
-    slides.filter(notHero).forEach((s) => ScrollTrigger.create({
-      trigger: s,
-      start: 'top 8%',
-      once: true,
-      onEnter: () => {
-        showReveal($$('[data-reveal]', s));
-        pendingReveals.forEach(([el, run]) => { if (s.contains(el)) run(); });
-      },
-    }));
-    $$('[data-clip]').filter(notHero).forEach((el) => onEnter(el, () => {
-      gsap.to(el, { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.6, ease: 'expo.inOut' });
-      const imgs = $$(':scope > img:not(.pimg):not(.pside__img)', el);
-      if (imgs.length) gsap.to(imgs, { scale: 1, duration: 2.4, ease: 'expo.out', delay: 0.15, clearProps: 'transform' });
-    }, 'top 92%'));
-    $$('[data-count]').filter(notHero).forEach((el) => onEnter(el, () => countUp(el, 0.2), 'top 95%'));
-    $$('[data-progress]').filter(notHero).forEach((el) => onEnter(el, () => {
-      gsap.to(el, { scaleX: el.dataset.progress / 100, duration: 2, ease: 'expo.inOut', delay: 0.3 });
-    }, 'top 95%'));
-    const draw = $('.steps__draw');
-    if (draw) onEnter($('.steps'), () => gsap.to(draw, { strokeDashoffset: 0, duration: 2.6, ease: 'power2.inOut', delay: 0.2 }), 'top 75%');
 
-    /* Big outline words drift horizontally while their slide is on screen */
-    const drift = (sel, from, to) => {
-      const el = $(sel);
-      if (!el) return;
-      gsap.fromTo(el, { xPercent: from }, {
-        xPercent: to, ease: 'none',
-        scrollTrigger: { trigger: el.closest('.slide'), start: 'top bottom', end: 'bottom top', scrub: 0.6 },
-      });
+  function introTargets(slide) {
+    const clips = $$('[data-clip]', slide);
+    const hero = slide.classList.contains('slide--hero');
+    return {
+      words: $$('[data-split] .wi', slide),
+      chars: $$('.ch', slide),
+      reveals: $$('[data-reveal]', slide).concat(hero ? HERO_BITS.flatMap((q) => $$(q, slide)) : []),
+      clips,
+      clipImgs: clips.flatMap((c) => $$(CLIP_IMG, c)),
+      bars: $$('[data-progress]', slide),
+      counts: $$('[data-count]', slide),
+      draw: $('.steps__draw', slide),
+      big: stage ? $$('.nature__word span, .docs__word span', slide) : [],
     };
-    drift('.nature__word span', 6, -10);
-    drift('.docs__word span', 8, -8);
-    const docsWord = $('.docs__word span');
-    if (docsWord) {
-      gsap.fromTo(docsWord, { backgroundPosition: '100% 0' }, {
-        backgroundPosition: '-100% 0', ease: 'none',
-        scrollTrigger: { trigger: docsWord.closest('.slide'), start: 'top bottom', end: 'bottom top', scrub: 0.6 },
-      });
-    }
+  }
+
+  function prepareIntro(slide) {
+    if (slide._intro) { slide._intro.kill(); slide._intro = null; }
+    const t = introTargets(slide);
+    if (t.words.length) gsap.set(t.words, { yPercent: 110 });
+    if (t.chars.length) gsap.set(t.chars, { yPercent: 115 });
+    if (t.reveals.length) gsap.set(t.reveals, { autoAlpha: 0, y: 30 });
+    if (t.clips.length) gsap.set(t.clips, { clipPath: 'inset(100% 0% 0% 0%)' });
+    if (t.clipImgs.length) gsap.set(t.clipImgs, { scale: 1.25 });
+    if (t.bars.length) gsap.set(t.bars, { scaleX: 0 });
+    t.counts.forEach((c) => { if (c._count) c._count.kill(); c.textContent = '0'; });
+    if (t.draw) gsap.set(t.draw, { strokeDashoffset: 1 });
+    if (t.big.length) gsap.set(t.big, { xPercent: 14, autoAlpha: 0 });
+  }
+
+  function runIntro(slide) {
+    if (slide._intro) slide._intro.kill();
+    const t = introTargets(slide);
+    const tl = gsap.timeline({ defaults: { ease: 'expo.out' } });
+    if (t.chars.length) tl.to(t.chars, { yPercent: 0, duration: 1.4, stagger: 0.05 }, 0);
+    if (t.words.length) tl.to(t.words, { yPercent: 0, duration: 1.15, stagger: 0.016 }, 0.05);
+    if (t.reveals.length) tl.to(t.reveals, { autoAlpha: 1, y: 0, duration: 1.05, stagger: 0.045, clearProps: 'transform' }, 0.15);
+    if (t.clips.length) tl.to(t.clips, { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.25, ease: 'expo.inOut', stagger: 0.08 }, 0);
+    if (t.clipImgs.length) tl.to(t.clipImgs, { scale: 1, duration: 1.9, clearProps: 'transform' }, 0.1);
+    if (t.bars.length) tl.to(t.bars, { scaleX: (i, el) => el.dataset.progress / 100, duration: 1.7, ease: 'expo.inOut', stagger: 0.1 }, 0.3);
+    if (t.counts.length) tl.add(() => t.counts.forEach((c) => countUp(c)), 0.2);
+    if (t.draw) tl.to(t.draw, { strokeDashoffset: 0, duration: 2.1, ease: 'power2.inOut' }, 0.3);
+    if (t.big.length) tl.to(t.big, { xPercent: 0, autoAlpha: 1, duration: 2.2 }, 0);
+    slide._intro = tl;
+    return tl;
   }
 
   /* ------------------------------------------------------------------------
-     Stacked slides — each card is pinned while the next one slides over it,
-     receding into depth. Desktop only; mobile keeps a natural flow.
-     ------------------------------------------------------------------------ */
-  const snap = { busy: false, timer: 0, dir: 1 };
-
-  function snapPoints() {
-    const vh = window.innerHeight;
-    const pts = [];
-    slides.forEach((s) => {
-      const top = slideTop(s);
-      pts.push(top);
-      const extra = s.offsetHeight - vh;
-      if (extra > 4) pts.push(top + extra);
-    });
-    pts.push(Math.round(ScrollTrigger.maxScroll(window)));
-    return [...new Set(pts)].sort((a, b) => a - b);
-  }
-
-  function trySnap() {
-    if (!isStack || !lenis || snap.busy || modalOpen || menuOpen) return;
-    const y = lenis.scroll;
-    const vh = window.innerHeight;
-    const pts = snapPoints();
-    let prev = null;
-    let next = null;
-    for (const p of pts) {
-      if (p <= y + 1) prev = p;
-      if (p >= y - 1 && next === null) next = p;
-    }
-    if (prev === null || next === null) return;
-    if (Math.abs(y - prev) < 2 || Math.abs(next - y) < 2) return;
-    const gap = next - prev;
-    let target = null;
-    if (gap <= vh * 1.15) {
-      const progress = (y - prev) / gap;
-      target = snap.dir > 0 ? (progress > 0.1 ? next : prev) : (progress < 0.9 ? prev : next);
-    } else if (y - prev < vh * 0.22) {
-      target = prev;
-    } else if (next - y < vh * 0.22) {
-      target = next;
-    }
-    if (target !== null) scrollToY(target, 1.15);
-  }
-
-  function stepSlide(dir) {
-    const pts = snapPoints();
-    const y = lenis ? lenis.targetScroll : window.scrollY;
-    const target = dir > 0 ? pts.find((p) => p > y + 4) : [...pts].reverse().find((p) => p < y - 4);
-    if (target !== undefined) scrollToY(target, 1.25);
-  }
-
-  function initStack() {
-    const mm = gsap.matchMedia();
-    mm.add(STACK_MQ, () => {
-      isStack = true;
-      root.classList.add('is-stack');
-
-      slides.forEach((slide, i) => {
-        const card = $('.card', slide);
-        const bg = $('.card__bg', slide);
-        const bgImg = bg && $('img', bg);
-        const next = slides[i + 1];
-
-        // incoming parallax: the background lags behind the card as it rises
-        if (i > 0 && bgImg) {
-          gsap.fromTo(bgImg, { yPercent: -9 }, {
-            yPercent: 0, ease: 'none',
-            scrollTrigger: { trigger: slide, start: 'top bottom', end: 'top top', scrub: true },
-          });
-        }
-        if (!next) return;
-
-        ScrollTrigger.create({
-          trigger: slide,
-          start: () => (slide.offsetHeight > window.innerHeight + 2 ? 'bottom bottom' : 'top top'),
-          endTrigger: next,
-          end: 'top top',
-          pin: true,
-          pinSpacing: false,
-        });
-
-        // outgoing: card recedes, dims and its photo drifts
-        const out = { trigger: next, start: 'top bottom', end: 'top top', scrub: true };
-        gsap.fromTo(card, { scale: 1, '--dim': 0 }, { scale: 0.9, '--dim': 0.72, ease: 'none', immediateRender: false, scrollTrigger: out });
-        if (bg) gsap.fromTo(bg, { yPercent: 0 }, { yPercent: 7, ease: 'none', immediateRender: false, scrollTrigger: { ...out } });
-      });
-
-      const onWheel = () => { snap.busy = false; };
-      window.addEventListener('wheel', onWheel, { passive: true });
-      window.addEventListener('touchstart', onWheel, { passive: true });
-
-      return () => {
-        isStack = false;
-        root.classList.remove('is-stack');
-        window.removeEventListener('wheel', onWheel);
-        window.removeEventListener('touchstart', onWheel);
-      };
-    });
-  }
-
-  /* ------------------------------------------------------------------------
-     Pager (slide counter + dots) and header state
+     Pager + header state (shared by both engines)
      ------------------------------------------------------------------------ */
   const pagerCur = $('.pager__cur');
   const pagerDots = $('.pager__dots');
   const navLinks = $$('.nav a');
-  const pad = (n) => String(n).padStart(2, '0');
   $('.pager__total').textContent = pad(slides.length);
   const dots = slides.map((s, i) => {
     const li = document.createElement('li');
@@ -307,145 +160,486 @@
     b.type = 'button';
     b.setAttribute('aria-label', `${pad(i + 1)} — ${s.dataset.title}`);
     b.innerHTML = `<span>${s.dataset.title}</span>`;
-    b.addEventListener('click', () => scrollToY(slideTop(s), 1.6));
+    b.addEventListener('click', () => goToSlide && goToSlide(i));
     li.appendChild(b);
     pagerDots.appendChild(li);
     return b;
   });
-  let current = -1;
+  let pagerIndex = -1;
   function setActive(i) {
-    if (i === current) return;
-    current = i;
+    if (i === pagerIndex) return;
+    pagerIndex = i;
     dots.forEach((d, k) => d.classList.toggle('is-active', k === i));
     const id = slides[i].id;
     navLinks.forEach((a) => a.classList.toggle('is-active', a.getAttribute('href') === `#${id}`));
-    if (hasGsap && !reduce && pagerCur.textContent !== pad(i + 1)) {
+    if (motion) {
       gsap.timeline()
-        .to(pagerCur, { yPercent: -60, autoAlpha: 0, duration: 0.22, ease: 'power2.in' })
+        .to(pagerCur, { yPercent: -60, autoAlpha: 0, duration: 0.2, ease: 'power2.in' })
         .add(() => { pagerCur.textContent = pad(i + 1); })
         .fromTo(pagerCur, { yPercent: 60, autoAlpha: 0 }, { yPercent: 0, autoAlpha: 1, duration: 0.45, ease: 'expo.out' });
     } else {
       pagerCur.textContent = pad(i + 1);
     }
   }
+  const headerSolid = () => menuOpen || (stage ? current > 0 : window.scrollY > window.innerHeight * 0.35);
+  const updateHeader = () => header.classList.toggle('is-solid', headerSolid());
   setActive(0);
 
-  if (hasGsap) {
-    slides.forEach((s, i) => ScrollTrigger.create({
-      trigger: s, start: 'top 55%', end: 'bottom 55%',
-      onToggle: (self) => { if (self.isActive) setActive(i); },
-    }));
-    ScrollTrigger.create({
-      start: () => window.innerHeight * 0.35, end: 'max',
-      onToggle: (self) => header.classList.toggle('is-solid', self.isActive),
-    });
-  } else {
-    window.addEventListener('scroll', () => header.classList.toggle('is-solid', window.scrollY > window.innerHeight * 0.35), { passive: true });
-  }
-
-  /* ------------------------------------------------------------------------
-     Anchors, keyboard navigation, idle snapping
-     ------------------------------------------------------------------------ */
+  // in-page links: "#projects" etc.
+  const slideIndexOf = (hash) => {
+    let t = null;
+    try { t = hash && hash.length > 1 ? document.querySelector(hash) : null; } catch (err) { t = null; }
+    const s = t && t.closest('.slide');
+    return s ? slides.indexOf(s) : -1;
+  };
   $$('a[href^="#"]').forEach((a) => a.addEventListener('click', (e) => {
-    const hash = a.getAttribute('href');
-    if (hash.length < 2) return;
-    const target = document.querySelector(hash);
-    if (!target) return;
-    e.preventDefault();
+    const i = slideIndexOf(a.getAttribute('href'));
     if (menuOpen) toggleMenu(false);
-    const slide = target.closest('.slide') || target;
-    scrollToY(slideTop(slide), 1.6);
+    if (i < 0 || !goToSlide) return;
+    e.preventDefault();
+    goToSlide(i);
   }));
 
-  window.addEventListener('keydown', (e) => {
-    if (!isStack || modalOpen || menuOpen || e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey) return;
-    if (e.target.closest('input, textarea, select, button, a, [contenteditable]')) return;
-    const map = { ArrowDown: 1, PageDown: 1, ArrowUp: -1, PageUp: -1, ' ': e.shiftKey ? -1 : 1 };
-    if (e.key === 'Home') { e.preventDefault(); scrollToY(0, 1.6); return; }
-    if (e.key === 'End') { e.preventDefault(); scrollToY(ScrollTrigger.maxScroll(window), 1.6); return; }
-    const dir = map[e.key];
-    if (!dir) return;
-    e.preventDefault();
-    snap.dir = dir;
-    stepSlide(dir);
-  });
-
-  if (lenis) {
-    lenis.on('scroll', (l) => {
-      if (l.direction) snap.dir = l.direction;
-      clearTimeout(snap.timer);
-      if (!snap.busy) snap.timer = setTimeout(trySnap, 160);
+  /* ==========================================================================
+     STAGE ENGINE (desktop)
+     ========================================================================== */
+  function initStage() {
+    const S = slides.map((el) => {
+      const card = $('.card', el);
+      const shade = document.createElement('div');
+      shade.className = 'card__shade';
+      card.appendChild(shade);
+      return { el, card, shade, inner: $('.card__inner', el), bg: $('.card__bg img', el) };
     });
+    const shutter = document.createElement('div');
+    shutter.className = 'shutter';
+    shutter.setAttribute('aria-hidden', 'true');
+    shutter.innerHTML = '<i></i>'.repeat(7);
+    $('.slides').appendChild(shutter);
+    const blades = $$('i', shutter);
+    const IO = 'expo.inOut';
+
+    /* FX[k] animates slide k → k+1. Going back plays the same film in reverse.
+       front: which of the two slides is drawn on top while it runs.
+       Each build starts with A at rest / B before entering, and ends with
+       B at rest / A gone — so reversing it is always exact.
+       All tweens finish together, so a reversed film starts moving at once.
+       intro: when the arriving slide's own content starts to animate. */
+    const FX = [
+      { // 01 → 02 — the next slide pushes in from the left, its content trailing behind
+        name: 'push-left', front: 'b', intro: 0.3,
+        build: (tl, a, b) => tl
+          .fromTo(b.card, { xPercent: -104, rotate: -1.5, scale: 0.94 }, { xPercent: 0, rotate: 0, scale: 1, duration: 1.3, ease: IO }, 0)
+          .fromTo(b.inner, { xPercent: -16 }, { xPercent: 0, duration: 1.3, ease: IO }, 0)
+          .fromTo(a.card, { xPercent: 0, scale: 1 }, { xPercent: 26, scale: 0.88, duration: 1.3, ease: IO }, 0)
+          .fromTo(a.shade, { opacity: 0 }, { opacity: 0.75, duration: 1.3, ease: 'power2.inOut' }, 0),
+      },
+      { // 02 → 03 — the camera flies through the screen into the next room
+        name: 'fly-through', front: 'a', intro: 0.55,
+        build: (tl, a, b) => tl
+          .fromTo(a.card, { scale: 1, opacity: 1 }, { scale: 1.55, opacity: 0, duration: 0.9, ease: 'power3.in' }, 0)
+          .fromTo(b.card, { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 1.05, ease: 'expo.out' }, 0.4)
+          .fromTo(b.shade, { opacity: 0.7 }, { opacity: 0, duration: 1.05, ease: 'power2.out' }, 0.4),
+      },
+      { // 03 → 04 — an iris opens from the centre of the screen
+        name: 'iris', front: 'b', intro: 0.35,
+        build: (tl, a, b) => tl
+          .fromTo(b.card, { clipPath: 'circle(0% at 50% 55%)' }, { clipPath: 'circle(80% at 50% 55%)', duration: 1.4, ease: IO }, 0)
+          .fromTo(b.inner, { scale: 1.18 }, { scale: 1, duration: 1.25, ease: 'expo.out' }, 0.15)
+          .fromTo(a.card, { scale: 1 }, { scale: 0.9, duration: 1.4, ease: IO }, 0)
+          .fromTo(a.shade, { opacity: 0 }, { opacity: 0.7, duration: 1.4 }, 0),
+      },
+      { // 04 → 05 — a window opens onto the valley and the camera pulls back
+        name: 'window', front: 'b', intro: 0.65,
+        build: (tl, a, b) => tl
+          .fromTo(b.card, { clipPath: 'inset(36% 33% 36% 33% round 28px)' }, { clipPath: 'inset(0% 0% 0% 0% round 28px)', duration: 1.45, ease: IO }, 0)
+          .fromTo(b.bg, { scale: 1.9 }, { scale: 1, duration: 1.5, ease: 'expo.inOut' }, 0)
+          .fromTo(b.inner, { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: 0.8, ease: 'expo.out' }, 0.7)
+          .fromTo(a.card, { scale: 1, yPercent: 0 }, { scale: 0.84, yPercent: -4, duration: 1.45, ease: IO }, 0)
+          .fromTo(a.shade, { opacity: 0 }, { opacity: 0.8, duration: 1.45 }, 0),
+      },
+      { // 05 → 06 — the next slide flips up in 3D, the current one tips back
+        name: 'flip-up', front: 'b', intro: 0.55,
+        build: (tl, a, b) => tl
+          .fromTo(b.card,
+            { yPercent: 105, rotateX: -50, transformOrigin: '50% 100%', transformPerspective: 1800 },
+            { yPercent: 0, rotateX: 0, transformOrigin: '50% 100%', transformPerspective: 1800, duration: 1.4, ease: IO }, 0)
+          .fromTo(a.card,
+            { yPercent: 0, rotateX: 0, scale: 1, transformOrigin: '50% 0%', transformPerspective: 1800 },
+            { yPercent: -10, rotateX: 22, scale: 0.86, transformOrigin: '50% 0%', transformPerspective: 1800, duration: 1.4, ease: IO }, 0)
+          .fromTo(a.shade, { opacity: 0 }, { opacity: 0.8, duration: 1.4 }, 0),
+      },
+      { // 06 → 07 — shutters close over the slide and open on the next one
+        name: 'shutters', front: 'a', intro: 0.95,
+        build: (tl, a, b) => tl
+          .set(shutter, { autoAlpha: 1 }, 0)
+          .fromTo(blades, { scaleY: 0, transformOrigin: '50% 100%' }, { scaleY: 1, transformOrigin: '50% 100%', duration: 0.5, stagger: 0.045, ease: 'power3.in' }, 0)
+          .fromTo(a.card, { scale: 1 }, { scale: 0.94, duration: 0.78, ease: 'power2.in' }, 0)
+          .set(a.card, { opacity: 0 }, 0.8)
+          .fromTo(blades, { scaleY: 1, transformOrigin: '50% 0%' }, { scaleY: 0, transformOrigin: '50% 0%', duration: 0.55, stagger: 0.045, ease: 'power3.out', immediateRender: false }, 0.84)
+          .fromTo(b.card, { scale: 1.12 }, { scale: 1, duration: 0.95, ease: 'expo.out' }, 0.8)
+          .set(shutter, { autoAlpha: 0 }, 1.66),
+      },
+      { // 07 → 08 — a slanted wipe sweeps across
+        name: 'diagonal', front: 'b', intro: 0.35,
+        build: (tl, a, b) => tl
+          .fromTo(b.card,
+            { clipPath: 'polygon(0% 0%, 0% 0%, -40% 100%, -40% 100%)' },
+            { clipPath: 'polygon(0% 0%, 140% 0%, 100% 100%, -40% 100%)', duration: 1.35, ease: IO }, 0)
+          .fromTo(b.inner, { xPercent: -12 }, { xPercent: 0, duration: 1.35, ease: IO }, 0)
+          .fromTo(a.card, { xPercent: 0 }, { xPercent: 14, duration: 1.35, ease: IO }, 0)
+          .fromTo(a.shade, { opacity: 0 }, { opacity: 0.7, duration: 1.35 }, 0),
+      },
+      { // 08 → 09 — the next card is dealt in from the corner
+        name: 'deal', front: 'b', intro: 0.5,
+        build: (tl, a, b) => tl
+          .fromTo(b.card,
+            { xPercent: 75, yPercent: 55, rotate: 14, scale: 0.55, transformOrigin: '100% 100%' },
+            { xPercent: 0, yPercent: 0, rotate: 0, scale: 1, transformOrigin: '100% 100%', duration: 1.45, ease: IO }, 0)
+          .fromTo(a.card, { xPercent: 0, rotate: 0, scale: 1 }, { xPercent: -10, rotate: -3, scale: 0.88, duration: 1.45, ease: IO }, 0)
+          .fromTo(a.shade, { opacity: 0 }, { opacity: 0.75, duration: 1.45 }, 0),
+      },
+      { // 09 → 10 — doors open and the camera flies into the house
+        name: 'doors', front: 'b', intro: 0.45,
+        build: (tl, a, b) => tl
+          .fromTo(b.card, { clipPath: 'inset(0% 50% 0% 50%)' }, { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.3, ease: IO }, 0)
+          .fromTo(b.bg, { scale: 1.75 }, { scale: 1, duration: 1.35, ease: 'power3.out' }, 0)
+          .fromTo(a.card, { scale: 1 }, { scale: 1.12, duration: 1.3, ease: IO }, 0)
+          .fromTo(a.shade, { opacity: 0 }, { opacity: 0.85, duration: 1.3 }, 0),
+      },
+    ];
+
+    // menu / pager jumps over several slides: a vertical curtain in the travel direction
+    const JUMP = {
+      name: 'jump', front: 'b', intro: 0.3,
+      build: (tl, a, b, dir) => tl
+        .fromTo(b.card,
+          { clipPath: dir > 0 ? 'inset(100% 0% 0% 0% round 28px)' : 'inset(0% 0% 100% 0% round 28px)' },
+          { clipPath: 'inset(0% 0% 0% 0% round 28px)', duration: 1.2, ease: IO }, 0)
+        .fromTo(b.bg || b.inner, { scale: 1.3 }, { scale: 1, duration: 1.2, ease: 'power3.out' }, 0)
+        .fromTo(a.card, { scale: 1, yPercent: 0 }, { scale: 0.9, yPercent: dir > 0 ? -6 : 6, duration: 1.2, ease: IO }, 0)
+        .fromTo(a.shade, { opacity: 0 }, { opacity: 0.8, duration: 1.2 }, 0),
+    };
+
+    let busy = false;
+    let running = null;
+    let lockCall = null;
+    let introCall = null;
+
+    function layout(i) {
+      S.forEach((o, k) => {
+        o.el.classList.toggle('is-on', k === i);
+        o.el.classList.toggle('is-near', Math.abs(k - i) === 1);
+        o.el.inert = k !== i;
+      });
+    }
+
+    function finishRunning() {
+      if (!running) return;
+      const r = running;
+      running = null;
+      r.tl.progress(r.reverse ? 0 : 1, true);
+      r.done();
+    }
+
+    function go(to, { instant = false } = {}) {
+      to = Math.max(0, Math.min(S.length - 1, to));
+      if (to === current || busy) return;
+      finishRunning();
+      if (lockCall) lockCall.kill();
+      if (introCall) introCall.kill();
+
+      const from = current;
+      current = to;
+      setActive(to);
+      updateHeader();
+      const target = S[to];
+
+      if (instant) {
+        layout(to);
+        prepareIntro(target.el);
+        runIntro(target.el);
+        return;
+      }
+
+      const adjacent = Math.abs(to - from) === 1;
+      const reverse = adjacent && to < from;
+      const k = Math.min(from, to);
+      const fx = adjacent ? FX[k] : JUMP;
+      const A = adjacent ? S[k] : S[from];
+      const B = adjacent ? S[k + 1] : S[to];
+
+      // only the two slides of this transition are rendered
+      S.forEach((o) => {
+        const on = o === A || o === B;
+        o.el.classList.toggle('is-on', on);
+        o.el.classList.remove('is-near');
+        o.el.classList.toggle('is-moving', on);
+        o.el.inert = true;
+      });
+      const front = fx.front === 'a' ? A : B;
+      (front === A ? A : B).el.style.zIndex = 4;
+      (front === A ? B : A).el.style.zIndex = 3;
+      prepareIntro(target.el);
+
+      const tl = gsap.timeline({ paused: true });
+      fx.build(tl, A, B, to > from ? 1 : -1);
+      busy = true;
+
+      let finished = false;
+      const done = () => {
+        if (finished) return;
+        finished = true;
+        if (running && running.tl === tl) running = null;
+        gsap.set([A.card, A.inner, A.shade, B.card, B.inner, B.shade, A.bg, B.bg, shutter, ...blades].filter(Boolean), { clearProps: 'all' });
+        [A, B].forEach((o) => { o.el.style.zIndex = ''; o.el.classList.remove('is-moving'); });
+        layout(current);
+      };
+      running = { tl, reverse, done };
+
+      const speed = reverse ? 1.12 : 1;
+      if (reverse) {
+        tl.progress(1, true);
+        tl.eventCallback('onReverseComplete', done);
+        tl.timeScale(speed).reverse();
+      } else {
+        tl.eventCallback('onComplete', done);
+        tl.play();
+      }
+      const total = tl.duration() / speed;
+      // input opens again slightly before the film ends; a new move first snaps this one to its end
+      lockCall = gsap.delayedCall(total * 0.9, () => { busy = false; });
+      introCall = gsap.delayedCall(reverse ? total * 0.35 : (fx.intro ?? 0.5), () => runIntro(target.el));
+    }
+    goToSlide = (i) => go(i);
+
+    /* ---------- input: wheel, touch, keyboard ---------- */
+    let lastWheel = 0;
+    let wheelAcc = 0;
+    let gestureUsed = false;
+    window.addEventListener('wheel', (e) => {
+      if (modalOpen || menuOpen) return;
+      if (e.target.closest && e.target.closest('[data-lenis-prevent]')) return;
+      e.preventDefault();
+      const now = performance.now();
+      const gap = now - lastWheel;
+      lastWheel = now;
+      // a pause in the wheel stream means a new gesture; trackpad inertia never pauses
+      if (gap > 220) { gestureUsed = false; wheelAcc = 0; }
+      if (gestureUsed || busy) return;
+      const dy = e.deltaMode === 1 ? e.deltaY * 33 : e.deltaY;
+      if (Math.abs(e.deltaX) > Math.abs(dy)) return;
+      wheelAcc += dy;
+      if (Math.abs(wheelAcc) > 36) {
+        gestureUsed = true;
+        const dir = Math.sign(wheelAcc);
+        wheelAcc = 0;
+        go(current + dir);
+      }
+    }, { passive: false });
+
+    let touchY = null;
+    let touchX = null;
+    window.addEventListener('touchstart', (e) => {
+      touchY = e.touches[0].clientY;
+      touchX = e.touches[0].clientX;
+    }, { passive: true });
+    window.addEventListener('touchmove', (e) => {
+      if (!modalOpen && !menuOpen && !e.target.closest('input[type="range"], [data-lenis-prevent]')) e.preventDefault();
+    }, { passive: false });
+    window.addEventListener('touchend', (e) => {
+      if (touchY === null || modalOpen || menuOpen) return;
+      const dy = touchY - e.changedTouches[0].clientY;
+      const dx = touchX - e.changedTouches[0].clientX;
+      touchY = null;
+      if (Math.abs(dy) > 50 && Math.abs(dy) > Math.abs(dx)) go(current + Math.sign(dy));
+    }, { passive: true });
+
+    window.addEventListener('keydown', (e) => {
+      if (modalOpen || menuOpen || e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey) return;
+      if (e.target.closest('input, textarea, select, [contenteditable]')) return;
+      const onControl = e.target.closest('button, a');
+      const map = { ArrowDown: 1, PageDown: 1, ArrowRight: 1, ArrowUp: -1, PageUp: -1, ArrowLeft: -1 };
+      if (!onControl) { map[' '] = e.shiftKey ? -1 : 1; }
+      if (e.key === 'Home') { e.preventDefault(); go(0); return; }
+      if (e.key === 'End') { e.preventDefault(); go(S.length - 1); return; }
+      const dir = map[e.key];
+      if (!dir || (onControl && e.target.closest('[role="tab"]'))) return;
+      e.preventDefault();
+      go(current + dir);
+    });
+
+    /* ---------- start ---------- */
+    const start = Math.max(0, slideIndexOf(location.hash));
+    current = start;
+    layout(start);
+    setActive(start);
+    updateHeader();
+    return start;
+  }
+
+  /* ==========================================================================
+     FLOW ENGINE (phones, tablets, short screens)
+     ========================================================================== */
+  const scrollPos = () => (lenis ? lenis.scroll : window.scrollY);
+  const slideTop = (s) => Math.round(s.getBoundingClientRect().top + scrollPos());
+  function scrollToY(y) {
+    if (lenis) lenis.scrollTo(y, { duration: 1.4, easing: easeInOutQuart, force: true });
+    else window.scrollTo({ top: y, behavior: reduce ? 'auto' : 'smooth' });
+  }
+
+  function initFlow() {
+    goToSlide = (i) => scrollToY(slideTop(slides[i]));
+
+    if (motion && finePointer && window.Lenis) {
+      lenis = new Lenis({ lerp: 0.1, smoothWheel: true, wheelMultiplier: 0.95 });
+      lenis.on('scroll', ScrollTrigger.update);
+      gsap.ticker.add((t) => lenis.raf(t * 1000));
+      gsap.ticker.lagSmoothing(0);
+      lenis.stop();
+    }
+
+    if (hasGsap) {
+      slides.forEach((s, i) => ScrollTrigger.create({
+        trigger: s, start: 'top 55%', end: 'bottom 55%',
+        onToggle: (self) => { if (self.isActive) { current = i; setActive(i); } },
+      }));
+      ScrollTrigger.create({ start: () => window.innerHeight * 0.35, end: 'max', onToggle: updateHeader });
+    } else {
+      window.addEventListener('scroll', updateHeader, { passive: true });
+    }
+    if (!motion) return;
+
+    // each card enters in its own way as it scrolls in — transforms only,
+    // and none of them makes the card wider than the screen
+    const entries = [
+      { scale: 0.86, transformOrigin: '50% 0%' },
+      { rotateX: 18, transformPerspective: 1100, transformOrigin: '50% 100%' },
+      { skewY: 5, transformOrigin: '0% 0%' },
+      { yPercent: 14, scale: 0.9, transformOrigin: '50% 100%' },
+    ];
+    slides.forEach((s, i) => {
+      if (i === 0) return;
+      const card = $('.card', s);
+      gsap.fromTo(card,
+        { yPercent: 6, scale: 0.95, ...entries[i % entries.length] },
+        { yPercent: 0, rotateX: 0, skewY: 0, scale: 1, ease: 'none',
+          scrollTrigger: { trigger: s, start: 'top bottom', end: 'top 45%', scrub: true } });
+      const bg = $('.card__bg img', s);
+      if (bg) {
+        gsap.fromTo(bg, { yPercent: -6 }, { yPercent: 6, ease: 'none',
+          scrollTrigger: { trigger: s, start: 'top bottom', end: 'bottom top', scrub: true } });
+      }
+    });
+    const drift = (sel, from, to) => {
+      const el = $(sel);
+      if (!el) return;
+      gsap.fromTo(el, { xPercent: from }, { xPercent: to, ease: 'none',
+        scrollTrigger: { trigger: el.closest('.slide'), start: 'top bottom', end: 'bottom top', scrub: true } });
+    };
+    drift('.nature__word span', 6, -10);
+    drift('.docs__word span', 8, -8);
+  }
+
+  /* Flow-mode reveals: each element once, when it scrolls in — or, for things
+     at the very bottom of a slide, when the slide reaches the top. */
+  function initFlowReveals() {
+    const revealed = new WeakSet();
+    const pending = [];
+    const notHero = (el) => !el.closest('.slide--hero');
+    const onEnter = (el, fn, start = 'top 88%') => {
+      const run = () => { if (revealed.has(el)) return; revealed.add(el); fn(); };
+      pending.push([el, run]);
+      ScrollTrigger.create({ trigger: el, start, once: true, onEnter: run });
+    };
+    const showReveal = (els) => {
+      const fresh = els.filter((e) => !revealed.has(e));
+      if (!fresh.length) return;
+      fresh.forEach((e) => revealed.add(e));
+      gsap.to(fresh, { autoAlpha: 1, y: 0, duration: 1.1, ease: 'expo.out', stagger: 0.08, overwrite: true, clearProps: 'transform' });
+    };
+    $$('[data-split]').filter(notHero).forEach((el) => onEnter(el, () => {
+      gsap.to($$('.wi', el), { yPercent: 0, duration: 1.2, ease: 'expo.out', stagger: 0.025 });
+    }));
+    ScrollTrigger.batch($$('[data-reveal]').filter(notHero), { start: 'top 92%', once: true, onEnter: showReveal });
+    $$('[data-clip]').filter(notHero).forEach((el) => onEnter(el, () => {
+      gsap.to(el, { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.5, ease: 'expo.inOut' });
+      const imgs = $$(CLIP_IMG, el);
+      if (imgs.length) gsap.to(imgs, { scale: 1, duration: 2.2, ease: 'expo.out', delay: 0.15, clearProps: 'transform' });
+    }, 'top 92%'));
+    $$('[data-count]').filter(notHero).forEach((el) => onEnter(el, () => countUp(el, 0.2), 'top 95%'));
+    $$('[data-progress]').filter(notHero).forEach((el) => onEnter(el, () => {
+      gsap.to(el, { scaleX: el.dataset.progress / 100, duration: 1.8, ease: 'expo.inOut', delay: 0.3 });
+    }, 'top 95%'));
+    const draw = $('.steps__draw');
+    if (draw) onEnter($('.steps'), () => gsap.to(draw, { strokeDashoffset: 0, duration: 2.4, ease: 'power2.inOut', delay: 0.2 }), 'top 75%');
+    slides.filter(notHero).forEach((s) => ScrollTrigger.create({
+      trigger: s, start: 'top 8%', once: true,
+      onEnter: () => {
+        showReveal($$('[data-reveal]', s));
+        pending.forEach(([el, run]) => { if (s.contains(el)) run(); });
+      },
+    }));
   }
 
   /* ------------------------------------------------------------------------
-     Preloader + hero intro
+     Images: load and decode everything after the first screen, in idle time,
+     so no transition has to wait for a decode
      ------------------------------------------------------------------------ */
-  const preloader = $('.preloader');
-  function heroIntro() {
-    const tl = gsap.timeline({ defaults: { ease: 'expo.out' } });
-    tl.fromTo('.slide--hero .card__bg img', { scale: 1.28 }, { scale: 1, duration: 2.8 }, 0)
-      .to('.hero__title .ch', { yPercent: 0, duration: 1.6, stagger: 0.055 }, 0.15)
-      .to(header, { autoAlpha: 1, duration: 1.2 }, 0.5)
-      .to('.hero__meta li', { autoAlpha: 1, y: 0, duration: 1.2, stagger: 0.06 }, 0.55)
-      .to('.hero__welcome .wi', { yPercent: 0, duration: 1.3, stagger: 0.05 }, 0.8)
-      .to(['.hero__text', '.hero__cta', '.status', '.hero__facts li', '.scroll-hint'], { autoAlpha: 1, y: 0, duration: 1.2, stagger: 0.07 }, 0.95)
-      .to('.slide--hero [data-progress]', { scaleX: 0.75, duration: 2, ease: 'expo.inOut' }, 1.1)
-      .add(() => $$('.slide--hero [data-count]').forEach((el) => countUp(el)), 1.1)
-      .to('.pager', { autoAlpha: 1, duration: 1 }, 1.2);
-    return tl;
+  function warmImages() {
+    const imgs = $$('img').filter((im) => !im.closest('.slide--hero'));
+    imgs.forEach((im) => { im.loading = 'eager'; });
+    const idle = window.requestIdleCallback || ((fn) => setTimeout(fn, 50));
+    let i = 0;
+    const next = () => {
+      if (i >= imgs.length) return;
+      const im = imgs[i++];
+      const p = im.decode ? im.decode().catch(() => {}) : Promise.resolve();
+      p.then(() => idle(next));
+    };
+    idle(next);
   }
 
-  function finishLoading() {
-    if (lenis) lenis.start();
-    initReveals();
-    ScrollTrigger.refresh();
-    if (location.hash && document.querySelector(location.hash)) {
-      const s = document.querySelector(location.hash).closest('.slide');
-      if (s) setTimeout(() => scrollToY(slideTop(s), 1.6), 300);
-    }
-  }
-
-  function startPreloader() {
-    if (lenis) lenis.scrollTo(0, { immediate: true, force: true });
-    else window.scrollTo(0, 0);
-
+  /* ------------------------------------------------------------------------
+     Preloader → first slide
+     ------------------------------------------------------------------------ */
+  function startPreloader(startIndex, onReady) {
+    window.scrollTo(0, 0);
     const count = $('.preloader__count');
     const bar = $('.preloader__bar i');
-    const letters = $$('.preloader__logo span');
-    gsap.fromTo(letters, { yPercent: 60, autoAlpha: 0 }, { yPercent: 0, autoAlpha: 1, duration: 1, stagger: 0.04, ease: 'expo.out' });
+    gsap.fromTo($$('.preloader__logo span'), { yPercent: 60, autoAlpha: 0 }, { yPercent: 0, autoAlpha: 1, duration: 0.9, stagger: 0.035, ease: 'expo.out' });
 
-    const heroImg = $('.slide--hero .card__bg img');
-    const imgReady = new Promise((res) => {
-      if (heroImg.complete && heroImg.naturalWidth) res();
-      else { heroImg.addEventListener('load', res, { once: true }); heroImg.addEventListener('error', res, { once: true }); }
-    }).then(() => (heroImg.decode ? heroImg.decode().catch(() => {}) : null));
-    const ready = Promise.all([
-      document.fonts ? document.fonts.ready : null,
-      imgReady,
-      new Promise((r) => setTimeout(r, 1100)),
-    ]);
-    const timeout = new Promise((r) => setTimeout(r, 6500));
+    const first = slides[startIndex];
+    const firstImg = $('img', first);
+    const imgReady = !firstImg ? Promise.resolve() : new Promise((res) => {
+      if (firstImg.complete && firstImg.naturalWidth) res();
+      else { firstImg.addEventListener('load', res, { once: true }); firstImg.addEventListener('error', res, { once: true }); }
+    }).then(() => (firstImg.decode ? firstImg.decode().catch(() => {}) : null));
+    const ready = Promise.all([document.fonts ? document.fonts.ready : null, imgReady, new Promise((r) => setTimeout(r, 650))]);
+    const timeout = new Promise((r) => setTimeout(r, 5000));
 
     const p = { v: 0 };
     const render = () => {
       count.textContent = Math.round(p.v);
       bar.style.transform = `scaleX(${p.v / 100})`;
     };
-    const crawl = gsap.to(p, { v: 86, duration: 2.4, ease: 'power2.out', onUpdate: render });
+    const crawl = gsap.to(p, { v: 88, duration: 1.4, ease: 'power2.out', onUpdate: render });
 
     Promise.race([ready, timeout]).then(() => {
       crawl.kill();
       gsap.to(p, {
-        v: 100, duration: 0.55, ease: 'power2.inOut', onUpdate: render,
+        v: 100, duration: 0.35, ease: 'power2.inOut', onUpdate: render,
         onComplete: () => {
-          const tl = gsap.timeline();
-          tl.to('.preloader__inner', { autoAlpha: 0, y: -24, duration: 0.55, ease: 'power2.in' })
+          const bgImg = $('.card__bg img', first);
+          gsap.timeline()
+            .to('.preloader__inner', { autoAlpha: 0, y: -24, duration: 0.45, ease: 'power2.in' })
             .to(preloader, {
-              clipPath: 'inset(0% 0% 100% 0%)', duration: 1.2, ease: 'expo.inOut',
-              onComplete: () => { preloader.remove(); finishLoading(); },
-            }, '-=0.15')
-            .add(heroIntro(), '-=0.7');
+              clipPath: 'inset(0% 0% 100% 0%)', duration: 1.05, ease: 'expo.inOut',
+              onComplete: () => { preloader.remove(); onReady(); },
+            }, '-=0.1')
+            .add(() => { if (bgImg) gsap.fromTo(bgImg, { scale: 1.28 }, { scale: 1, duration: 2.6, ease: 'expo.out', clearProps: 'transform' }); }, '-=0.75')
+            .add(() => runIntro(first), '-=0.6')
+            .to([header, '.pager'], { autoAlpha: 1, duration: 1, ease: 'power2.out' }, '-=0.3');
         },
       });
     });
@@ -603,7 +797,7 @@
     burger.setAttribute('aria-expanded', String(menuOpen));
     burger.setAttribute('aria-label', menuOpen ? 'Закрыть меню' : 'Открыть меню');
     menu.setAttribute('aria-hidden', String(!menuOpen));
-    header.classList.toggle('is-solid', menuOpen || scrollY() > window.innerHeight * 0.35);
+    updateHeader();
     if (lenis) (menuOpen ? lenis.stop() : lenis.start());
   }
   burger.addEventListener('click', () => toggleMenu());
@@ -742,10 +936,29 @@
      Boot
      ------------------------------------------------------------------------ */
   if (motion) {
-    initStack();
-    startPreloader();
-    window.addEventListener('load', () => ScrollTrigger.refresh());
-  } else if (preloader) {
-    preloader.remove();
+    gsap.set([header, '.pager'], { autoAlpha: 0 });
+    let startIndex = 0;
+    if (stage) {
+      startIndex = initStage();
+      prepareIntro(slides[startIndex]);
+    } else {
+      initFlow();
+      slides.forEach(prepareIntro);
+    }
+    startPreloader(startIndex, () => {
+      if (stage) {
+        warmImages();
+        return;
+      }
+      if (lenis) lenis.start();
+      initFlowReveals();
+      ScrollTrigger.refresh();
+      const i = slideIndexOf(location.hash);
+      if (i > 0) setTimeout(() => scrollToY(slideTop(slides[i])), 300);
+    });
+    window.addEventListener('load', () => { if (!stage) ScrollTrigger.refresh(); });
+  } else {
+    if (preloader) preloader.remove();
+    if (hasGsap) initFlow();
   }
 })();

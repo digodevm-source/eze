@@ -92,10 +92,6 @@ h1, h2, h3, p { margin: 0; }
   content: ''; position: absolute; inset: 0;
   background: radial-gradient(120% 90% at 50% 20%, rgba(11, 13, 12, .25), rgba(11, 13, 12, .88) 70%);
 }
-.grain {
-  position: fixed; inset: 0; z-index: 150; pointer-events: none; opacity: .055;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-}
 
 /* ---------- Generic UI ---------- */
 .kicker {
@@ -108,9 +104,9 @@ h1, h2, h3, p { margin: 0; }
   font-size: clamp(30px, min(3.2vw, 6vh), 54px); line-height: 1.02; letter-spacing: -.02em;
 }
 .glass {
-  background: rgba(22, 26, 24, .38);
-  -webkit-backdrop-filter: blur(18px) saturate(1.25);
-  backdrop-filter: blur(18px) saturate(1.25);
+  background: rgba(20, 24, 22, .5);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  backdrop-filter: blur(14px) saturate(1.2);
   border: 1px solid rgba(255, 255, 255, .13);
   border-radius: 18px;
 }
@@ -152,8 +148,8 @@ h1, h2, h3, p { margin: 0; }
 
 /* split-text helpers */
 .w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .08em; margin-bottom: -.08em; }
-.wi { display: inline-block; will-change: transform; }
-.ch { display: inline-block; will-change: transform; }
+.wi { display: inline-block; }
+.ch { display: inline-block; }
 
 /* ==========================================================================
    Preloader
@@ -296,12 +292,9 @@ h1, h2, h3, p { margin: 0; }
   overflow: hidden;
   background: var(--card);
   box-shadow: 0 -24px 70px rgba(0, 0, 0, .38), inset 0 0 0 1px rgba(255, 255, 255, .06);
-  transform-origin: 50% 40%;
 }
-.card::after {
-  content: ''; position: absolute; inset: 0; z-index: 30; pointer-events: none;
-  background: #050606; opacity: var(--dim, 0);
-}
+/* darkening layer for the slide that is leaving (animated by opacity only) */
+.card__shade { position: absolute; inset: 0; z-index: 30; pointer-events: none; background: #050606; opacity: 0; }
 .card--solid { background: radial-gradient(120% 80% at 80% 0%, #1b201c 0%, #121513 55%, #0f1210 100%); }
 .card__inner { position: relative; flex: 1; padding: var(--top) var(--pad) var(--pad); }
 .card__bg { position: absolute; inset: 0; z-index: -1; overflow: hidden; }
@@ -427,8 +420,8 @@ h1, h2, h3, p { margin: 0; }
 .feat h3 { margin: 10px 0 8px; font-size: 12.5px; font-weight: 700; line-height: 1.35; letter-spacing: .1em; text-transform: uppercase; }
 .feat p { font-size: 12.5px; line-height: 1.5; color: var(--muted); width: 30ch; max-width: 100%; }
 .feat__img { position: relative; flex: 1; min-height: 200px; border-radius: 16px; overflow: hidden; }
-.feat__img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(1.02); transition: transform 1.4s var(--ease), filter 1s var(--ease); filter: saturate(.85) brightness(.92); }
-.feat:hover .feat__img img { transform: scale(1.08); filter: saturate(1) brightness(1); }
+.feat__img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(1.02); transition: transform 1.4s var(--ease); }
+.feat:hover .feat__img img { transform: scale(1.08); }
 @media (hover: hover) {
   .features__grid:hover .feat { flex-grow: .85; }
   .features__grid .feat:hover { flex-grow: 1.5; }
@@ -590,8 +583,7 @@ h1, h2, h3, p { margin: 0; }
   display: grid; grid-template-columns: 1fr auto; align-content: start; column-gap: 14px;
   padding: 16px 18px 18px; border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, .1);
-  background: rgba(18, 22, 20, .35);
-  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  background: rgba(16, 20, 18, .62);
   transition: border-color .5s, background .5s, transform .7s var(--ease);
 }
 .doc:hover { border-color: rgba(205, 231, 127, .4); background: rgba(24, 29, 26, .55); transform: translateY(-4px); }
@@ -658,11 +650,11 @@ h1, h2, h3, p { margin: 0; }
 .invest__desc li {
   grid-area: 1 / 1;
   font-family: var(--f-display); font-weight: 300; font-size: clamp(18px, min(1.55vw, 3vh), 26px); line-height: 1.32; letter-spacing: -.005em;
-  opacity: 0; transform: translateY(16px); filter: blur(4px);
-  transition: opacity .6s var(--ease), transform .9s var(--ease), filter .6s var(--ease);
+  opacity: 0; transform: translateY(16px);
+  transition: opacity .6s var(--ease), transform .9s var(--ease);
   pointer-events: none;
 }
-.invest__desc li.is-active { opacity: 1; transform: none; filter: none; transition-delay: .15s; pointer-events: auto; }
+.invest__desc li.is-active { opacity: 1; transform: none; transition-delay: .15s; pointer-events: auto; }
 
 /* ==========================================================================
    09 Calculator
@@ -750,15 +742,7 @@ input[type="range"]:focus-visible { outline: none; }
 .cta__bottom { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; padding-top: 18px; border-top: 1px solid rgba(255, 255, 255, .14); }
 .cta__bottom .dotlink { color: rgba(255, 255, 255, .82); }
 
-.site-footer {
-  display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px 24px;
-  padding: 18px calc(var(--gap) + var(--pad)) calc(22px + env(safe-area-inset-bottom));
-  font-size: 12px; color: var(--faint);
-  position: relative; z-index: 20;
-}
-.site-footer__top { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); transition: color .3s; }
-.site-footer__top svg { width: 12px; height: 12px; }
-.site-footer__top:hover { color: var(--text); }
+.cta__copy { font-size: 12px; color: rgba(255, 255, 255, .5); }
 
 /* ==========================================================================
    Modal
@@ -855,9 +839,25 @@ input[type="range"]:focus-visible { outline: none; }
     .hero__title { font-size: clamp(56px, min(16.4vw, 54cqh), 330px); }
   }
   .pager { display: flex; }
-  .card { will-change: transform; }
   .card__inner { padding-right: calc(var(--pad) + 18px); }
 }
+
+/* ==========================================================================
+   Stage mode (desktop): slides are layers of one fixed scene,
+   the script moves between them with a different transition each time
+   ========================================================================== */
+.is-stage, .is-stage body { height: 100%; overflow: hidden; overscroll-behavior: none; }
+.is-stage .slides { position: fixed; inset: 0; z-index: 1; }
+.is-stage .slide { position: absolute; inset: 0; min-height: 0; height: 100%; visibility: hidden; }
+.is-stage .slide.is-near { visibility: visible; z-index: 1; }   /* pre-painted under the current one */
+.is-stage .slide.is-on { visibility: visible; z-index: 2; }
+.is-stage .card { height: 100%; min-height: 0; }
+.is-stage .slide.is-moving .glass { -webkit-backdrop-filter: none; backdrop-filter: none; background: rgba(20, 24, 22, .78); }
+.is-stage .slide:not(.is-on) .invest__ring { animation-play-state: paused; }
+
+.shutter { position: absolute; inset: 0; z-index: 10; display: flex; pointer-events: none; visibility: hidden; }
+.shutter i { flex: 1; background: linear-gradient(180deg, #151a17, #0b0d0c); transform: scaleY(0); }
+.shutter i + i { box-shadow: -1px 0 0 rgba(205, 231, 127, .12); }
 
 /* ==========================================================================
    Responsive
