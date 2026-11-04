@@ -1,0 +1,569 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Altai Ridge — коттеджный посёлок на Алтае</title>
+  <meta name="description" content="Altai Ridge — коттеджный посёлок в горах Алтая, в 70 км от Горно-Алтайска. Современные дома от 150 м² с панорамными видами, ипотека и юридическое сопровождение под ключ.">
+  <meta name="theme-color" content="#0b0d0c">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Altai Ridge — дома для жизни на высоте">
+  <meta property="og:description" content="Коттеджный посёлок в горах Алтая. Место, где природа заодно с современным комфортом.">
+  <meta property="og:image" content="assets/img/og.jpg">
+  <meta property="og:locale" content="ru_RU">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="assets/fonts/jost-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/jost-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/manrope-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" as="image" href="assets/img/hero.webp" imagesrcset="assets/img/hero-sm.webp 960w, assets/img/hero.webp 2560w" imagesizes="100vw" fetchpriority="high">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script>document.documentElement.classList.add('js');</script>
+</head>
+<body>
+
+  <div class="backdrop" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <!-- ============ PRELOADER ============ -->
+  <div class="preloader" aria-hidden="true">
+    <div class="preloader__inner">
+      <div class="preloader__logo"><span>A</span><span>L</span><span>T</span><span>A</span><span>I</span><span class="sp"></span><span>R</span><span>I</span><span>D</span><span>G</span><span>E</span></div>
+      <div class="preloader__bar"><i></i></div>
+      <div class="preloader__meta"><span>Дома для жизни на высоте</span><span><b class="preloader__count">0</b>%</span></div>
+    </div>
+  </div>
+
+  <!-- ============ HEADER ============ -->
+  <header class="header" id="header">
+    <a class="logo" href="#home" aria-label="Altai Ridge — на главную">
+      <svg class="logo__mark" viewBox="0 0 40 24" aria-hidden="true"><path d="M1 22 L12 6 L18 14 L24 4 L39 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><path d="M8.5 22 L12 17 L14.6 20" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round" opacity=".55"/></svg>
+      <span class="logo__text">Altai Ridge</span>
+    </a>
+    <nav class="nav" aria-label="Основная навигация">
+      <a href="#about">О посёлке</a>
+      <a href="#projects">Проекты</a>
+      <a href="#path">Этапы</a>
+      <a href="#invest">Инвестиции</a>
+      <a href="#calc">Ипотека</a>
+      <a href="#contact">Контакты</a>
+    </nav>
+    <div class="header__right">
+      <a class="header__phone" href="tel:+73850060336">+7 (385) 006-03-36</a>
+      <button class="btn btn--light btn--sm" type="button" data-modal-open><span>Оставить заявку</span></button>
+      <button class="burger" type="button" aria-label="Открыть меню" aria-expanded="false" aria-controls="menu"><span></span><span></span></button>
+    </div>
+  </header>
+
+  <!-- ============ MOBILE / FULLSCREEN MENU ============ -->
+  <div class="menu" id="menu" aria-hidden="true" data-lenis-prevent>
+    <div class="menu__bg"><img src="assets/img/forest-fog-sm.webp" alt="" loading="lazy" decoding="async"></div>
+    <nav class="menu__nav" aria-label="Меню">
+      <a href="#about"><i>01</i>О посёлке</a>
+      <a href="#features"><i>02</i>Преимущества</a>
+      <a href="#projects"><i>03</i>Проекты домов</a>
+      <a href="#nature"><i>04</i>Жизнь на Алтае</a>
+      <a href="#path"><i>05</i>Ваш путь</a>
+      <a href="#docs"><i>06</i>Документы</a>
+      <a href="#invest"><i>07</i>Инвестиции</a>
+      <a href="#calc"><i>08</i>Ипотека</a>
+      <a href="#contact"><i>09</i>Контакты</a>
+    </nav>
+    <div class="menu__foot">
+      <a href="tel:+73850060336">+7 (385) 006-03-36</a>
+      <a href="mailto:alt@ridge.ru">alt@ridge.ru</a>
+      <span>Алтай, 70 км от Горно-Алтайска</span>
+    </div>
+  </div>
+
+  <!-- ============ SLIDE PAGER ============ -->
+  <aside class="pager" aria-label="Навигация по слайдам">
+    <div class="pager__num"><span class="pager__cur">01</span><span class="pager__sep"></span><span class="pager__total">10</span></div>
+    <ul class="pager__dots"></ul>
+  </aside>
+
+  <main class="slides">
+
+    <!-- 01 ============ HERO ============ -->
+    <section class="slide slide--hero" id="home" data-title="Добро пожаловать">
+      <div class="card">
+        <div class="card__bg"><img src="assets/img/hero.webp" srcset="assets/img/hero-sm.webp 960w, assets/img/hero.webp 2560w" sizes="100vw" alt="Дом у горного озера в окружении скалистых вершин" fetchpriority="high" decoding="async"></div>
+        <div class="hero__grad" aria-hidden="true"></div>
+        <div class="card__inner hero">
+          <ul class="hero__meta">
+            <li>Дома для жизни<br>на высоте</li>
+            <li>Пространство<br>для вашей жизни</li>
+            <li>Коттеджный посёлок</li>
+            <li>Алтай</li>
+            <li>2026</li>
+          </ul>
+
+          <div class="hero__titlebox">
+            <h1 class="hero__title" aria-label="Altai Ridge">
+              <span class="hero__line" aria-hidden="true"><span data-chars>ALTAI</span></span>
+              <span class="hero__line hero__line--2" aria-hidden="true"><span data-chars>RIDGE</span></span>
+            </h1>
+          </div>
+
+          <div class="hero__bottom">
+            <div class="hero__left">
+              <a class="glass status" href="#about">
+                <span class="status__head"><span>Процесс<br>строительства</span><span class="status__icon" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M3 9 9 3M4 3h5v5" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></span></span>
+                <span class="status__row"><span>Завершено</span><span><b data-count="75">75</b>%</span></span>
+                <span class="bar"><i data-progress="75"></i></span>
+              </a>
+              <ul class="hero__facts">
+                <li>Площадь недвижимости от 150 м²</li>
+                <li>Алтай, 70 км от Горно-Алтайска</li>
+              </ul>
+            </div>
+
+            <div class="scroll-hint" aria-hidden="true"><span>Листайте</span><i></i></div>
+
+            <div class="hero__right">
+              <h2 class="hero__welcome" data-split>Добро пожаловать<br>в Altai Ridge</h2>
+              <p class="hero__text">Место, где природа заодно с современным комфортом. Это не просто недвижимость — это возможность создать свой собственный оазис.</p>
+              <div class="hero__cta"><a class="btn btn--light" href="#projects" data-magnetic><span>Посмотреть коттеджи</span><svg class="btn__arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></a></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 02 ============ ABOUT ============ -->
+    <section class="slide" id="about" data-title="О посёлке">
+      <div class="card card--solid">
+        <div class="card__inner about">
+          <div class="about__col">
+            <p class="about__lead" data-split>Коттеджный посёлок, спроектированный для спокойной жизни и наслаждения видами. Здесь вы почувствуете себя дома.</p>
+
+            <div class="about__brand">
+              <span class="kicker">О нас</span>
+              <h2 class="about__logo" data-split>Altai<br>Ridge</h2>
+            </div>
+
+            <div class="about__note" data-reveal>
+              <p>Это место, где современный комфорт встречается с первозданной красотой природы. Где ваш дом становится не просто недвижимостью, а частью вашей жизни.</p>
+              <figure class="about__thumb" data-clip><img src="assets/img/forest-fog-sm.webp" alt="Хвойный лес в утреннем тумане" loading="lazy" decoding="async"></figure>
+            </div>
+          </div>
+
+          <figure class="about__media" data-clip data-cursor="Altai Ridge">
+            <img src="assets/img/lake-house.webp" srcset="assets/img/lake-house-sm.webp 960w, assets/img/lake-house.webp 1800w" sizes="(min-width: 1024px) 55vw, 100vw" alt="Дом на берегу горного озера среди хвойного леса" loading="lazy" decoding="async">
+            <figcaption class="about__cap glass"><span>Горный воздух</span><b>1 100 м</b><span>над уровнем моря</span></figcaption>
+          </figure>
+
+          <div class="about__stats">
+            <div class="stat" data-reveal>
+              <span class="stat__num"><small>до</small><b data-count="25">25</b>%</span>
+              <span class="stat__idx">01</span>
+              <p>Рост капитализации ежегодно</p>
+            </div>
+            <div class="stat" data-reveal>
+              <span class="stat__num"><b data-count="10">10</b>+</span>
+              <span class="stat__idx">02</span>
+              <p>Лет опыта в сфере недвижимости</p>
+            </div>
+            <div class="stat" data-reveal>
+              <span class="stat__num"><b data-count="30">30</b><small>мин</small></span>
+              <span class="stat__idx">03</span>
+              <p>На машине до аэропорта Горно-Алтайска</p>
+            </div>
+            <div class="stage" data-reveal>
+              <h3>Текущая стадия</h3>
+              <div class="stage__row"><span>Построено по плану</span><span>90%</span></div>
+              <span class="bar"><i data-progress="90"></i></span>
+              <div class="stage__row"><span>Продано коттеджей</span><span>70%</span></div>
+              <span class="bar"><i data-progress="70"></i></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 ============ FEATURES ============ -->
+    <section class="slide" id="features" data-title="Преимущества">
+      <div class="card card--solid">
+        <div class="card__inner features">
+          <header class="features__head">
+            <p class="features__pre" data-reveal>Приватность и простор:</p>
+            <h2 class="h2" data-split>Ваш личный уголок природы</h2>
+          </header>
+
+          <div class="features__grid">
+            <article class="feat" data-reveal>
+              <div class="feat__text">
+                <span class="feat__num">/ 01</span>
+                <h3>Развитая<br>инфраструктура</h3>
+                <p>Полная инфраструктура для жизни: дороги, связь, автономная инженерия. Система «умный дом» позволяет управлять домом даже удалённо.</p>
+              </div>
+              <figure class="feat__img"><img src="assets/img/cabin-forest-sm.webp" srcset="assets/img/cabin-forest-sm.webp 960w, assets/img/cabin-forest.webp 1800w" sizes="(min-width: 1024px) 28vw, 90vw" alt="Деревянный дом в хвойном лесу" loading="lazy" decoding="async"></figure>
+            </article>
+
+            <article class="feat" data-reveal>
+              <div class="feat__text">
+                <span class="feat__num">/ 02</span>
+                <h3>Безграничный<br>простор</h3>
+                <p>Ощущение свободы и уединения, которое трудно описать словами. Каждый дом окружён пространством, где вы найдёте свою тишину.</p>
+              </div>
+              <figure class="feat__img"><img src="assets/img/waterfall-sm.webp" srcset="assets/img/waterfall-sm.webp 720w, assets/img/waterfall.webp 1200w" sizes="(min-width: 1024px) 28vw, 90vw" alt="Горный водопад в зелёном ущелье" loading="lazy" decoding="async"></figure>
+            </article>
+
+            <article class="feat feat--rev" data-reveal>
+              <div class="feat__text">
+                <span class="feat__num">/ 03</span>
+                <h3>Современная<br>архитектура</h3>
+                <p>Дома, спроектированные с учётом горного ландшафта: панорамное остекление и натуральные материалы, которые не нарушают целостность природы.</p>
+              </div>
+              <figure class="feat__img"><img src="assets/img/house-facade-sm.webp" srcset="assets/img/house-facade-sm.webp 960w, assets/img/house-facade.webp 1800w" sizes="(min-width: 1024px) 28vw, 90vw" alt="Фасад современного дома с тёплой подсветкой" loading="lazy" decoding="async"></figure>
+            </article>
+
+            <article class="feat" data-reveal>
+              <div class="feat__text">
+                <span class="feat__num">/ 04</span>
+                <h3>Захватывающие<br>виды</h3>
+                <p>Даже в пасмурную погоду, когда горы окутаны туманом, пейзажи Алтая завораживают атмосферой таинственности и величия.</p>
+              </div>
+              <figure class="feat__img"><img src="assets/img/peaks-sun-sm.webp" srcset="assets/img/peaks-sun-sm.webp 960w, assets/img/peaks-sun.webp 1800w" sizes="(min-width: 1024px) 28vw, 90vw" alt="Скалистые горные пики на закате" loading="lazy" decoding="async"></figure>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 04 ============ PROJECTS ============ -->
+    <section class="slide" id="projects" data-title="Проекты домов">
+      <div class="card card--solid">
+        <div class="card__inner projects">
+          <div class="projects__intro">
+            <span class="kicker">Проекты домов</span>
+            <h2 class="projects__title">
+              <span class="projects__l1" data-split>Современный</span>
+              <span class="projects__l2"><span class="projects__sub" data-reveal>в сердце<br>природы</span><span data-split>комфорт</span></span>
+            </h2>
+            <p class="projects__text" data-reveal>Часть проектов уже реализована и ждёт своих владельцев — можно заехать сразу. Актуальный список готовых объектов уточняйте у менеджера.</p>
+
+            <ul class="plist" role="tablist" aria-label="Проекты домов" data-reveal>
+              <li><button class="plist__item is-active" type="button" role="tab" aria-selected="true" data-project="0"
+                data-name="Comfort+" data-beds="3 спальни" data-area="120 м²" data-plot="8 соток" data-term="6 мес." data-price="от 14,9 млн ₽">
+                <span class="plist__name">Comfort+</span><span class="plist__meta">3 спальни · 120 м²</span></button></li>
+              <li><button class="plist__item" type="button" role="tab" aria-selected="false" data-project="1"
+                data-name="Classic Flow" data-beds="5 спален" data-area="240 м²" data-plot="15 соток" data-term="11 мес." data-price="от 27,5 млн ₽">
+                <span class="plist__name">Classic Flow</span><span class="plist__meta">5 спален · 240 м²</span></button></li>
+              <li><button class="plist__item" type="button" role="tab" aria-selected="false" data-project="2"
+                data-name="Modern" data-beds="4 спальни" data-area="170 м²" data-plot="10 соток" data-term="8 мес." data-price="от 19,8 млн ₽">
+                <span class="plist__name">Modern</span><span class="plist__meta">4 спальни · 170 м²</span></button></li>
+              <li><button class="plist__item" type="button" role="tab" aria-selected="false" data-project="3"
+                data-name="Panorama" data-beds="4 спальни" data-area="205 м²" data-plot="12 соток" data-term="10 мес." data-price="от 23,4 млн ₽">
+                <span class="plist__name">Panorama</span><span class="plist__meta">4 спальни · 205 м²</span></button></li>
+            </ul>
+          </div>
+
+          <div class="projects__stage" data-clip data-cursor="Проект">
+            <img class="pimg is-active" src="assets/img/house-deck.webp" srcset="assets/img/house-deck-sm.webp 960w, assets/img/house-deck.webp 1800w" sizes="(min-width: 1024px) 45vw, 100vw" alt="Проект Comfort+: терраса с бассейном на закате" loading="lazy" decoding="async">
+            <img class="pimg" src="assets/img/house-night.webp" srcset="assets/img/house-night-sm.webp 960w, assets/img/house-night.webp 2400w" sizes="(min-width: 1024px) 45vw, 100vw" alt="Проект Classic Flow: двухэтажный дом с подсветкой" loading="lazy" decoding="async">
+            <img class="pimg" src="assets/img/house-dusk.webp" srcset="assets/img/house-dusk-sm.webp 960w, assets/img/house-dusk.webp 1800w" sizes="(min-width: 1024px) 45vw, 100vw" alt="Проект Modern: дом с панорамным остеклением в сумерках" loading="lazy" decoding="async">
+            <img class="pimg" src="assets/img/house-facade.webp" srcset="assets/img/house-facade-sm.webp 960w, assets/img/house-facade.webp 1800w" sizes="(min-width: 1024px) 45vw, 100vw" alt="Проект Panorama: тёмный фасад с деревянными вставками" loading="lazy" decoding="async">
+
+            <div class="pinfo glass" aria-live="polite">
+              <div class="pinfo__head">
+                <span class="pinfo__name">Comfort+</span>
+                <span class="pinfo__price">от 14,9 млн ₽</span>
+              </div>
+              <dl class="pinfo__specs">
+                <div><dt>Спальни</dt><dd data-f="beds">3 спальни</dd></div>
+                <div><dt>Площадь</dt><dd data-f="area">120 м²</dd></div>
+                <div><dt>Участок</dt><dd data-f="plot">8 соток</dd></div>
+                <div><dt>Строительство</dt><dd data-f="term">6 мес.</dd></div>
+              </dl>
+              <button class="btn btn--light btn--sm btn--block" type="button" data-modal-open data-modal-title="Получить планировку"><span>Получить планировку</span></button>
+            </div>
+          </div>
+
+          <div class="projects__side">
+            <figure class="pside" data-clip>
+              <img class="pside__img is-active" src="assets/img/interior-living-sm.webp" srcset="assets/img/interior-living-sm.webp 960w, assets/img/interior-living.webp 1800w" sizes="(min-width: 1024px) 20vw, 50vw" alt="Гостиная с камином и выходом на террасу" loading="lazy" decoding="async">
+              <img class="pside__img" src="assets/img/interior-dining-sm.webp" srcset="assets/img/interior-dining-sm.webp 960w, assets/img/interior-dining.webp 1800w" sizes="(min-width: 1024px) 20vw, 50vw" alt="Столовая с панорамными окнами" loading="lazy" decoding="async">
+              <img class="pside__img" src="assets/img/interior-living-sm.webp" alt="" loading="lazy" decoding="async">
+              <img class="pside__img" src="assets/img/interior-dining-sm.webp" alt="" loading="lazy" decoding="async">
+            </figure>
+            <p class="pside__cap" data-reveal><span>Интерьер</span><span class="pside__count"><b>01</b> / 04</span></p>
+            <p class="pside__text" data-reveal>Каждый проект адаптируем под участок и ваш сценарий жизни: от количества спален до отделки.</p>
+            <a class="dotlink" href="#contact" data-reveal>Больше проектов на нашем сайте<i></i></a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 05 ============ NATURE ============ -->
+    <section class="slide" id="nature" data-title="Жизнь на Алтае">
+      <div class="card">
+        <div class="card__bg"><img src="assets/img/valley.webp" srcset="assets/img/valley-sm.webp 960w, assets/img/valley.webp 2400w" sizes="100vw" alt="Зелёная горная долина под облаками" loading="lazy" decoding="async"></div>
+        <div class="nature__grad" aria-hidden="true"></div>
+        <div class="card__inner nature">
+          <div class="nature__text">
+            <p class="nature__lead" data-split>Жизнь на Алтае — это не просто переезд в другое место. Это полное изменение отношения к окружающему миру. Здесь каждый день напоминает о важности бережного отношения к природе и своему здоровью.</p>
+            <p class="nature__sub" data-reveal>Чистейший воздух, целебная вода из горных источников, продукты от местных фермеров — всё это создаёт идеальную среду для восстановления и поддержания здоровья.</p>
+          </div>
+
+          <div class="nature__card glass" data-reveal>
+            <figure class="nature__img"><img src="assets/img/hiker-sm.webp" srcset="assets/img/hiker-sm.webp 960w, assets/img/hiker.webp 1800w" sizes="(min-width: 1024px) 18vw, 45vw" alt="Путешественник на скале над облаками" loading="lazy" decoding="async"></figure>
+            <div class="nature__list">
+              <h3>Всё для комфортной жизни:</h3>
+              <ul class="checklist">
+                <li>Безопасность и приватность</li>
+                <li>Надёжные коммуникации, система «умный дом»</li>
+                <li>Удобная транспортная доступность в любое время года</li>
+                <li>Просторные планировки, наполненные естественным светом</li>
+                <li>Качественные современные материалы</li>
+                <li>Чистый воздух и возможность отдохнуть от суеты</li>
+                <li>Окружение живой природы</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="nature__word" aria-hidden="true"><span>ALTAI RIDGE</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 06 ============ PATH ============ -->
+    <section class="slide" id="path" data-title="Ваш путь">
+      <div class="card card--solid">
+        <div class="card__inner path">
+          <header class="path__head">
+            <h2 class="path__title" data-split>Ваш путь</h2>
+            <p class="path__sub" data-reveal><span>к дому</span> в горах</p>
+            <span class="kicker path__kicker">Этапы работы</span>
+          </header>
+
+          <div class="steps">
+            <svg class="steps__line" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+              <path class="steps__track" d="M40 12.5 C40 25 60 25 60 37.5 C60 50 40 50 40 62.5 C40 75 60 75 60 87.5" vector-effect="non-scaling-stroke"/>
+              <path class="steps__draw" pathLength="1" d="M40 12.5 C40 25 60 25 60 37.5 C60 50 40 50 40 62.5 C40 75 60 75 60 87.5" vector-effect="non-scaling-stroke"/>
+            </svg>
+            <ol class="steps__list">
+            <li class="step" style="--cx: 40%" data-reveal>
+              <h3 class="step__name"><i></i>Идея</h3>
+              <figure class="step__img"><img src="assets/img/hills-sm.webp" alt="" loading="lazy" decoding="async"></figure>
+              <p class="step__text">Выбираете участок и проект, который вам откликается. Мы поможем определиться с форматом дома и найти идеальное место с видом на хребет или лес. Хотите заселиться уже сегодня — покажем подборку готовых домов.</p>
+            </li>
+            <li class="step" style="--cx: 60%" data-reveal>
+              <h3 class="step__name"><i></i>Планирование</h3>
+              <figure class="step__img"><img src="assets/img/interior-dining-sm.webp" alt="" loading="lazy" decoding="async"></figure>
+              <p class="step__text">Согласовываем детали и бронируем участок. Помогаем с ипотекой на специальных условиях (одобрение от 2 недель), готовим предварительный договор. Вы чётко понимаете сроки, бюджет и этапы — никаких сюрпризов.</p>
+            </li>
+            <li class="step step--r" style="--cx: 40%" data-reveal>
+              <h3 class="step__name">Строительство<i></i></h3>
+              <figure class="step__img"><img src="assets/img/cabin-forest-sm.webp" alt="" loading="lazy" decoding="async"></figure>
+              <p class="step__text">Поэтапный контроль и открытая коммуникация. Вы получаете фото- и видеоотчёты с площадки и видите, как из чертежей рождаются стены. Дом строится под ключ от 6 до 12 месяцев в зависимости от проекта.</p>
+            </li>
+            <li class="step" style="--cx: 60%" data-reveal>
+              <h3 class="step__name"><i></i>Результат</h3>
+              <figure class="step__img"><img src="assets/img/house-dusk-sm.webp" alt="" loading="lazy" decoding="async"></figure>
+              <p class="step__text">Вы получаете ключи от готового дома. Вместе проверяем все системы, подписываем акт — и место становится вашим. Остаётся завезти вещи и в полной мере насладиться видами, ради которых вы выбрали это место.</p>
+            </li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 07 ============ DOCS ============ -->
+    <section class="slide" id="docs" data-title="Документы">
+      <div class="card">
+        <div class="card__bg"><img src="assets/img/peaks-night.webp" srcset="assets/img/peaks-night-sm.webp 960w, assets/img/peaks-night.webp 2400w" sizes="100vw" alt="" loading="lazy" decoding="async"></div>
+        <div class="docs__grad" aria-hidden="true"></div>
+        <div class="card__inner docs">
+          <p class="docs__lead" data-split>Наша команда сопровождает вас на каждом этапе — от первого просмотра до получения ключей.</p>
+
+          <div class="docs__row">
+            <article class="doc" data-reveal><span class="doc__num">01</span><h3>Свидетельство о собственности на землю</h3><p>Участки оформлены в собственность, категория земель — ИЖС. Все документы проверены и готовы к регистрации.</p></article>
+            <article class="doc" data-reveal><span class="doc__num">02</span><h3>Разрешение на строительство</h3><p>Проектная документация согласована, получено разрешение на строительство каждого дома.</p></article>
+            <article class="doc" data-reveal><span class="doc__num">03</span><h3>Договор подряда с гарантией 5&nbsp;лет</h3><p>Фиксированная смета, поэтапная оплата, строительный контроль. Гарантия на конструктив и инженерные системы — 5 лет.</p></article>
+          </div>
+
+          <div class="docs__word" aria-hidden="true"><span>ДОКУМЕНТАЦИЯ</span></div>
+
+          <div class="docs__row">
+            <article class="doc" data-reveal><span class="doc__num">04</span><h3>Акт ввода в эксплуатацию</h3><p>После завершения строительства дом передаётся с актом ввода, что упрощает регистрацию права собственности.</p></article>
+            <article class="doc" data-reveal><span class="doc__num">05</span><h3>Ипотека под ключ</h3><p>Поможем с оформлением ипотеки на специальных условиях. Работаем с банками-партнёрами, одобрение — на старте.</p></article>
+            <article class="doc" data-reveal><span class="doc__num">06</span><h3>Юридическое сопровождение сделки</h3><p>Проверка чистоты документов, помощь в регистрации прав, сопровождение до передачи ключей.</p></article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 08 ============ INVEST ============ -->
+    <section class="slide" id="invest" data-title="Инвестиции">
+      <div class="card card--solid">
+        <div class="card__inner invest">
+          <header class="invest__head">
+            <span class="kicker invest__kicker">Выгоды</span>
+            <h2 class="invest__title"><span data-split>Ваш актив</span><span class="invest__l2"><span data-split>в горах</span><span class="invest__sub" data-reveal>который<br>растёт в цене</span></span></h2>
+          </header>
+
+          <ul class="invest__list" role="tablist" aria-label="Выгоды инвестиций" data-reveal>
+            <li><button class="ibtn is-active" type="button" role="tab" aria-selected="true" data-i="0"><span>Безопасность вложений</span><i></i></button></li>
+            <li><button class="ibtn" type="button" role="tab" aria-selected="false" data-i="1"><span>Пассивный доход</span><i></i></button></li>
+            <li><button class="ibtn" type="button" role="tab" aria-selected="false" data-i="2"><span>Высокая ликвидность</span><i></i></button></li>
+            <li><button class="ibtn" type="button" role="tab" aria-selected="false" data-i="3"><span>Туристический потенциал</span><i></i></button></li>
+          </ul>
+
+          <div class="invest__visual" data-reveal>
+            <svg class="invest__ring" viewBox="0 0 200 200" aria-hidden="true">
+              <defs><path id="ring-path" d="M100,100 m-88,0 a88,88 0 1,1 176,0 a88,88 0 1,1 -176,0"/></defs>
+              <text><textPath href="#ring-path" textLength="548">ALTAI RIDGE · ИНВЕСТИЦИИ В ПРИРОДУ · ALTAI RIDGE · ДОМ В ГОРАХ ·</textPath></text>
+            </svg>
+            <div class="invest__circle">
+              <img class="iimg is-active" src="assets/img/clouds-sm.webp" srcset="assets/img/clouds-sm.webp 960w, assets/img/clouds.webp 2400w" sizes="(min-width: 1024px) 30vw, 80vw" alt="Горы над морем облаков" loading="lazy" decoding="async">
+              <img class="iimg" src="assets/img/house-night-sm.webp" srcset="assets/img/house-night-sm.webp 960w, assets/img/house-night.webp 2400w" sizes="(min-width: 1024px) 30vw, 80vw" alt="Современный дом вечером" loading="lazy" decoding="async">
+              <img class="iimg" src="assets/img/hills-sm.webp" srcset="assets/img/hills-sm.webp 960w, assets/img/hills.webp 1800w" sizes="(min-width: 1024px) 30vw, 80vw" alt="Зелёные холмы" loading="lazy" decoding="async">
+              <img class="iimg" src="assets/img/stars-sm.webp" srcset="assets/img/stars-sm.webp 960w, assets/img/stars.webp 1800w" sizes="(min-width: 1024px) 30vw, 80vw" alt="Звёздное небо над заснеженными горами" loading="lazy" decoding="async">
+            </div>
+          </div>
+
+          <div class="invest__desc" data-reveal>
+            <span class="invest__idx"><b>01</b> / 04</span>
+            <ul>
+              <li class="is-active">Природная ценность региона, ограниченное количество застройки и экологичность места делают эту недвижимость уникальным активом.</li>
+              <li>Возможность сдачи дома в аренду в туристический сезон. Ваш дом может приносить стабильный доход круглый год.</li>
+              <li>Недвижимость в уникальной горной локации всегда пользуется спросом. Это надёжный актив, который сохраняет и приумножает свою стоимость.</li>
+              <li>Алтай становится всё более популярным направлением для отдыха. Регион активно развивается, привлекая туристов со всей России и из-за рубежа.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 09 ============ CALCULATOR ============ -->
+    <section class="slide" id="calc" data-title="Ипотека">
+      <div class="card card--solid">
+        <div class="card__inner calc">
+          <div class="calc__intro">
+            <span class="kicker">Ипотека под ключ</span>
+            <h2 class="calc__title" data-split>Рассчитайте<br>платёж</h2>
+            <p class="calc__text" data-reveal>Предварительный расчёт по аннуитетной схеме. Точные условия подберём вместе с банками-партнёрами — одобрение от 2 недель.</p>
+            <figure class="calc__img" data-clip><img src="assets/img/interior-living-sm.webp" srcset="assets/img/interior-living-sm.webp 960w, assets/img/interior-living.webp 1800w" sizes="(min-width: 1024px) 30vw, 100vw" alt="Светлая гостиная с панорамными окнами" loading="lazy" decoding="async"></figure>
+          </div>
+
+          <form class="calc__form" data-reveal novalidate>
+            <div class="range">
+              <div class="range__head"><label for="r-price">Стоимость дома</label><output for="r-price" data-v="price"></output></div>
+              <input id="r-price" type="range" min="10" max="40" step="0.1" value="19.8">
+              <div class="range__scale"><span>10 млн</span><span>40 млн</span></div>
+            </div>
+            <div class="range">
+              <div class="range__head"><label for="r-down">Первоначальный взнос</label><output for="r-down" data-v="down"></output></div>
+              <input id="r-down" type="range" min="10" max="90" step="1" value="30">
+              <div class="range__scale"><span>10%</span><span>90%</span></div>
+            </div>
+            <div class="range">
+              <div class="range__head"><label for="r-years">Срок кредита</label><output for="r-years" data-v="years"></output></div>
+              <input id="r-years" type="range" min="3" max="30" step="1" value="20">
+              <div class="range__scale"><span>3 года</span><span>30 лет</span></div>
+            </div>
+            <div class="range">
+              <div class="range__head"><label for="r-rate">Ставка</label><output for="r-rate" data-v="rate"></output></div>
+              <input id="r-rate" type="range" min="3" max="25" step="0.1" value="6">
+              <div class="chips chips--rate" role="group" aria-label="Готовые программы">
+                <button type="button" data-rate="6">Семейная · 6%</button>
+                <button type="button" data-rate="12">Субсидированная · 12%</button>
+                <button type="button" data-rate="18">Рыночная · 18%</button>
+              </div>
+            </div>
+          </form>
+
+          <div class="calc__result glass" data-reveal>
+            <span class="calc__label">Ежемесячный платёж</span>
+            <strong class="calc__pay" data-out="pay">—</strong>
+            <dl class="calc__dl">
+              <div><dt>Сумма кредита</dt><dd data-out="loan">—</dd></div>
+              <div><dt>Взнос</dt><dd data-out="down">—</dd></div>
+              <div><dt>Переплата</dt><dd data-out="over">—</dd></div>
+              <div><dt>Рекомендуемый доход</dt><dd data-out="income">—</dd></div>
+            </dl>
+            <button class="btn btn--light btn--block" type="button" data-modal-open data-modal-title="Точный расчёт ипотеки" data-magnetic><span>Получить точный расчёт</span></button>
+            <small class="calc__note">Расчёт предварительный и не является публичной офертой.</small>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 ============ CTA ============ -->
+    <section class="slide slide--cta" id="contact" data-title="Контакты">
+      <div class="card">
+        <div class="card__bg"><img src="assets/img/house-night.webp" srcset="assets/img/house-night-sm.webp 960w, assets/img/house-night.webp 2400w" sizes="100vw" alt="Современный дом с подсветкой в вечерних сумерках" loading="lazy" decoding="async"></div>
+        <div class="cta__grad" aria-hidden="true"></div>
+        <div class="card__inner cta">
+          <div class="cta__top">
+            <p data-reveal>Мы организуем онлайн- или очный просмотр, поможем подобрать участок и проект. Подготовим ипотеку, оформим сделку и сопроводим до получения ключей.</p>
+            <p data-reveal>Покупка дома в горах — это не просто финансовая сделка. Это воплощение мечты, шаг к новой жизни и инвестиция в качество жизни всей семьи.</p>
+          </div>
+
+          <div class="cta__center">
+            <h2 class="cta__title"><span data-split>Вы готовы обсудить</span><span data-split>ваш будущий дом?</span></h2>
+            <div class="cta__actions" data-reveal>
+              <button class="btn btn--light btn--lg" type="button" data-modal-open data-magnetic><span>Записаться на просмотр</span><svg class="btn__arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button>
+              <a class="btn btn--ghost btn--lg" href="tel:+73850060336" data-magnetic><span>Позвонить</span></a>
+            </div>
+          </div>
+
+          <div class="cta__bottom" data-reveal>
+            <a class="dotlink" href="https://altai-ridge.ru" target="_blank" rel="noopener">altai-ridge.ru<i></i></a>
+            <a class="dotlink" href="mailto:alt@ridge.ru">alt@ridge.ru<i></i></a>
+            <a class="dotlink" href="tel:+73850060336">+7 (385) 006-03-36<i></i></a>
+            <div class="qr" title="altai-ridge.ru">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25" role="img" aria-label="QR-код сайта altai-ridge.ru"><path stroke="#0d0f0e" d="M0 0.5h7m1 0h2m1 0h1m1 0h2m3 0h7m-25 1h1m5 0h1m3 0h1m1 0h3m3 0h1m5 0h1m-25 1h1m1 0h3m1 0h1m1 0h1m2 0h3m1 0h1m2 0h1m1 0h3m1 0h1m-25 1h1m1 0h3m1 0h1m3 0h1m1 0h3m3 0h1m1 0h3m1 0h1m-25 1h1m1 0h3m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m2 0h1m1 0h3m1 0h1m-25 1h1m5 0h1m1 0h1m1 0h1m1 0h1m2 0h1m1 0h1m5 0h1m-25 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-17 1h1m2 0h1m1 0h1m-17 1h1m1 0h2m1 0h3m1 0h3m1 0h1m2 0h2m2 0h3m-23 1h1m2 0h2m1 0h1m3 0h2m3 0h1m1 0h1m1 0h1m3 0h2m-25 1h2m2 0h1m1 0h1m1 0h1m1 0h4m1 0h2m2 0h1m1 0h2m1 0h1m-24 1h1m1 0h2m3 0h2m2 0h1m3 0h1m2 0h1m3 0h1m-24 1h3m3 0h3m3 0h1m1 0h2m1 0h1m4 0h1m1 0h1m-25 1h4m1 0h1m2 0h1m4 0h1m1 0h1m4 0h1m1 0h1m-23 1h1m2 0h1m1 0h1m1 0h2m1 0h1m2 0h1m1 0h1m1 0h1m2 0h4m-23 1h1m1 0h1m3 0h2m3 0h3m1 0h1m1 0h3m1 0h2m-24 1h4m2 0h1m1 0h2m1 0h1m1 0h1m1 0h2m1 0h6m-17 1h1m1 0h1m2 0h1m1 0h1m1 0h1m3 0h1m1 0h2m-25 1h7m3 0h1m1 0h1m1 0h2m1 0h1m1 0h1m1 0h3m-24 1h1m5 0h1m1 0h2m3 0h2m1 0h1m3 0h1m1 0h2m-25 1h1m1 0h3m1 0h1m2 0h2m1 0h1m1 0h1m2 0h5m1 0h1m-25 1h1m1 0h3m1 0h1m1 0h1m1 0h1m1 0h2m1 0h1m2 0h3m-21 1h1m1 0h3m1 0h1m1 0h4m1 0h1m3 0h2m2 0h1m1 0h1m-25 1h1m5 0h1m1 0h1m1 0h1m2 0h3m1 0h1m2 0h2m1 0h1m-25 1h7m1 0h1m1 0h1m3 0h4m1 0h1m1 0h1m1 0h1"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>© 2026 Altai Ridge. Коттеджный посёлок на Алтае</span>
+    <span>Алтай · 70 км от Горно-Алтайска</span>
+    <a href="#home" class="site-footer__top">Наверх <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M6 10V2M2.5 5.5 6 2l3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.3"/></svg></a>
+  </footer>
+
+  <!-- ============ MODAL ============ -->
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-hidden="true" data-lenis-prevent>
+    <div class="modal__overlay" data-modal-close></div>
+    <div class="modal__panel">
+      <button class="modal__close" type="button" aria-label="Закрыть" data-modal-close><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3l10 10M13 3 3 13" stroke="currentColor" stroke-width="1.4"/></svg></button>
+      <figure class="modal__img"><img src="assets/img/forest-fog-sm.webp" alt="" loading="lazy" decoding="async"><figcaption><b>Altai Ridge</b><span>Ответим в течение 15 минут в рабочее время</span></figcaption></figure>
+      <div class="modal__body">
+        <span class="kicker">Заявка</span>
+        <h3 class="modal__title" id="modal-title">Запишитесь на просмотр</h3>
+        <p class="modal__text">Оставьте контакты — менеджер свяжется с вами, ответит на вопросы и подберёт удобное время показа.</p>
+        <form class="form" novalidate>
+          <input type="hidden" name="subject" value="Запись на просмотр">
+          <label class="field"><input name="name" type="text" autocomplete="name" placeholder=" " required><span>Ваше имя</span></label>
+          <label class="field"><input name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder=" " required><span>Телефон</span></label>
+          <div class="chips" role="radiogroup" aria-label="Формат просмотра">
+            <label><input type="radio" name="format" value="online" checked><span>Онлайн-показ</span></label>
+            <label><input type="radio" name="format" value="offline"><span>Приеду лично</span></label>
+          </div>
+          <label class="field"><textarea name="comment" rows="2" placeholder=" "></textarea><span>Комментарий</span></label>
+          <label class="check"><input type="checkbox" name="agree" checked required><span>Согласен на обработку персональных данных</span></label>
+          <button class="btn btn--light btn--block" type="submit"><span>Отправить заявку</span></button>
+        </form>
+        <div class="form__success" hidden>
+          <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M15 24.5l6 6 12-13" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+          <h3>Спасибо!</h3>
+          <p>Заявка принята. Мы перезвоним вам в ближайшее время.</p>
+          <button class="btn btn--ghost btn--sm" type="button" data-modal-close><span>Закрыть</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cursor" aria-hidden="true"><span class="cursor__label"></span></div>
+
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script src="assets/vendor/ScrollTrigger.min.js"></script>
+  <script src="assets/vendor/lenis.min.js"></script>
+  <script src="assets/js/main.js"></script>
+</body>
+</html>
