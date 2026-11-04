@@ -118,8 +118,24 @@
   /* ------------------------------------------------------------------------
      Scroll-triggered reveals (work in both stacked and flow layouts)
      ------------------------------------------------------------------------ */
+  /* Each reveal runs once: either when its element scrolls in, or — for things
+     sitting at the very bottom of a slide — when the slide itself lands on screen. */
+  const revealed = new WeakSet();
+  const pendingReveals = [];
   function onEnter(el, fn, start = 'top 88%') {
-    ScrollTrigger.create({ trigger: el, start, once: true, onEnter: fn });
+    const run = () => {
+      if (revealed.has(el)) return;
+      revealed.add(el);
+      fn();
+    };
+    pendingReveals.push([el, run]);
+    ScrollTrigger.create({ trigger: el, start, once: true, onEnter: run });
+  }
+  function showReveal(els) {
+    const fresh = els.filter((e) => !revealed.has(e));
+    if (!fresh.length) return;
+    fresh.forEach((e) => revealed.add(e));
+    gsap.to(fresh, { autoAlpha: 1, y: 0, duration: 1.2, ease: 'expo.out', stagger: 0.09, overwrite: true, clearProps: 'transform' });
   }
   function countUp(el, delay = 0) {
     const end = parseFloat(el.dataset.count);
@@ -133,8 +149,17 @@
     ScrollTrigger.batch($$('[data-reveal]').filter(notHero), {
       start: 'top 92%',
       once: true,
-      onEnter: (batch) => gsap.to(batch, { autoAlpha: 1, y: 0, duration: 1.2, ease: 'expo.out', stagger: 0.09, overwrite: true, clearProps: 'transform' }),
+      onEnter: showReveal,
     });
+    slides.filter(notHero).forEach((s) => ScrollTrigger.create({
+      trigger: s,
+      start: 'top 8%',
+      once: true,
+      onEnter: () => {
+        showReveal($$('[data-reveal]', s));
+        pendingReveals.forEach(([el, run]) => { if (s.contains(el)) run(); });
+      },
+    }));
     $$('[data-clip]').filter(notHero).forEach((el) => onEnter(el, () => {
       gsap.to(el, { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.6, ease: 'expo.inOut' });
       const imgs = $$(':scope > img:not(.pimg):not(.pside__img)', el);

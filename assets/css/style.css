@@ -749,8 +749,6 @@ input[type="range"]:focus-visible { outline: none; }
 .cta__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: clamp(20px, 4vh, 40px); }
 .cta__bottom { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; padding-top: 18px; border-top: 1px solid rgba(255, 255, 255, .14); }
 .cta__bottom .dotlink { color: rgba(255, 255, 255, .82); }
-.qr { width: 78px; padding: 7px; border-radius: 12px; background: #f2f3ee; flex: none; }
-.qr svg { width: 100%; height: auto; }
 
 .site-footer {
   display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px 24px;
@@ -966,7 +964,6 @@ input[type="range"]:focus-visible { outline: none; }
   .calc__dl { grid-template-columns: 1fr 1fr; }
   .cta__actions .btn { width: 100%; }
   .cta__bottom { flex-direction: column; align-items: flex-start; gap: 12px; }
-  .qr { display: none; }
   .modal { padding: 8px; align-items: end; }
   .modal__panel { border-radius: 22px; max-height: calc(100svh - 16px); }
   .modal__img { display: none; }
