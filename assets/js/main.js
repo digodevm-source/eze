@@ -241,7 +241,7 @@
       { // 04 → 05 — a window opens onto the valley and the camera pulls back
         name: 'window', front: 'b', intro: 0.65,
         build: (tl, a, b) => tl
-          .fromTo(b.card, { clipPath: 'inset(36% 33% 36% 33% round 28px)' }, { clipPath: 'inset(0% 0% 0% 0% round 28px)', duration: 1.45, ease: IO }, 0)
+          .fromTo(b.card, { clipPath: 'inset(48% 47% 48% 47% round 28px)' }, { clipPath: 'inset(0% 0% 0% 0% round 28px)', duration: 1.45, ease: IO }, 0)
           .fromTo(b.bg, { scale: 1.9 }, { scale: 1, duration: 1.5, ease: 'expo.inOut' }, 0)
           .fromTo(b.inner, { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: 0.8, ease: 'expo.out' }, 0.7)
           .fromTo(a.card, { scale: 1, yPercent: 0 }, { scale: 0.84, yPercent: -4, duration: 1.45, ease: IO }, 0)
@@ -630,6 +630,14 @@
     });
   }
 
+  /* Hover switches only after the pointer rests on an item for a moment,
+     so sweeping the mouse across a list does not fire a chain of switches. */
+  function hoverIntent(el, fn, delay = 140) {
+    let t = 0;
+    el.addEventListener('mouseenter', () => { clearTimeout(t); t = setTimeout(fn, delay); });
+    el.addEventListener('mouseleave', () => clearTimeout(t));
+  }
+
   /* ------------------------------------------------------------------------
      Projects switcher
      ------------------------------------------------------------------------ */
@@ -666,7 +674,7 @@
     }
     items.forEach((b, k) => {
       b.addEventListener('click', () => show(k));
-      if (finePointer) b.addEventListener('mouseenter', () => show(k));
+      if (finePointer) hoverIntent(b, () => show(k));
     });
     // keyboard arrows within the tablist
     $('.plist').addEventListener('keydown', (e) => {
@@ -699,7 +707,7 @@
     }
     btns.forEach((b, k) => {
       b.addEventListener('click', () => show(k));
-      if (finePointer) b.addEventListener('mouseenter', () => show(k));
+      if (finePointer) hoverIntent(b, () => show(k));
     });
   })();
 
