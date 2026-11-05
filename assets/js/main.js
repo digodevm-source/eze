@@ -150,15 +150,13 @@
   /* ------------------------------------------------------------------------
      Pager + header state (shared by both engines)
      ------------------------------------------------------------------------ */
-  const pagerCur = $('.pager__cur');
   const pagerDots = $('.pager__dots');
   const navLinks = $$('.nav a');
-  $('.pager__total').textContent = pad(slides.length);
   const dots = slides.map((s, i) => {
     const li = document.createElement('li');
     const b = document.createElement('button');
     b.type = 'button';
-    b.setAttribute('aria-label', `${pad(i + 1)} — ${s.dataset.title}`);
+    b.setAttribute('aria-label', s.dataset.title);
     b.innerHTML = `<span>${s.dataset.title}</span>`;
     b.addEventListener('click', () => goToSlide && goToSlide(i));
     li.appendChild(b);
@@ -172,14 +170,6 @@
     dots.forEach((d, k) => d.classList.toggle('is-active', k === i));
     const id = slides[i].id;
     navLinks.forEach((a) => a.classList.toggle('is-active', a.getAttribute('href') === `#${id}`));
-    if (motion) {
-      gsap.timeline()
-        .to(pagerCur, { yPercent: -60, autoAlpha: 0, duration: 0.2, ease: 'power2.in' })
-        .add(() => { pagerCur.textContent = pad(i + 1); })
-        .fromTo(pagerCur, { yPercent: 60, autoAlpha: 0 }, { yPercent: 0, autoAlpha: 1, duration: 0.45, ease: 'expo.out' });
-    } else {
-      pagerCur.textContent = pad(i + 1);
-    }
   }
   const headerSolid = () => menuOpen || (stage ? current > 0 : window.scrollY > window.innerHeight * 0.35);
   const updateHeader = () => header.classList.toggle('is-solid', headerSolid());

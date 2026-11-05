@@ -240,7 +240,6 @@ h1, h2, h3, p { margin: 0; }
   transform: translateY(30px); opacity: 0;
   transition: transform .9s var(--ease), opacity .9s var(--ease), color .3s;
 }
-.menu__nav a i { font-style: normal; font-family: var(--f-body); font-size: 11px; color: var(--faint); letter-spacing: .1em; }
 .menu__nav a:hover { color: var(--accent); }
 .menu-open .menu__nav a { transform: none; opacity: 1; }
 .menu-open .menu__nav a:nth-child(2) { transition-delay: .04s; }
@@ -258,9 +257,6 @@ h1, h2, h3, p { margin: 0; }
   transform: translateY(-50%);
   display: none; flex-direction: column; align-items: center; gap: 16px;
 }
-.pager__num { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 10.5px; font-weight: 700; letter-spacing: .08em; font-variant-numeric: tabular-nums; }
-.pager__total { color: var(--faint); }
-.pager__sep { width: 1px; height: 14px; background: var(--line-2); }
 .pager__dots { display: flex; flex-direction: column; gap: 4px; }
 .pager__dots button { position: relative; display: grid; place-items: center; width: 18px; height: 18px; }
 .pager__dots button::before {
