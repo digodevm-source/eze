@@ -89,7 +89,7 @@
   /* ------------------------------------------------------------------------
      Content intro of a slide: hide (prepare) → play (run)
      ------------------------------------------------------------------------ */
-  const HERO_BITS = ['.hero__meta li', '.status', '.hero__facts li', '.hero__text', '.hero__cta', '.scroll-hint'];
+  const HERO_BITS = ['.hero__meta li', '.status', '.hero__facts li', '.hero__text', '.hero__cta'];
   const CLIP_IMG = ':scope > img:not(.pimg):not(.pside__img)';
 
   function countUp(el, delay = 0) {
@@ -157,7 +157,6 @@
     const b = document.createElement('button');
     b.type = 'button';
     b.setAttribute('aria-label', s.dataset.title);
-    b.innerHTML = `<span>${s.dataset.title}</span>`;
     b.addEventListener('click', () => goToSlide && goToSlide(i));
     li.appendChild(b);
     pagerDots.appendChild(li);
@@ -595,7 +594,6 @@
      ------------------------------------------------------------------------ */
   function startPreloader(startIndex, onReady) {
     window.scrollTo(0, 0);
-    const count = $('.preloader__count');
     const bar = $('.preloader__bar i');
     gsap.fromTo($$('.preloader__logo span'), { yPercent: 60, autoAlpha: 0 }, { yPercent: 0, autoAlpha: 1, duration: 0.9, stagger: 0.035, ease: 'expo.out' });
 
@@ -609,10 +607,7 @@
     const timeout = new Promise((r) => setTimeout(r, 5000));
 
     const p = { v: 0 };
-    const render = () => {
-      count.textContent = Math.round(p.v);
-      bar.style.transform = `scaleX(${p.v / 100})`;
-    };
+    const render = () => { bar.style.transform = `scaleX(${p.v / 100})`; };
     const crawl = gsap.to(p, { v: 88, duration: 1.4, ease: 'power2.out', onUpdate: render });
 
     Promise.race([ready, timeout]).then(() => {
@@ -643,7 +638,6 @@
     const imgs = $$('.pimg');
     const sides = $$('.pside__img');
     const info = $('.pinfo');
-    const sideCount = $('.pside__count b');
     if (!items.length) return;
     let cur = 0;
     let swapT;
@@ -659,7 +653,6 @@
       imgs.forEach((img, k) => img.classList.toggle('is-active', k === i));
       setTimeout(() => { if (cur === i) imgs[prev].classList.remove('was-active'); }, 1300);
       sides.forEach((img, k) => img.classList.toggle('is-active', k === i));
-      sideCount.textContent = pad(i + 1);
 
       const d = items[i].dataset;
       info.classList.add('is-swapping');
@@ -695,7 +688,6 @@
     const btns = $$('.ibtn');
     const imgs = $$('.iimg');
     const texts = $$('.invest__desc li');
-    const idx = $('.invest__idx b');
     if (!btns.length) return;
     let cur = 0;
     function show(i) {
@@ -704,7 +696,6 @@
       btns.forEach((b, k) => { b.classList.toggle('is-active', k === i); b.setAttribute('aria-selected', k === i ? 'true' : 'false'); });
       imgs.forEach((im, k) => im.classList.toggle('is-active', k === i));
       texts.forEach((t, k) => t.classList.toggle('is-active', k === i));
-      idx.textContent = pad(i + 1);
     }
     btns.forEach((b, k) => {
       b.addEventListener('click', () => show(k));
@@ -888,39 +879,6 @@
   });
   $$('.field input', form).forEach((i) => i.addEventListener('input', () => i.closest('.field').classList.remove('is-error')));
 
-  /* ------------------------------------------------------------------------
-     Cursor + magnetic buttons (fine pointers only)
-     ------------------------------------------------------------------------ */
-  if (finePointer && motion) {
-    root.classList.add('has-cursor');
-    const cur = $('.cursor');
-    const label = $('.cursor__label', cur);
-    const xTo = gsap.quickTo(cur, 'x', { duration: 0.5, ease: 'power3' });
-    const yTo = gsap.quickTo(cur, 'y', { duration: 0.5, ease: 'power3' });
-    window.addEventListener('pointermove', (e) => { xTo(e.clientX); yTo(e.clientY); cur.classList.add('is-visible'); }, { passive: true });
-    document.documentElement.addEventListener('pointerleave', () => cur.classList.remove('is-visible'));
-    window.addEventListener('pointerdown', () => cur.classList.add('is-down'));
-    window.addEventListener('pointerup', () => cur.classList.remove('is-down'));
-    document.addEventListener('pointerover', (e) => {
-      const lab = e.target.closest('[data-cursor]');
-      const hov = e.target.closest('a, button, label, input[type="range"]');
-      const text = !hov && lab ? lab.dataset.cursor : '';
-      cur.classList.toggle('is-label', Boolean(text));
-      cur.classList.toggle('is-hover', Boolean(hov));
-      if (text) label.textContent = text;
-    });
-
-    $$('[data-magnetic]').forEach((el) => {
-      const mx = gsap.quickTo(el, 'x', { duration: 0.7, ease: 'power3' });
-      const my = gsap.quickTo(el, 'y', { duration: 0.7, ease: 'power3' });
-      el.addEventListener('pointermove', (e) => {
-        const r = el.getBoundingClientRect();
-        mx((e.clientX - r.left - r.width / 2) * 0.22);
-        my((e.clientY - r.top - r.height / 2) * 0.35);
-      });
-      el.addEventListener('pointerleave', () => { mx(0); my(0); });
-    });
-  }
 
   /* ------------------------------------------------------------------------
      Boot
