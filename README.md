@@ -76,7 +76,7 @@ assets/
   css/style.css      — стили
   js/main.js         — анимации и интерактив
   vendor/            — gsap 3.12.5, ScrollTrigger, lenis 1.1.20
-  fonts/             — Jost и Manrope (variable, кириллица и латиница)
+  fonts/             — Jost и Manrope (variable), Unbounded 600 для крупных надписей; кириллица и латиница
   img/               — фото в WebP
 ```
 
