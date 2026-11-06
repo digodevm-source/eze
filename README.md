@@ -57,7 +57,7 @@ Settings → Pages → Deploy from a branch → выберите ветку и �
 
 - `index.html`: разметка и тексты (на английском).
 - `assets/css/style.css`: стиль, цвета и шрифты задаются переменными в `:root`.
-  Шрифты: Cormorant Garamond и Hanken Grotesk (Google Fonts).
+  Шрифты: Unbounded (заголовки) и Inter Tight (текст), Google Fonts.
 - `assets/js/main.js`: проигрыватель роликов 60 к/с, плавный скролл, мягкое появление блоков, лёгкий параллакс, часы.
 - `assets/vendor/lenis.min.js`: Lenis 1.3.26 (MIT), плавный скролл.
 
