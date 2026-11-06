@@ -9,7 +9,7 @@
  * 2. Loader: a generative ring of fine lines drawn live while the first film
  *    downloads; the counter follows the real download progress.
  * 3. Smooth scrolling (Lenis), word-by-word reveals, a slight parallax on
- *    films, a running line of disciplines and a soft mouse cursor.
+ *    films and a soft mouse cursor.
  * 4. Visitor's local time in the header and footer.
  */
 (() => {
@@ -423,7 +423,7 @@
   }
 
   /* ------------------------------------------------------------------ */
-  /* 3. Smooth scroll, reveals, parallax, running line, cursor           */
+  /* 3. Smooth scroll, reveals, parallax, cursor                         */
   /* ------------------------------------------------------------------ */
 
   let lenis = null;
@@ -506,34 +506,6 @@
     }
   }
 
-  // running line: drifts left, speeds up (or turns back) with the scroll
-  const track = document.querySelector('[data-marquee]');
-  const marquee = { x: 0, half: 0, vel: 0, visible: false };
-  if (track) {
-    track.innerHTML += track.innerHTML;
-    const measure = () => { marquee.half = track.scrollWidth / 2; };
-    measure();
-    fontsReady.then(measure);
-    window.addEventListener('resize', measure);
-    if ('IntersectionObserver' in window) {
-      new IntersectionObserver((entries) => { marquee.visible = entries[0].isIntersecting; }).observe(track);
-    } else {
-      marquee.visible = true;
-    }
-  }
-
-  function tickMarquee(dt) {
-    if (!track || !marquee.visible || reduceMotion || !marquee.half) return;
-    const rem = parseFloat(getComputedStyle(root).fontSize) || 16;
-    const scrollVel = lenis ? lenis.velocity || 0 : 0;
-    marquee.vel += (scrollVel - marquee.vel) * 0.08;
-    const speed = rem * 3.2 + marquee.vel * rem * 0.9; // px per second
-    marquee.x -= speed * (dt / 1000);
-    if (marquee.x <= -marquee.half) marquee.x += marquee.half;
-    if (marquee.x > 0) marquee.x -= marquee.half;
-    track.style.transform = 'translate3d(' + marquee.x.toFixed(2) + 'px,0,0)';
-  }
-
   // soft cursor: a dot that follows the mouse and a ring that trails it
   const cursor = document.querySelector('.cursor');
   const pointer = { x: -100, y: -100, rx: -100, ry: -100, seen: false };
@@ -566,15 +538,11 @@
     cursorRing.style.transform = 'translate3d(' + pointer.rx.toFixed(2) + 'px,' + pointer.ry.toFixed(2) + 'px,0)';
   }
 
-  let lastFrame = 0;
   function frame(time) {
-    const dt = lastFrame ? Math.min(time - lastFrame, 100) : 16;
-    lastFrame = time;
     if (lenis) lenis.raf(time);
     tickLoader(time);
     for (const f of films) f.tick(time);
     updateParallax();
-    tickMarquee(dt);
     tickCursor();
     requestAnimationFrame(frame);
   }

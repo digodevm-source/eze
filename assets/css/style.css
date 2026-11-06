@@ -420,44 +420,6 @@ video { max-width: 100%; }
   line-height: 1.7;
 }
 
-/* ---------- running line of disciplines ---------- */
-
-.marquee {
-  overflow: hidden;
-  padding-block: 3rem;
-  border-block: 1px solid var(--hair);
-}
-
-.marquee__track {
-  display: flex;
-  width: max-content;
-  will-change: transform;
-}
-
-.marquee__track span {
-  display: inline-flex;
-  align-items: center;
-  gap: 3.25rem;
-  padding-right: 3.25rem;
-  font: 200 6.5rem/1.15 var(--display);
-  letter-spacing: -0.05em;
-  white-space: nowrap;
-  color: var(--dim);
-}
-
-.marquee__track span:nth-child(even) {
-  color: transparent;
-  -webkit-text-stroke: 1px var(--dim);
-}
-
-.marquee__track span::after {
-  content: "";
-  width: 0.85rem;
-  height: 0.85rem;
-  border: 1px solid var(--dim);
-  border-radius: 50%;
-}
-
 /* ---------- loader ---------- */
 
 .loader {
