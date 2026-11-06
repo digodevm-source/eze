@@ -26,11 +26,14 @@ encode() {
   ffmpeg -v error -y -stream_loop $((full_loops - 1)) -i "$src" -vf "$vf,$GRADE" "${X264[@]}" \
     -movflags +faststart "assets/video/$name.mp4"
   ffmpeg -v error -y -i "assets/video/$name.mp4" -frames:v 1 -q:v 3 "assets/img/$name.jpg"
-  echo "$name: $(ffprobe -v error -select_streams v:0 -show_entries stream=width,height,profile,level -of csv=p=0 "assets/video/$name.seg.mp4")"
+  echo "$name: $(ffprobe -v error -select_streams v:0 -show_entries stream=width,height,profile,level -of csv=p=0 "assets/video/$name.seg.mp4") $(du -h "assets/video/$name.seg.mp4" "assets/video/$name.mp4" | cut -f1 | tr '\n' ' ')"
 }
 
 #        name      filter                          seg  full   (source loop length)
-encode   sphere    "crop=560:560:120:20"             1    1   # 6.00 s, 150 frames
-encode   radiance  "scale=640:640:flags=lanczos"     2    5   # 0.96 s, 24 frames
-encode   rain      "scale=860:860:flags=lanczos"     2    5   # 0.96 s, 24 frames
-encode   offering  "scale=960:540:flags=lanczos"     4   10   # 0.48 s, 12 frames
+# Sizes are for desktop screens up to 2560 px wide; upscaling here with
+# lanczos keeps the particles crisper than the browser's own scaling.
+#        name      filter                                             seg  full   (source loop length)
+encode   sphere    "crop=560:560:120:20,scale=840:840:flags=lanczos"    1    1   # 6.00 s, 150 frames
+encode   radiance  "scale=800:800:flags=lanczos"                        2    5   # 0.96 s, 24 frames
+encode   rain      "scale=1000:1000"                                    2    5   # 0.96 s, 24 frames
+encode   offering  "scale=1280:720:flags=lanczos"                       4   10   # 0.48 s, 12 frames

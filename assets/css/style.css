@@ -1,7 +1,10 @@
-/* nightly
+/* nightly (desktop only)
    Layout: alternating gallery plates. Every chapter is a two-column spread on a
    12-column grid with the film in one cell and the copy on pure black in the
-   other, so text never sits on top of an animation. */
+   other, so text never sits on top of an animation.
+   Scale: the page is composed at 1440 px and everything is sized in rem, while
+   the root font size follows the window width, so the composition looks the
+   same on a 1280 laptop and on a 2560 monitor. */
 
 :root {
   color-scheme: dark;
@@ -21,10 +24,10 @@
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-soft: cubic-bezier(0.45, 0, 0.2, 1);
 
-  /* layout */
-  --max: 1400px;
-  --gutter: clamp(16px, 4.2vw, 64px);
-  --col-gap: clamp(1rem, 2.4vw, 2.5rem);
+  /* layout (rem, so it scales with the root size below) */
+  --max: 87.5rem;
+  --gutter: 3.75rem;
+  --col-gap: 2.25rem;
 }
 
 /* ---------- base ---------- */
@@ -34,8 +37,15 @@
 *::after { box-sizing: border-box; }
 
 html {
+  /* 16 px at 1440 px wide, growing with the monitor */
+  font-size: clamp(14.5px, 1.111vw, 26px);
   background: var(--black);
   -webkit-text-size-adjust: 100%;
+}
+
+/* narrow desktop windows: keep scaling down instead of re-flowing */
+@media (max-width: 1305px) {
+  html { font-size: max(1.111vw, min(14.5px, 1.45vw)); }
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -123,13 +133,13 @@ video { max-width: 100%; }
 }
 
 .display {
-  font-size: clamp(3rem, 6.4vw, 7rem);
+  font-size: 5.75rem;
   line-height: 0.95;
   letter-spacing: -0.018em;
 }
 
 .title {
-  font-size: clamp(2.25rem, 4vw, 4.1rem);
+  font-size: 3.6rem;
   line-height: 1.03;
   letter-spacing: -0.012em;
 }
@@ -138,7 +148,7 @@ video { max-width: 100%; }
 .lede {
   margin: 1.75rem 0 0;
   max-width: 29rem;
-  font-size: clamp(1rem, 0.2vw + 0.95rem, 1.0625rem);
+  font-size: 1.0625rem;
   line-height: 1.75;
   color: var(--grey);
   text-wrap: pretty;
@@ -378,7 +388,7 @@ video { max-width: 100%; }
 
 /* ---------- chapters ---------- */
 
-.chapter { padding-block: clamp(5rem, 12vw, 10.5rem); }
+.chapter { padding-block: 10.5rem; }
 
 .chapter__grid {
   display: grid;
@@ -420,7 +430,7 @@ video { max-width: 100%; }
 
 /* ---------- studio ---------- */
 
-.studio { padding-block: clamp(5rem, 12vw, 10.5rem) clamp(3rem, 7vw, 6rem); }
+.studio { padding-block: 10.5rem 6rem; }
 
 .studio__head {
   display: grid;
@@ -439,7 +449,7 @@ video { max-width: 100%; }
 .statement {
   grid-column: 4 / -1;
   max-width: 23em;
-  font-size: clamp(1.9rem, 3.4vw, 3.5rem);
+  font-size: 3.05rem;
   line-height: 1.14;
   letter-spacing: -0.008em;
   text-wrap: pretty;
@@ -450,7 +460,7 @@ video { max-width: 100%; }
   grid-template-columns: repeat(12, minmax(0, 1fr));
   column-gap: var(--col-gap);
   row-gap: 2.5rem;
-  margin: clamp(4rem, 9vw, 7.5rem) 0 0;
+  margin: 7.5rem 0 0;
   padding: 0;
   list-style: none;
 }
@@ -481,12 +491,12 @@ video { max-width: 100%; }
 
 .footer {
   overflow: hidden;
-  padding-block: clamp(3rem, 8vw, 6rem) calc(2rem + env(safe-area-inset-bottom, 0px));
+  padding-block: 6rem 2rem;
 }
 
 .wordmark {
-  margin: 0 0 clamp(2rem, 5vw, 3.75rem);
-  font: 300 min(30vw, 27rem)/0.8 var(--display);
+  margin: 0 0 3.75rem;
+  font: 300 27rem/0.8 var(--display);
   letter-spacing: -0.035em;
   text-align: center;
   color: var(--white);
@@ -568,78 +578,6 @@ video { max-width: 100%; }
 .js [data-reveal].is-in {
   opacity: 1;
   transform: none;
-}
-
-/* ---------- tablet ---------- */
-
-@media (max-width: 1100px) {
-  .chapter--media-left .plate { grid-column: 1 / span 7; }
-  .chapter--media-left .chapter__copy { grid-column: 8 / -1; }
-  .chapter--media-right .plate { grid-column: 6 / -1; }
-  .chapter--media-right .chapter__copy { grid-column: 1 / span 5; }
-
-  .studio__head .eyebrow { grid-column: 1 / -1; margin: 0 0 1.75rem; }
-  .statement { grid-column: 1 / -1; }
-  .principles li,
-  .principles li:first-child { grid-column: span 4; }
-}
-
-/* ---------- phone: film first, then its text below ---------- */
-
-@media (max-width: 820px) {
-  .site-header__inner { grid-template-columns: 1fr auto; }
-  .clock { display: none; }
-  .nav { gap: 1.5rem; }
-
-  .hero {
-    min-height: 0;
-    padding-block: 5.75rem 4rem;
-  }
-
-  .hero__grid { row-gap: 2.25rem; }
-  .hero__copy,
-  .plate--hero { grid-column: 1 / -1; }
-  .plate--hero { order: -1; }
-
-  .plate--hero .plate__move { width: min(100%, 52vh, 26rem); }
-
-  @supports (height: 100svh) {
-    .plate--hero .plate__move { width: min(100%, 52svh, 26rem); }
-  }
-
-  .caption { font-size: 0.62rem; letter-spacing: 0.18em; }
-
-  .display { font-size: clamp(2.75rem, 12.5vw, 4.25rem); }
-  .lede { margin-top: 1.25rem; }
-  .scroll-cue { display: none; }
-
-  .chapter { padding-block: 3.5rem; }
-
-  .chapter__grid { row-gap: 2.5rem; }
-
-  .chapter--media-left .plate,
-  .chapter--media-right .plate,
-  .chapter--media-left .chapter__copy,
-  .chapter--media-right .chapter__copy {
-    grid-column: 1 / -1;
-    grid-row: auto;
-  }
-
-  .plate--radiance .plate__move,
-  .plate--rain .plate__move { max-width: min(100%, 30rem); }
-
-  .eyebrow { margin-bottom: 1.25rem; }
-  .body { margin-top: 1.25rem; }
-  .tags { margin-top: 1.75rem; }
-
-  .principles li,
-  .principles li:first-child { grid-column: 1 / -1; }
-
-  .footer__row { justify-content: flex-start; }
-}
-
-@media (max-width: 820px) and (max-height: 560px) {
-  .plate--hero .plate__move { width: min(100%, 17rem); }
 }
 
 /* ---------- reduced motion: no entrance, reveal or parallax; the films keep looping ---------- */

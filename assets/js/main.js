@@ -13,7 +13,8 @@
 
   const root = document.documentElement;
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const MS = window.ManagedMediaSource || window.MediaSource;
+  // Desktop browsers: plain MediaSource (Chrome, Edge, Firefox, Safari on macOS).
+  const MS = window.MediaSource || window.ManagedMediaSource;
 
   /* ------------------------------------------------------------------ */
   /* 1. Seamless loops                                                   */
@@ -87,7 +88,7 @@
     play() {
       if (!this.wanted || !this.mode) return;
       const p = this.video.play();
-      // Autoplay can be refused (e.g. iOS Low Power Mode); it is retried on the first touch.
+      // If the browser refuses autoplay, it is retried on the first click or key press.
       if (p && typeof p.catch === 'function') p.catch(() => {});
     }
 
@@ -271,7 +272,7 @@
 
   // Browsers that refused autoplay get another try on the first interaction.
   const retry = () => loops.forEach((l) => l.play());
-  ['touchstart', 'pointerdown', 'keydown'].forEach((type) =>
+  ['pointerdown', 'keydown'].forEach((type) =>
     window.addEventListener(type, retry, { passive: true, once: true }));
   document.addEventListener('visibilitychange', () => { if (!document.hidden) retry(); });
 
@@ -308,7 +309,6 @@
     reveals.forEach((el) => el.classList.add('is-in'));
   }
 
-  const wide = window.matchMedia('(min-width: 821px)');
   const parallax = Array.from(document.querySelectorAll('[data-parallax]')).map((el) => ({
     el,
     k: parseFloat(el.dataset.parallax) || 1,
@@ -322,14 +322,14 @@
     if (y === lastY && h === lastH) return;
     lastY = y;
     lastH = h;
-    const on = wide.matches && !reduceMotion;
+    if (reduceMotion) return;
     for (const p of parallax) {
-      if (!on) { p.el.style.transform = ''; continue; }
       const r = p.el.parentElement.getBoundingClientRect();
       if (r.bottom < -200 || r.top > h + 200) continue;
       // -1 when the plate is entering from below, +1 when it leaves at the top
       const progress = (h / 2 - (r.top + r.height / 2)) / (h / 2 + r.height / 2);
-      const shift = Math.max(-1, Math.min(1, progress)) * 34 * p.k;
+      const rem = parseFloat(getComputedStyle(root).fontSize) || 16;
+      const shift = Math.max(-1, Math.min(1, progress)) * 2.1 * rem * p.k;
       p.el.style.transform = 'translate3d(0,' + shift.toFixed(2) + 'px,0)';
     }
   }
@@ -340,8 +340,6 @@
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
-
-  wide.addEventListener && wide.addEventListener('change', () => { lastY = null; });
 
   /* ------------------------------------------------------------------ */
   /* 3. Local time                                                        */
