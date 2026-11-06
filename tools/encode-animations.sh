@@ -16,46 +16,50 @@
 # Blacks are crushed to true #000 so the frames melt into the page background
 # and colour is removed (the site is pure monochrome).
 #
-# Usage: tools/encode-animations.sh [film|anim]   (default: both)
+# Usage: tools/encode-animations.sh [film|anim|all] [clip]   (default: everything)
 set -euo pipefail
 cd "$(dirname "$0")/.."
 mkdir -p assets/film assets/anim
 ONLY=${1:-all}
+CLIP=${2:-}
 
 GRADE="hue=s=0,curves=all='0/0 0.035/0 0.09/0.07 1/1',format=yuv420p"
 
-film() { # name size-filter frames-at-60 source-loop-seconds
-  local name=$1 vf=$2 frames=$3 src_len=$4
+film() { # name size-filter frames-at-60 source-loop-seconds [crf]
+  local name=$1 vf=$2 frames=$3 src_len=$4 crf=${5:-22}
   local len k
   len=$(python3 -c "print($frames/60)")
   k=$(python3 -c "print(($frames/60)/$src_len)")
   ffmpeg -v error -y -stream_loop 2 -i "media-src/$name.mp4" -an -vf "setpts=PTS*$k,\
 minterpolate=fps=60:mi_mode=mci:mc_mode=aobmc:me_mode=bidir:vsbmc=1,\
 trim=start=$len:end=$(python3 -c "print(2*$len)"),setpts=PTS-STARTPTS,$vf,$GRADE" \
-    -c:v libx264 -preset veryslow -tune film -crf 22 -refs 4 -bf 0 -g 9999 -x264-params slices=1 \
+    -c:v libx264 -preset veryslow -tune film -crf "$crf" -refs 4 -bf 0 -g 9999 -x264-params slices=1 \
     -pix_fmt yuv420p -color_range tv -movflags +faststart "assets/film/$name.mp4"
   echo "film $name: $(ffprobe -v error -count_frames -select_streams v:0 -show_entries stream=nb_read_frames,width,height,level -of csv=p=0 "assets/film/$name.mp4") $(du -h "assets/film/$name.mp4" | cut -f1)"
 }
 
-anim() { # name size-filter
-  local name=$1 vf=$2
+anim() { # name size-filter [avif-crf] [webp-quality]
+  local name=$1 vf=$2 acrf=${3:-28} wq=${4:-80}
   ffmpeg -v error -y -i "media-src/$name.mp4" -vf "$vf,$GRADE" \
-    -c:v libaom-av1 -crf 28 -b:v 0 -cpu-used 4 -row-mt 1 -g 300 -loop 0 "assets/anim/$name.avif"
+    -c:v libaom-av1 -crf "$acrf" -b:v 0 -cpu-used 4 -row-mt 1 -g 300 -loop 0 "assets/anim/$name.avif"
   ffmpeg -v error -y -i "media-src/$name.mp4" -vf "$vf,$GRADE" \
-    -c:v libwebp_anim -lossless 0 -quality 80 -compression_level 5 -loop 0 "assets/anim/$name.webp"
+    -c:v libwebp_anim -lossless 0 -quality "$wq" -compression_level 5 -loop 0 "assets/anim/$name.webp"
   echo "anim $name: $(du -h "assets/anim/$name.avif" "assets/anim/$name.webp" | cut -f1 | tr '\n' ' ')"
 }
 
 # Sizes are for desktop screens up to 2560 px wide.
-#        name      size                                                 60fps frames  source loop
+#        name      size                                                 60fps frames  source loop  [film crf  avif crf  webp q]
 SPHERE=( sphere    "crop=560:560:120:20,scale=840:840:flags=lanczos"    360           6.00 )
 RADIANCE=( radiance "scale=800:800:flags=lanczos"                       58            0.96 )
 RAIN=( rain        "scale=1000:1000"                                    58            0.96 )
 OFFERING=( offering "scale=1280:720:flags=lanczos"                      29            0.48 )
+# media-src/ring.mp4 is frames 11-132 of media-src/ring-source.mp4: two full periods that close seamlessly
+RING=( ring        "crop=680:680:20:298"                                293           4.88         26        36        70 )
 
-for clip in SPHERE RADIANCE RAIN OFFERING; do
+for clip in SPHERE RADIANCE RAIN OFFERING RING; do
   declare -n c=$clip
-  if [[ $ONLY != anim ]]; then film "${c[0]}" "${c[1]}" "${c[2]}" "${c[3]}" & fi
-  if [[ $ONLY != film ]]; then anim "${c[0]}" "${c[1]}" & fi
+  if [[ -n $CLIP && ${c[0]} != "$CLIP" ]]; then continue; fi
+  if [[ $ONLY != anim ]]; then film "${c[0]}" "${c[1]}" "${c[2]}" "${c[3]}" ${c[4]:-} & fi
+  if [[ $ONLY != film ]]; then anim "${c[0]}" "${c[1]}" ${c[5]:-} ${c[6]:-} & fi
 done
 wait

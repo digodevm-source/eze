@@ -6,14 +6,21 @@
  *    stops, never seeks and has no seam. This does not depend on video
  *    autoplay rules. Where WebCodecs is missing, a 25 fps looping animated
  *    image (AVIF, or WebP) is shown instead.
- * 2. Smooth scrolling (Lenis), soft reveals and a slight parallax on films.
- * 3. Visitor's local time in the header and footer.
+ * 2. Loader: a generative ring of fine lines drawn live while the first film
+ *    downloads; the counter follows the real download progress.
+ * 3. Smooth scrolling (Lenis), word-by-word reveals, a slight parallax on
+ *    films, a running line of disciplines and a soft mouse cursor.
+ * 4. Visitor's local time in the header and footer.
  */
 (() => {
   'use strict';
 
   const root = document.documentElement;
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // always start at the top so the opening sequence plays
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  window.scrollTo(0, 0);
 
   /* ------------------------------------------------------------------ */
   /* 1. Films                                                            */
@@ -116,6 +123,33 @@
     throw new Error('no H.264 track');
   }
 
+  // fetch a file into memory, reporting progress (0..1) when the size is known
+  async function fetchBuffer(url, onProgress) {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const total = Number(res.headers.get('content-length')) || 0;
+    if (!onProgress || !total || !res.body || !res.body.getReader) {
+      const buffer = await res.arrayBuffer();
+      if (onProgress) onProgress(1);
+      return buffer;
+    }
+    const reader = res.body.getReader();
+    const chunks = [];
+    let got = 0;
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      chunks.push(value);
+      got += value.length;
+      onProgress(Math.min(1, got / total));
+    }
+    const out = new Uint8Array(got);
+    let at = 0;
+    for (const c of chunks) { out.set(c, at); at += c.length; }
+    onProgress(1);
+    return out.buffer;
+  }
+
   class Film {
     constructor(el) {
       this.el = el;
@@ -139,9 +173,7 @@
 
     async start() {
       if (!('VideoDecoder' in window) || !('EncodedVideoChunk' in window)) throw new Error('no WebCodecs');
-      const res = await fetch(this.src);
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      const mp4 = readMp4(await res.arrayBuffer());
+      const mp4 = readMp4(await fetchBuffer(this.src, this.onProgress));
       this.config = {
         codec: mp4.codec,
         description: mp4.description,
@@ -235,6 +267,7 @@
       if (due) {
         this.ctx.drawImage(due, 0, 0, this.canvas.width, this.canvas.height);
         due.close();
+        if (!this.shown) { this.shown = true; if (this.onReady) this.onReady(); }
       }
       this.feed();
     }
@@ -263,11 +296,105 @@
       img.draggable = false;
       picture.append(source, img);
       this.el.appendChild(picture);
+      const ready = () => { if (this.onReady) this.onReady(); };
+      img.addEventListener('load', ready, { once: true });
+      img.addEventListener('error', ready, { once: true });
     }
   }
 
   const films = Array.from(document.querySelectorAll('[data-film]')).map((el) => new Film(el));
   const filmOf = new Map(films.map((f) => [f.el, f]));
+
+  /* ------------------------------------------------------------------ */
+  /* 2. Loader                                                           */
+  /* ------------------------------------------------------------------ */
+
+  const loader = document.querySelector('.loader');
+  const loaderCount = document.querySelector('[data-loader-count]');
+  const loaderBar = document.querySelector('[data-loader-bar]');
+  const ringCanvas = document.querySelector('.loader__ring');
+  const ringCtx = ringCanvas ? ringCanvas.getContext('2d') : null;
+  const boot = { target: 0.06, shown: 0, filmReady: false, fontsReady: false, start: performance.now(), finished: 0 };
+
+  const heroFilm = films.find((f) => 'eager' in f.el.dataset);
+  if (heroFilm) {
+    heroFilm.onProgress = (p) => { boot.target = Math.max(boot.target, 0.06 + p * 0.84); };
+    heroFilm.onReady = () => { boot.filmReady = true; };
+  } else {
+    boot.filmReady = true;
+  }
+  const fontsReady = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
+  fontsReady.then(() => { boot.fontsReady = true; });
+
+  // a ribbon of short strokes around a slowly turning, breathing ring
+  function drawRing(t) {
+    if (!ringCtx) return;
+    const c = ringCtx;
+    const w = ringCanvas.width;
+    const h = ringCanvas.height;
+    const time = reduceMotion ? 0 : t;
+    const R = w * 0.29;
+    const band = w * 0.16;
+    const N = 200;
+    // mostly face-on like a ring in the hand: spins in its own plane and only tilts a little
+    const az = time * 0.00035;
+    const ay = Math.sin(time * 0.0005) * 0.55;
+    const ax = Math.sin(time * 0.00037 + 1) * 0.45;
+    const cosZ = Math.cos(az), sinZ = Math.sin(az);
+    const cosY = Math.cos(ay), sinY = Math.sin(ay), cosX = Math.cos(ax), sinX = Math.sin(ax);
+    c.clearRect(0, 0, w, h);
+    c.lineWidth = 1;
+    c.strokeStyle = 'rgba(236, 235, 232, 0.4)';
+    c.beginPath();
+    for (let k = 0; k < N; k++) {
+      const a = (k / N) * Math.PI * 2;
+      const wob = 1 + 0.07 * Math.sin(a * 3 + time * 0.0011);
+      const px = Math.cos(a) * R * wob;
+      const py = Math.sin(a) * R * wob;
+      const pz = Math.sin(a * 2 + time * 0.0008) * R * 0.16;
+      // strokes run across the band (mostly along the ring's axis), leaning a little as it breathes
+      const tw = a * 1 + time * 0.0006;
+      const lean = 0.3 * Math.sin(tw);
+      const dx = Math.cos(a) * lean * band;
+      const dy = Math.sin(a) * lean * band;
+      const dz = (0.85 + 0.15 * Math.cos(tw)) * band;
+      for (const sgn of [-1, 1]) {
+        const x0 = px + sgn * dx, y0 = py + sgn * dy, z = pz + sgn * dz;
+        const x = x0 * cosZ - y0 * sinZ;
+        const y = x0 * sinZ + y0 * cosZ;
+        const x1 = x * cosY + z * sinY;
+        const z1 = -x * sinY + z * cosY;
+        const y1 = y * cosX - z1 * sinX;
+        if (sgn < 0) c.moveTo(w / 2 + x1, h / 2 + y1);
+        else c.lineTo(w / 2 + x1, h / 2 + y1);
+      }
+    }
+    c.stroke();
+  }
+
+  function tickLoader(time) {
+    if (!loader) return;
+    if (boot.finished && time - boot.finished > 1600) return; // faded out: stop drawing
+    drawRing(time);
+    if (boot.finished) return;
+    const elapsed = time - boot.start;
+    if ((boot.filmReady && boot.fontsReady && elapsed > 1500) || elapsed > 4500) boot.target = 1;
+    boot.shown += (boot.target - boot.shown) * 0.085;
+    if (boot.target === 1 && boot.shown > 0.996) {
+      boot.shown = 1;
+      boot.finished = time;
+      setTimeout(() => {
+        root.classList.add('is-ready');
+        if (lenis) lenis.start();
+      }, 300);
+    }
+    if (loaderCount) loaderCount.textContent = String(Math.round(boot.shown * 100)).padStart(2, '0');
+    if (loaderBar) loaderBar.style.setProperty('--p', boot.shown.toFixed(4));
+  }
+
+  if (!loader) {
+    Promise.race([fontsReady, new Promise((r) => setTimeout(r, 900))]).then(() => root.classList.add('is-ready'));
+  }
 
   if ('IntersectionObserver' in window) {
     // download a film well before it scrolls into view…
@@ -296,7 +423,7 @@
   }
 
   /* ------------------------------------------------------------------ */
-  /* 2. Smooth scroll, reveals, parallax                                 */
+  /* 3. Smooth scroll, reveals, parallax, running line, cursor           */
   /* ------------------------------------------------------------------ */
 
   let lenis = null;
@@ -313,6 +440,32 @@
       lenis = null;
     }
   }
+  if (lenis && loader && !root.classList.contains('is-ready')) lenis.stop();
+
+  // wrap every word of [data-split] headings so they can rise one after another
+  document.querySelectorAll('[data-split]').forEach((el) => {
+    let i = 0;
+    const walk = (node) => {
+      Array.from(node.childNodes).forEach((child) => {
+        if (child.nodeType === 3) {
+          const frag = document.createDocumentFragment();
+          child.textContent.split(/(\s+)/).forEach((part) => {
+            if (!part) return;
+            if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(part)); return; }
+            const w = document.createElement('span');
+            w.className = 'w';
+            w.style.setProperty('--i', String(i++));
+            w.textContent = part;
+            frag.appendChild(w);
+          });
+          child.replaceWith(frag);
+        } else if (child.nodeType === 1) {
+          walk(child);
+        }
+      });
+    };
+    walk(el);
+  });
 
   const reveals = document.querySelectorAll('[data-reveal]');
   if ('IntersectionObserver' in window && !reduceMotion) {
@@ -353,16 +506,82 @@
     }
   }
 
+  // running line: drifts left, speeds up (or turns back) with the scroll
+  const track = document.querySelector('[data-marquee]');
+  const marquee = { x: 0, half: 0, vel: 0, visible: false };
+  if (track) {
+    track.innerHTML += track.innerHTML;
+    const measure = () => { marquee.half = track.scrollWidth / 2; };
+    measure();
+    fontsReady.then(measure);
+    window.addEventListener('resize', measure);
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver((entries) => { marquee.visible = entries[0].isIntersecting; }).observe(track);
+    } else {
+      marquee.visible = true;
+    }
+  }
+
+  function tickMarquee(dt) {
+    if (!track || !marquee.visible || reduceMotion || !marquee.half) return;
+    const rem = parseFloat(getComputedStyle(root).fontSize) || 16;
+    const scrollVel = lenis ? lenis.velocity || 0 : 0;
+    marquee.vel += (scrollVel - marquee.vel) * 0.08;
+    const speed = rem * 3.2 + marquee.vel * rem * 0.9; // px per second
+    marquee.x -= speed * (dt / 1000);
+    if (marquee.x <= -marquee.half) marquee.x += marquee.half;
+    if (marquee.x > 0) marquee.x -= marquee.half;
+    track.style.transform = 'translate3d(' + marquee.x.toFixed(2) + 'px,0,0)';
+  }
+
+  // soft cursor: a dot that follows the mouse and a ring that trails it
+  const cursor = document.querySelector('.cursor');
+  const pointer = { x: -100, y: -100, rx: -100, ry: -100, seen: false };
+  const finePointer = window.matchMedia('(pointer: fine)').matches;
+  let cursorDot = null;
+  let cursorRing = null;
+  if (cursor && finePointer) {
+    root.classList.add('has-cursor');
+    cursor.classList.add('is-hidden');
+    cursorDot = cursor.querySelector('.cursor__dot');
+    cursorRing = cursor.querySelector('.cursor__ring');
+    window.addEventListener('pointermove', (e) => {
+      if (e.pointerType && e.pointerType !== 'mouse') return;
+      pointer.x = e.clientX;
+      pointer.y = e.clientY;
+      if (!pointer.seen) { pointer.rx = pointer.x; pointer.ry = pointer.y; pointer.seen = true; }
+      cursor.classList.remove('is-hidden');
+      const link = e.target && e.target.closest ? e.target.closest('a, button') : null;
+      cursor.classList.toggle('is-link', !!link);
+    }, { passive: true });
+    document.addEventListener('mouseleave', () => cursor.classList.add('is-hidden'));
+    document.addEventListener('mouseenter', () => { if (pointer.seen) cursor.classList.remove('is-hidden'); });
+  }
+
+  function tickCursor() {
+    if (!cursorDot || !pointer.seen) return;
+    pointer.rx += (pointer.x - pointer.rx) * 0.16;
+    pointer.ry += (pointer.y - pointer.ry) * 0.16;
+    cursorDot.style.transform = 'translate3d(' + pointer.x + 'px,' + pointer.y + 'px,0)';
+    cursorRing.style.transform = 'translate3d(' + pointer.rx.toFixed(2) + 'px,' + pointer.ry.toFixed(2) + 'px,0)';
+  }
+
+  let lastFrame = 0;
   function frame(time) {
+    const dt = lastFrame ? Math.min(time - lastFrame, 100) : 16;
+    lastFrame = time;
     if (lenis) lenis.raf(time);
+    tickLoader(time);
     for (const f of films) f.tick(time);
     updateParallax();
+    tickMarquee(dt);
+    tickCursor();
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
 
   /* ------------------------------------------------------------------ */
-  /* 3. Local time                                                        */
+  /* 4. Local time                                                        */
   /* ------------------------------------------------------------------ */
 
   const clocks = document.querySelectorAll('[data-clock]');
@@ -379,13 +598,4 @@
   setInterval(tick, 10000);
 
   document.querySelectorAll('[data-year]').forEach((el) => { el.textContent = String(new Date().getFullYear()); });
-
-  /* ------------------------------------------------------------------ */
-  /* First-screen entrance: wait briefly for the fonts so nothing jumps   */
-  /* ------------------------------------------------------------------ */
-
-  const fontsReady = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
-  Promise.race([fontsReady, new Promise((r) => setTimeout(r, 900))]).then(() => {
-    requestAnimationFrame(() => root.classList.add('is-ready'));
-  });
 })();

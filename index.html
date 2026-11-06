@@ -8,13 +8,26 @@
 <meta name="description" content="nightly is a creative studio for identity, motion and 3D, working in black and white.">
 <meta name="theme-color" content="#000000">
 <meta name="color-scheme" content="dark">
-<script>document.documentElement.classList.remove('no-js');document.documentElement.classList.add('js');setTimeout(function(){document.documentElement.classList.add('is-ready')},2400);</script>
+<script>document.documentElement.classList.remove('no-js');document.documentElement.classList.add('js');setTimeout(function(){document.documentElement.classList.add('is-ready')},5000);</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@200;300;400&amp;family=Inter+Tight:wght@300;400;500&amp;display=swap">
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
+
+<!-- Loader: a generative ring of fine lines drawn live while the first film loads -->
+<div class="loader" aria-hidden="true">
+  <canvas class="loader__ring" width="480" height="480"></canvas>
+  <div class="loader__meta">
+    <span class="loader__brand">nightly</span>
+    <span class="loader__count" data-loader-count>00</span>
+  </div>
+  <div class="loader__bar"><span data-loader-bar></span></div>
+</div>
+
+<!-- Soft cursor (mouse only) -->
+<div class="cursor" aria-hidden="true"><span class="cursor__ring"></span><span class="cursor__dot"></span></div>
 
 <header class="site-header" data-intro style="--d:.15s">
   <div class="wrap site-header__inner">
@@ -60,7 +73,7 @@
           </div>
         </figure>
         <div class="chapter__copy">
-          <h2 class="title" id="identity-title" data-reveal style="--d:.08s">Every brand begins as <em>a single point of light.</em></h2>
+          <h2 class="title" id="identity-title" data-reveal data-split>Every brand begins as <em>a single point of light.</em></h2>
           <p class="body" data-reveal style="--d:.16s">We build identity systems that stay clear at every size, from an app icon to a building facade. Each one starts with one idea and grows outward until it carries the whole company.</p>
           <ul class="tags" data-reveal style="--d:.24s">
             <li>Strategy</li><li>Logotype</li><li>Type systems</li><li>Guidelines</li>
@@ -81,7 +94,7 @@
         </figure>
         <div class="chapter__copy">
           <p class="eyebrow" data-reveal>Motion</p>
-          <h2 class="title" id="motion-title" data-reveal style="--d:.08s">Stillness, <em>set in motion.</em></h2>
+          <h2 class="title" id="motion-title" data-reveal data-split>Stillness, <em>set in motion.</em></h2>
           <p class="body" data-reveal style="--d:.16s">Our films and loops move at the pace of attention. We direct, animate and edit for rhythm and atmosphere, so a few seconds on a screen can carry a whole campaign.</p>
           <ul class="tags" data-reveal style="--d:.24s">
             <li>Brand films</li><li>Loops</li><li>Title design</li><li>Sound direction</li>
@@ -102,7 +115,7 @@
         </figure>
         <div class="chapter__copy">
           <p class="eyebrow" data-reveal>3D &amp; CGI</p>
-          <h2 class="title" id="craft-title" data-reveal style="--d:.08s">Small worlds, <em>held with care.</em></h2>
+          <h2 class="title" id="craft-title" data-reveal data-split>Small worlds, <em>held with care.</em></h2>
           <p class="body" data-reveal style="--d:.16s">We model, light and render objects, characters and spaces that cannot be photographed. The people who design a scene stay with it from the first sketch to the final frame.</p>
           <ul class="tags" data-reveal style="--d:.24s">
             <li>Product CGI</li><li>Characters</li><li>Particle systems</li><li>Real-time</li>
@@ -113,12 +126,28 @@
 
   </div>
 
-  <!-- About the studio: text only, on black -->
+  <!-- Running line of disciplines; its speed follows the scroll -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee__track" data-marquee>
+      <span>Identity</span><span>Motion</span><span>3D &amp; CGI</span><span>Art direction</span><span>Loops</span>
+    </div>
+  </div>
+
+  <!-- About the studio: manifesto beside the line ring (reference video) -->
   <section class="studio" id="studio" aria-labelledby="studio-title">
     <div class="wrap">
-      <div class="studio__head">
-        <p class="eyebrow" id="studio-title" data-reveal>Studio</p>
-        <p class="statement" data-reveal style="--d:.08s">We work in black and white by choice. With no colour to lean on, every decision about <em>form, light and timing</em> has to stand on its own.</p>
+      <div class="studio__grid">
+        <div class="studio__copy">
+          <p class="eyebrow" id="studio-title" data-reveal>Studio</p>
+          <p class="statement" data-reveal data-split>We work in black and white by choice. With no colour to lean on, every decision about <em>form, light and timing</em> has to stand on its own.</p>
+        </div>
+        <figure class="plate plate--ring" data-reveal="film">
+          <div class="plate__move" data-parallax="1">
+            <div class="film film--ring" data-film="assets/film/ring.mp4" data-anim="assets/anim/ring" role="img" aria-label="A ring woven from fine white lines, slowly folding and turning">
+              <noscript><picture><source type="image/avif" srcset="assets/anim/ring.avif"><img class="film__media" src="assets/anim/ring.webp" width="680" height="680" alt=""></picture></noscript>
+            </div>
+          </div>
+        </figure>
       </div>
       <ul class="principles">
         <li data-reveal>
