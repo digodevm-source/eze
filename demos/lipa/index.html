@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- Демо для показа владельцу: не индексировать, пока сайт не согласован -->
+<meta name="robots" content="noindex, nofollow">
+<title>Lipa — цветочный магазин на Нижних Мнёвниках</title>
+<meta name="description" content="Букеты, цветы поштучно и оформление столов. Москва, ул. Нижние Мнёвники, 9.">
+<meta name="theme-color" content="#F4F0EA">
+<link rel="preload" href="assets/fonts/prata-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<header class="top" id="top-bar">
+  <a class="top__logo" href="#hero" aria-label="Lipa, в начало">LIPA</a>
+  <div class="top__right">
+    <a class="top__phone" data-phone></a>
+    <a class="btn btn--small" href="#order">Заказать букет</a>
+  </div>
+</header>
+
+<main>
+
+  <!-- 1. Первый экран: фото в центре раскрывается на весь экран при прокрутке -->
+  <section class="hero" id="hero">
+    <div class="hero__stage">
+      <div class="hero__word-wrap">
+        <h1 class="hero__word" aria-label="Lipa">
+          <span>L</span><span>I</span><span>P</span><span>A</span>
+        </h1>
+      </div>
+
+      <figure class="hero__side hero__side--l">
+        <img src="assets/img/peonies-sm.webp" alt="Пионы в ведре" decoding="async">
+      </figure>
+      <figure class="hero__side hero__side--r">
+        <img src="assets/img/roses-mono-sm.webp" alt="Букет из розовых кустовых роз" decoding="async">
+      </figure>
+
+      <div class="hero__frame" aria-hidden="true"></div>
+      <div class="hero__window">
+        <img class="hero__img" src="assets/img/basket.webp" alt="Букет из хризантем, пионов и роз в корзине" decoding="async">
+      </div>
+
+      <p class="hero__sub">Цветочный магазин<br>на Нижних Мнёвниках</p>
+
+      <div class="hero__caption">
+        <p>Свежие цветы<br>каждый день</p>
+        <a class="btn" href="#order">Заказать букет</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Коротко о магазине: слова проявляются по мере прокрутки -->
+  <section class="intro">
+    <p class="intro__text" data-highlight>
+      Lipa — цветочный магазин в первом квартале на Нижних Мнёвниках.
+      Собираем букеты на каждый день и к праздникам, продаём цветы поштучно
+      и оформляем столы к ужинам и событиям.
+    </p>
+  </section>
+
+  <!-- 3. Букеты: на компьютере лента едет вбок при прокрутке, на телефоне листается пальцем -->
+  <section class="strip" id="bouquets">
+    <div class="strip__stage">
+      <h2 class="strip__title" data-split>Букеты</h2>
+      <div class="strip__track">
+        <article class="card">
+          <figure><img src="assets/img/roses-mono-sm.webp" alt="" loading="lazy" decoding="async"></figure>
+          <h3>Моно-букет из розовых кустовых роз</h3>
+          <p>5 000 ₽</p>
+        </article>
+        <article class="card">
+          <figure><img src="assets/img/roses-sm.webp" alt="" loading="lazy" decoding="async"></figure>
+          <h3>Розы поштучно</h3>
+          <p>от 400 ₽</p>
+        </article>
+        <article class="card">
+          <figure><img src="assets/img/basket-sm.webp" alt="" loading="lazy" decoding="async"></figure>
+          <h3>Хризантемы, пионы и розы в корзине</h3>
+        </article>
+        <article class="card">
+          <figure><img src="assets/img/autumn-sm.webp" alt="" loading="lazy" decoding="async"></figure>
+          <h3>Осенний букет с ягодами илекса</h3>
+        </article>
+        <article class="card">
+          <figure><img src="assets/img/peonies-sm.webp" alt="" loading="lazy" decoding="async"></figure>
+          <h3>Пионы</h3>
+        </article>
+        <article class="card">
+          <figure><img src="assets/img/chrysanthemums-sm.webp" alt="" loading="lazy" decoding="async"></figure>
+          <h3>Шаровидные хризантемы</h3>
+        </article>
+        <article class="card">
+          <figure><img src="assets/img/amaryllis-sm.webp" alt="" loading="lazy" decoding="async"></figure>
+          <h3>Амариллисы</h3>
+        </article>
+        <article class="card">
+          <figure><img src="assets/img/daisies-sm.webp" alt="" loading="lazy" decoding="async"></figure>
+          <h3>Букет с ромашками и эустомой</h3>
+        </article>
+        <article class="card">
+          <figure><img src="assets/img/peach.webp" alt="" loading="lazy" decoding="async"></figure>
+          <h3>Персиковые розы и гвоздики</h3>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Оформление столов -->
+  <section class="events">
+    <figure class="events__photo" data-reveal>
+      <img src="assets/img/table.webp" alt="Стол со свечами и бордовыми хризантемами" loading="lazy" decoding="async">
+    </figure>
+    <div class="events__text">
+      <h2 data-split>Цветы к столу</h2>
+      <p data-rise>Оформим стол к ужину, дню рождения или свадьбе. Подберём цветы под посуду, свечи и цвет зала.</p>
+      <a class="link" data-rise data-telegram>Обсудить в Telegram</a>
+    </div>
+  </section>
+
+  <!-- 5. Оценка на картах -->
+  <section class="rating">
+    <a class="rating__inner" data-rise href="https://yandex.ru/maps/?text=Lipa%2C%20%D1%83%D0%BB.%20%D0%9D%D0%B8%D0%B6%D0%BD%D0%B8%D0%B5%20%D0%9C%D0%BD%D1%91%D0%B2%D0%BD%D0%B8%D0%BA%D0%B8%2C%209%2C%20%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0" target="_blank" rel="noopener">
+      <span class="rating__num">4,9</span>
+      <span class="rating__txt">на Яндекс Картах<br>23 оценки</span>
+    </a>
+  </section>
+
+  <!-- 6. Заказ и контакты -->
+  <section class="order" id="order">
+    <div class="order__text">
+      <h2 data-split>Заказать букет</h2>
+      <p class="order__lead" data-rise>Напишите, к какому дню и на какой бюджет нужен букет, или просто приходите в магазин.</p>
+      <div class="order__actions" data-rise>
+        <a class="btn btn--light" data-telegram>Написать в Telegram</a>
+        <a class="btn btn--outline" data-phone></a>
+      </div>
+      <dl class="order__info" data-rise>
+        <div><dt>Адрес</dt><dd>ул. Нижние Мнёвники, 9<br>подъезд 10</dd></div>
+        <div><dt>Метро</dt><dd>Терехово, 10 минут пешком</dd></div>
+        <div><dt>Открываемся</dt><dd data-hours></dd></div>
+        <div><dt>Оплата</dt><dd>Картой</dd></div>
+      </dl>
+      <a class="link link--light" data-rise href="https://yandex.ru/maps/?text=Lipa%2C%20%D1%83%D0%BB.%20%D0%9D%D0%B8%D0%B6%D0%BD%D0%B8%D0%B5%20%D0%9C%D0%BD%D1%91%D0%B2%D0%BD%D0%B8%D0%BA%D0%B8%2C%209%2C%20%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0" target="_blank" rel="noopener">Маршрут в Яндекс Картах</a>
+    </div>
+    <figure class="order__photo" data-reveal>
+      <img src="assets/img/autumn-girl.webp" alt="Флорист с осенним букетом" loading="lazy" decoding="async">
+    </figure>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <div class="foot__word" data-split aria-hidden="true">LIPA</div>
+  <div class="foot__row">
+    <span>© <span data-year></span> Lipa, цветочный магазин</span>
+    <span>dgd studio</span>
+  </div>
+</footer>
+
+<script src="assets/vendor/lenis.min.js"></script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>
