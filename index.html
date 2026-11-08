@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>LIPA — цветочная лавка на Нижних Мнёвниках</title>
+  <meta name="description" content="Букеты, цветы поштучно и композиции в корзинах. Москва, ул. Нижние Мнёвники, 9, подъезд 10. Рейтинг 4,9 на Яндекс Картах.">
+  <meta name="theme-color" content="#f4eee6">
+  <meta name="color-scheme" content="light">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ru_RU">
+  <meta property="og:title" content="LIPA — цветочная лавка на Нижних Мнёвниках">
+  <meta property="og:description" content="Букеты, цветы поштучно и композиции в корзинах. Ул. Нижние Мнёвники, 9, подъезд 10.">
+  <meta property="og:image" content="assets/img/hero-sm.webp">
+
+  <link rel="preload" href="assets/fonts/cormorant-garamond-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/cormorant-garamond-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/manrope-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" as="image" href="assets/img/hero.webp" imagesrcset="assets/img/hero-sm.webp 900w, assets/img/hero.webp 1600w" imagesizes="100vw" fetchpriority="high">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script>document.documentElement.classList.add('js');</script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Florist",
+    "name": "LIPA flowers shop",
+    "telephone": "+7 908 033-66-88",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "ул. Нижние Мнёвники, 9, подъезд 10",
+      "addressLocality": "Москва",
+      "addressCountry": "RU"
+    },
+    "geo": { "@type": "GeoCoordinates", "latitude": 55.751547, "longitude": 37.452628 },
+    "paymentAccepted": "Банковская карта"
+  }
+  </script>
+</head>
+<body>
+
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <!-- Лист липы: сердцевидный, с жилкой и черешком -->
+      <symbol id="leaf" viewBox="0 0 32 32">
+        <path d="M16 3C22 7 28 12 27 18c-.5 4.5-5 7-8.5 5.5-1.1-.5-1.9-1.1-2.5-2-.6.9-1.4 1.5-2.5 2C10 25 5.5 22.5 5 18 4 12 10 7 16 3Z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+        <path d="M16 21.5V8M16 15.5l-4.5-3.5M16 12.5l4-3M16 18.5l5-3.5" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+        <path d="M16 21.5c0 3.5-1 6.5-3 8.5" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="star" viewBox="0 0 24 24"><path d="M12 2.6l2.9 6 6.5.8-4.8 4.5 1.2 6.5L12 17.2l-5.8 3.2 1.2-6.5L2.6 9.4l6.5-.8z" fill="currentColor"/></symbol>
+      <symbol id="phone" viewBox="0 0 24 24"><path d="M6.6 10.8a15.2 15.2 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1z" fill="currentColor"/></symbol>
+      <symbol id="tg" viewBox="0 0 24 24"><path d="M21.4 4.3 18.3 19c-.2 1-.8 1.3-1.7.8l-4.6-3.4-2.2 2.1c-.3.3-.5.5-1 .5l.3-4.7 8.6-7.8c.4-.3-.1-.5-.6-.2L6.5 13 2 11.6c-1-.3-1-1 .2-1.5l17.7-6.8c.8-.3 1.6.2 1.5 1z" fill="currentColor"/></symbol>
+      <symbol id="arrow" viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    </defs>
+  </svg>
+
+  <!-- ============ ПРЕЛОАДЕР ============ -->
+  <div class="loader" aria-hidden="true">
+    <div class="loader__inner">
+      <div class="loader__logo">
+        <svg class="loader__leaf"><use href="#leaf"/></svg>
+        <span class="loader__word"><span>L</span><span>I</span><span>P</span><span>A</span></span>
+      </div>
+      <div class="loader__sub">flowers shop</div>
+    </div>
+    <div class="loader__foot">
+      <div class="loader__bar"><i></i></div>
+      <div class="loader__count"><span class="js-count">0</span>%</div>
+    </div>
+  </div>
+
+  <!-- ============ ШАПКА ============ -->
+  <header class="header">
+    <a class="logo" href="#top" aria-label="LIPA — на главную">
+      <svg class="logo__leaf"><use href="#leaf"/></svg>
+      <span class="logo__word">LIPA</span>
+      <span class="logo__sub">flowers shop</span>
+    </a>
+    <nav class="nav" aria-label="Разделы">
+      <a href="#bouquets">Букеты</a>
+      <a href="#shop">Лавка</a>
+      <a href="#order">Как заказать</a>
+      <a href="#contacts">Контакты</a>
+    </nav>
+    <div class="header__right">
+      <a class="header__phone js-phone" href="tel:+79080336688">+7 908 033-66-88</a>
+      <button class="btn btn--dark btn--sm" type="button" data-order>Заказать</button>
+      <button class="burger" type="button" aria-label="Открыть меню" aria-expanded="false" aria-controls="menu"><i></i><i></i></button>
+    </div>
+  </header>
+
+  <!-- Меню для телефонов -->
+  <div class="menu" id="menu" aria-hidden="true" data-lenis-prevent>
+    <nav class="menu__nav" aria-label="Меню">
+      <a href="#bouquets"><span>01</span>Букеты</a>
+      <a href="#shop"><span>02</span>Лавка</a>
+      <a href="#order"><span>03</span>Как заказать</a>
+      <a href="#contacts"><span>04</span>Контакты</a>
+    </nav>
+    <div class="menu__foot">
+      <a class="menu__phone js-phone" href="tel:+79080336688">+7 (908) 033-66-88</a>
+      <p>Москва, ул. Нижние Мнёвники, 9, подъезд 10</p>
+      <button class="btn btn--dark" type="button" data-order>Заказать букет</button>
+    </div>
+  </div>
+
+  <main>
+
+    <!-- ============ 01 ГЛАВНЫЙ ЭКРАН ============ -->
+    <section class="hero" id="top">
+      <div class="hero__sticky">
+        <div class="hero__word" aria-hidden="true">
+          <span class="hero__half hero__half--l"><span>L</span><span>I</span></span>
+          <span class="hero__half hero__half--r"><span>P</span><span>A</span></span>
+        </div>
+
+        <!-- Рамка-арка: задаёт стартовый размер фото. Сам кадр раскрывается из неё на весь экран при прокрутке -->
+        <div class="hero__frame" aria-hidden="true"></div>
+        <div class="hero__media">
+          <div class="hero__media-in">
+            <img src="assets/img/hero.webp" srcset="assets/img/hero-sm.webp 900w, assets/img/hero.webp 1600w" sizes="100vw" alt="Композиция в корзине: хризантемы, ранункулюсы, эустома и амарант" fetchpriority="high" decoding="async">
+          </div>
+          <div class="hero__shade"></div>
+        </div>
+
+        <div class="hero__bottom">
+          <div class="hero__col hero__col--l">
+            <p class="eyebrow"><svg><use href="#leaf"/></svg>Цветочная лавка · Терехово</p>
+            <h1 class="hero__title">Свежие букеты <em>в&nbsp;двух&nbsp;шагах</em> от&nbsp;дома</h1>
+          </div>
+          <div class="hero__col hero__col--r">
+            <p class="hero__lead">Букеты, цветы поштучно и&nbsp;композиции в&nbsp;корзинах. Ул.&nbsp;Нижние Мнёвники,&nbsp;9, подъезд&nbsp;10.</p>
+            <div class="hero__actions">
+              <button class="btn btn--dark" type="button" data-order>Заказать букет</button>
+              <a class="btn btn--ghost" href="#bouquets">Смотреть букеты</a>
+            </div>
+            <a class="rating-chip js-yandex" href="#" target="_blank" rel="noopener">
+              <span class="rating-chip__stars"><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg></span>
+              <b>4,9</b> · 23 оценки на Яндекс Картах
+            </a>
+          </div>
+        </div>
+
+        <div class="hero__caption">
+          <p class="hero__caption-title">Ждём вас <em>в&nbsp;гости</em></p>
+          <p class="hero__caption-sub">Открываемся в&nbsp;10:00 · ул. Нижние Мнёвники, 9, подъезд&nbsp;10</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 02 О ЛАВКЕ ============ -->
+    <section class="about" id="about">
+      <div class="container">
+        <p class="eyebrow" data-reveal><svg><use href="#leaf"/></svg>О лавке</p>
+        <p class="about__text js-words">
+          LIPA&nbsp;— цветочная лавка
+          <span class="pill-img"><img src="assets/img/pill-1.webp" alt="" loading="lazy" decoding="async"></span>
+          у&nbsp;дома на&nbsp;Нижних Мнёвниках. Собираем букеты под ваш повод и&nbsp;бюджет, продаём цветы поштучно,
+          <span class="pill-img"><img src="assets/img/pill-2.webp" alt="" loading="lazy" decoding="async"></span>
+          делаем композиции в&nbsp;корзинах и&nbsp;помогаем выбрать подарок к&nbsp;цветам.
+        </p>
+
+        <ul class="facts">
+          <li class="fact" data-reveal>
+            <b class="fact__num">4,9</b>
+            <span>рейтинг на Яндекс Картах, 23&nbsp;оценки</span>
+          </li>
+          <li class="fact" data-reveal style="--d:.08s">
+            <b class="fact__num"><small>от</small> 400&nbsp;₽</b>
+            <span>розы поштучно</span>
+          </li>
+          <li class="fact" data-reveal style="--d:.16s">
+            <b class="fact__num">10:00</b>
+            <span>открываем двери</span>
+          </li>
+          <li class="fact" data-reveal style="--d:.24s">
+            <b class="fact__num">137&nbsp;м</b>
+            <span>от остановки «Терехово»</span>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============ 03 БУКЕТЫ (горизонтальная лента) ============ -->
+    <section class="catalog" id="bouquets">
+      <div class="catalog__sticky">
+        <div class="catalog__head container">
+          <div>
+            <p class="eyebrow" data-reveal><svg><use href="#leaf"/></svg>Букеты</p>
+            <h2 class="h2" data-reveal>Что собираем <em>сейчас</em></h2>
+          </div>
+          <p class="catalog__note" data-reveal>Цветы меняются по&nbsp;сезону, поэтому каждый букет собираем заново. Понравился вариант&nbsp;— нажмите «Хочу такой», и&nbsp;флорист подберёт похожий под ваш бюджет.</p>
+        </div>
+
+        <div class="catalog__viewport">
+          <ul class="catalog__track">
+            <li class="card" data-cursor="Хочу такой">
+              <div class="card__img"><img src="assets/img/b-peony-roses.webp" alt="Монобукет из нежно-розовых пионовидных роз с эвкалиптом" loading="lazy" decoding="async"></div>
+              <div class="card__body">
+                <h3 class="card__title">Монобукет из пионовидных роз</h3>
+                <p class="card__desc">Нежно-розовые кустовые розы и эвкалипт</p>
+                <div class="card__row"><span class="card__price">5 000 ₽</span><button class="card__btn" type="button" data-order="Монобукет из пионовидных роз">Хочу такой<svg><use href="#arrow"/></svg></button></div>
+              </div>
+            </li>
+            <li class="card" data-cursor="Хочу такой">
+              <div class="card__img"><img src="assets/img/b-basket.webp" alt="Композиция в плетёной корзине: хризантемы, ранункулюсы, эустома и амарант" loading="lazy" decoding="async"></div>
+              <div class="card__body">
+                <h3 class="card__title">Композиция в&nbsp;корзине</h3>
+                <p class="card__desc">Хризантемы, ранункулюсы, эустома и&nbsp;амарант</p>
+                <div class="card__row"><span class="card__price card__price--ask">Цена по запросу</span><button class="card__btn" type="button" data-order="Композиция в корзине">Хочу такой<svg><use href="#arrow"/></svg></button></div>
+              </div>
+            </li>
+            <li class="card" data-cursor="Хочу такой">
+              <div class="card__img"><img src="assets/img/b-autumn.webp" alt="Осенний букет с хризантемами, эрингиумом и ягодами" loading="lazy" decoding="async"></div>
+              <div class="card__body">
+                <h3 class="card__title">Осенний букет</h3>
+                <p class="card__desc">Хризантемы, эрингиум, ягоды и&nbsp;осенняя листва</p>
+                <div class="card__row"><span class="card__price card__price--ask">Цена по запросу</span><button class="card__btn" type="button" data-order="Осенний букет">Хочу такой<svg><use href="#arrow"/></svg></button></div>
+              </div>
+            </li>
+            <li class="card" data-cursor="Хочу такой">
+              <div class="card__img"><img src="assets/img/b-peonies.webp" alt="Яркие розовые пионы в ведре" loading="lazy" decoding="async"></div>
+              <div class="card__body">
+                <h3 class="card__title">Пионы</h3>
+                <p class="card__desc">Яркие розовые пионы&nbsp;— поштучно или в&nbsp;букете</p>
+                <div class="card__row"><span class="card__price card__price--ask">Цена по запросу</span><button class="card__btn" type="button" data-order="Пионы">Хочу такой<svg><use href="#arrow"/></svg></button></div>
+              </div>
+            </li>
+            <li class="card" data-cursor="Хочу такой">
+              <div class="card__img"><img src="assets/img/b-amaryllis.webp" alt="Тёмно-красные амариллисы с атласной лентой" loading="lazy" decoding="async"></div>
+              <div class="card__body">
+                <h3 class="card__title">Амариллисы</h3>
+                <p class="card__desc">Тёмно-красные амариллисы с&nbsp;атласной лентой</p>
+                <div class="card__row"><span class="card__price card__price--ask">Цена по запросу</span><button class="card__btn" type="button" data-order="Амариллисы">Хочу такой<svg><use href="#arrow"/></svg></button></div>
+              </div>
+            </li>
+            <li class="card" data-cursor="Хочу такой">
+              <div class="card__img"><img src="assets/img/b-chamomile.webp" alt="Розовый букет с гвоздиками, кустовыми розами и ромашками" loading="lazy" decoding="async"></div>
+              <div class="card__body">
+                <h3 class="card__title">Розовый букет с&nbsp;ромашками</h3>
+                <p class="card__desc">Гвоздики, кустовые розы, эустома и&nbsp;матрикария</p>
+                <div class="card__row"><span class="card__price card__price--ask">Цена по запросу</span><button class="card__btn" type="button" data-order="Розовый букет с ромашками">Хочу такой<svg><use href="#arrow"/></svg></button></div>
+              </div>
+            </li>
+            <li class="card" data-cursor="Хочу такой">
+              <div class="card__img"><img src="assets/img/b-peach.webp" alt="Букет с персиковыми розами, эустомой и эвкалиптом" loading="lazy" decoding="async"></div>
+              <div class="card__body">
+                <h3 class="card__title">Персиковые розы и&nbsp;эустома</h3>
+                <p class="card__desc">Розы, эустома, гвоздики и&nbsp;эвкалипт</p>
+                <div class="card__row"><span class="card__price card__price--ask">Цена по запросу</span><button class="card__btn" type="button" data-order="Персиковые розы и эустома">Хочу такой<svg><use href="#arrow"/></svg></button></div>
+              </div>
+            </li>
+            <li class="card" data-cursor="Хочу такой">
+              <div class="card__img"><img src="assets/img/b-chrysanthemum.webp" alt="Крупные розовые хризантемы" loading="lazy" decoding="async"></div>
+              <div class="card__body">
+                <h3 class="card__title">Хризантемы</h3>
+                <p class="card__desc">Крупные розовые хризантемы&nbsp;— поштучно или в&nbsp;букете</p>
+                <div class="card__row"><span class="card__price card__price--ask">Цена по запросу</span><button class="card__btn" type="button" data-order="Хризантемы">Хочу такой<svg><use href="#arrow"/></svg></button></div>
+              </div>
+            </li>
+            <li class="card" data-cursor="Хочу такой">
+              <div class="card__img"><img src="assets/img/b-roses.webp" alt="Розовые розы с эвкалиптом крупным планом" loading="lazy" decoding="async"></div>
+              <div class="card__body">
+                <h3 class="card__title">Розы поштучно</h3>
+                <p class="card__desc">Соберём букет из&nbsp;любого количества</p>
+                <div class="card__row"><span class="card__price"><small>от</small> 400 ₽<small> / шт.</small></span><button class="card__btn" type="button" data-order="Розы поштучно">Хочу такой<svg><use href="#arrow"/></svg></button></div>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="catalog__foot container">
+          <span class="catalog__count"><b class="js-cat-index">01</b> / 09</span>
+          <span class="catalog__progress"><i class="js-cat-bar"></i></span>
+          <span class="catalog__hint">Листайте</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 04 ЛАВКА ============ -->
+    <section class="shop" id="shop">
+      <div class="container shop__grid">
+        <div class="shop__text">
+          <p class="eyebrow" data-reveal><svg><use href="#leaf"/></svg>Лавка</p>
+          <h2 class="h2" data-reveal>Заходите выбрать <em>сами</em></h2>
+          <p class="shop__lead" data-reveal>Цветы стоят в&nbsp;вазах прямо в&nbsp;зале: можно рассмотреть каждый, собрать букет вместе с&nbsp;флористом и&nbsp;сразу забрать. Подскажем, как ухаживать за&nbsp;цветами, чтобы они простояли дольше.</p>
+          <ul class="ticks">
+            <li data-reveal><svg><use href="#leaf"/></svg>Соберём букет при вас</li>
+            <li data-reveal style="--d:.06s"><svg><use href="#leaf"/></svg>Цветы поштучно и&nbsp;готовые композиции</li>
+            <li data-reveal style="--d:.12s"><svg><use href="#leaf"/></svg>Подарки и&nbsp;сувениры к&nbsp;цветам</li>
+            <li data-reveal style="--d:.18s"><svg><use href="#leaf"/></svg>Принимаем к&nbsp;оплате карты</li>
+          </ul>
+        </div>
+
+        <div class="shop__collage">
+          <figure class="ph ph--a" data-speed="-0.04">
+            <div class="ph__img"><img src="assets/img/shop-hall.webp" alt="Розовые хризантемы в вазах в зале лавки" loading="lazy" decoding="async"></div>
+            <figcaption>Хризантемы в&nbsp;зале</figcaption>
+          </figure>
+          <figure class="ph ph--b" data-speed="0.06">
+            <div class="ph__img"><img src="assets/img/shop-peonies.webp" alt="Флорист с ведром пионов в лавке" loading="lazy" decoding="async"></div>
+            <figcaption>Пионы только привезли</figcaption>
+          </figure>
+          <figure class="ph ph--c" data-speed="-0.02">
+            <div class="ph__img"><img src="assets/img/shop-table.webp" alt="Композиция из бордовых хризантем на праздничном столе" loading="lazy" decoding="async"></div>
+            <figcaption>Композиция для праздничного стола</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 05 КАК ЗАКАЗАТЬ ============ -->
+    <section class="order" id="order">
+      <div class="container">
+        <div class="order__head">
+          <p class="eyebrow eyebrow--light" data-reveal><svg><use href="#leaf"/></svg>Как заказать</p>
+          <h2 class="h2" data-reveal>Три способа <em>получить букет</em></h2>
+        </div>
+
+        <ol class="steps">
+          <li class="step" data-reveal>
+            <span class="step__num">01</span>
+            <h3 class="step__title">Приходите</h3>
+            <p>Ул. Нижние Мнёвники, 9, подъезд&nbsp;10. Открываемся в&nbsp;10:00&nbsp;— выберите цветы и&nbsp;заберите букет сразу.</p>
+            <a class="link js-route" href="#" target="_blank" rel="noopener">Построить маршрут<svg><use href="#arrow"/></svg></a>
+          </li>
+          <li class="step" data-reveal style="--d:.1s">
+            <span class="step__num">02</span>
+            <h3 class="step__title">Позвоните</h3>
+            <p>Расскажите про повод и&nbsp;бюджет&nbsp;— предложим варианты и&nbsp;отложим букет к&nbsp;вашему приходу.</p>
+            <a class="link js-phone" href="tel:+79080336688">+7 (908) 033-66-88<svg><use href="#arrow"/></svg></a>
+          </li>
+          <li class="step" data-reveal style="--d:.2s">
+            <span class="step__num">03</span>
+            <h3 class="step__title">Напишите</h3>
+            <p>Пришлите фото букета, который понравился, или оставьте заявку&nbsp;— перезвоним и&nbsp;всё уточним.</p>
+            <div class="step__btns">
+              <button class="btn btn--light btn--sm" type="button" data-order>Оставить заявку</button>
+              <a class="btn btn--outline-light btn--sm js-tg" href="#" target="_blank" rel="noopener"><svg><use href="#tg"/></svg>Telegram</a>
+            </div>
+          </li>
+        </ol>
+
+        <div class="rating" data-reveal>
+          <div class="rating__score">
+            <b>4,9</b>
+            <span class="rating__stars"><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg></span>
+          </div>
+          <p class="rating__text">Средняя оценка лавки на&nbsp;Яндекс Картах по&nbsp;23&nbsp;оценкам. Спасибо всем, кто оставил отзыв!</p>
+          <a class="btn btn--outline-light js-yandex" href="#" target="_blank" rel="noopener">Читать отзывы<svg><use href="#arrow"/></svg></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 06 КОНТАКТЫ ============ -->
+    <section class="contacts" id="contacts">
+      <div class="container contacts__grid">
+        <div class="contacts__info">
+          <p class="eyebrow" data-reveal><svg><use href="#leaf"/></svg>Контакты</p>
+          <h2 class="h2" data-reveal>Мы на <em>Нижних Мнёвниках</em></h2>
+
+          <dl class="dl">
+            <div data-reveal><dt>Адрес</dt><dd>Москва, ул. Нижние Мнёвники, 9, подъезд&nbsp;10</dd></div>
+            <div data-reveal><dt>Как добраться</dt><dd>Метро «Терехово»&nbsp;— 830&nbsp;м пешком<br>Остановка «Терехово»&nbsp;— 137&nbsp;м</dd></div>
+            <div data-reveal><dt>Телефон</dt><dd><a class="js-phone" href="tel:+79080336688">+7 (908) 033-66-88</a></dd></div>
+            <div data-reveal><dt>Время работы</dt><dd class="js-hours">Открываемся в&nbsp;10:00</dd></div>
+            <div data-reveal><dt>Оплата</dt><dd>Принимаем банковские карты</dd></div>
+          </dl>
+
+          <div class="contacts__btns" data-reveal>
+            <a class="btn btn--dark js-route" href="#" target="_blank" rel="noopener">Построить маршрут<svg><use href="#arrow"/></svg></a>
+            <a class="btn btn--ghost js-phone" href="tel:+79080336688"><svg><use href="#phone"/></svg>Позвонить</a>
+            <a class="btn btn--ghost js-tg" href="#" target="_blank" rel="noopener"><svg><use href="#tg"/></svg>Telegram</a>
+          </div>
+        </div>
+
+        <div class="map" data-reveal>
+          <div class="map__frame js-map" aria-label="Карта: LIPA, ул. Нижние Мнёвники, 9">
+            <div class="map__ph">
+              <svg><use href="#leaf"/></svg>
+              <span>Загружаем карту…</span>
+            </div>
+            <span class="map__hint">Нажмите, чтобы двигать карту</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ ПОДВАЛ ============ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__top">
+        <div class="footer__col">
+          <p class="footer__head">Разделы</p>
+          <a href="#bouquets">Букеты</a>
+          <a href="#shop">Лавка</a>
+          <a href="#order">Как заказать</a>
+          <a href="#contacts">Контакты</a>
+        </div>
+        <div class="footer__col">
+          <p class="footer__head">Лавка</p>
+          <p>Москва, ул. Нижние Мнёвники, 9,<br>подъезд 10</p>
+          <a class="js-phone" href="tel:+79080336688">+7 (908) 033-66-88</a>
+          <a class="js-tg" href="#" target="_blank" rel="noopener">Telegram-канал</a>
+        </div>
+        <div class="footer__col footer__col--cta">
+          <p class="footer__big">Цветы к&nbsp;любому <em>поводу</em>&nbsp;— и&nbsp;просто так</p>
+          <button class="btn btn--dark" type="button" data-order>Заказать букет</button>
+        </div>
+      </div>
+
+      <div class="footer__word" aria-hidden="true">
+        <svg class="footer__leaf"><use href="#leaf"/></svg><span>LIPA</span>
+      </div>
+
+      <div class="footer__bottom">
+        <span>© <span class="js-year">2026</span> LIPA flowers shop</span>
+        <span class="footer__demo js-demo">Демо-версия сайта</span>
+        <a href="#top" class="footer__up">Наверх<svg><use href="#arrow"/></svg></a>
+      </div>
+    </div>
+    <p class="signature" aria-label="dgd studio"><span class="js-sign">dgd studio</span></p>
+  </footer>
+
+  <!-- Нижняя панель на телефонах -->
+  <div class="dock" aria-label="Быстрые действия">
+    <a class="dock__btn js-phone" href="tel:+79080336688"><svg><use href="#phone"/></svg>Позвонить</a>
+    <a class="dock__btn js-tg" href="#" target="_blank" rel="noopener"><svg><use href="#tg"/></svg>Telegram</a>
+    <button class="dock__btn dock__btn--main" type="button" data-order>Заказать</button>
+  </div>
+
+  <!-- ============ ЗАЯВКА ============ -->
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-hidden="true" data-lenis-prevent>
+    <div class="modal__backdrop" data-close></div>
+    <div class="modal__box">
+      <button class="modal__close" type="button" aria-label="Закрыть" data-close><i></i><i></i></button>
+
+      <form class="form" novalidate>
+        <p class="eyebrow"><svg><use href="#leaf"/></svg>Заявка</p>
+        <h2 class="modal__title" id="modal-title">Заказать <em>букет</em></h2>
+        <p class="form__lead">Оставьте телефон&nbsp;— флорист перезвонит, уточнит детали и&nbsp;назовёт цену.</p>
+
+        <label class="field">
+          <span>Как вас зовут</span>
+          <input type="text" name="name" autocomplete="name" required minlength="2" placeholder="Анна">
+          <em class="field__err">Напишите имя</em>
+        </label>
+        <label class="field">
+          <span>Телефон</span>
+          <input type="tel" name="phone" autocomplete="tel" inputmode="tel" required placeholder="+7 (___) ___-__-__">
+          <em class="field__err">Проверьте номер телефона</em>
+        </label>
+        <label class="field">
+          <span>Какой букет хотите</span>
+          <input type="text" name="bouquet" placeholder="Например, розовые пионовидные розы">
+        </label>
+        <label class="field">
+          <span>Повод, бюджет, когда нужен <small>— по желанию</small></span>
+          <textarea name="comment" rows="2" placeholder="День рождения мамы, до 5 000 ₽, завтра к 18:00"></textarea>
+        </label>
+
+        <button class="btn btn--dark btn--wide form__submit" type="submit"><span>Отправить заявку</span></button>
+        <p class="form__legal">Нажимая кнопку, вы соглашаетесь на&nbsp;обработку персональных данных.</p>
+      </form>
+
+      <div class="form-done" hidden>
+        <svg class="form-done__leaf"><use href="#leaf"/></svg>
+        <h2 class="modal__title">Спасибо, <em>заявка у&nbsp;нас</em></h2>
+        <p>Флорист скоро свяжется с&nbsp;вами. Если букет нужен срочно, позвоните: <a class="js-phone" href="tel:+79080336688">+7 (908) 033-66-88</a></p>
+        <button class="btn btn--dark" type="button" data-close>Хорошо</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="cursor" aria-hidden="true"><span class="cursor__label"></span></div>
+
+  <script src="assets/vendor/lenis.min.js"></script>
+  <script src="assets/js/main.js"></script>
+</body>
+</html>
