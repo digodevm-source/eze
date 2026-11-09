@@ -88,7 +88,7 @@ assets/
   js/main.js         — CONFIG с данными лавки, анимации и интерактив
   vendor/lenis.min.js — Lenis 1.1.20, плавный скролл (MIT)
   vendor/maplibre-gl.* — MapLibre GL JS 5.6.0, карта (BSD-3-Clause)
-  fonts/             — Cormorant Garamond и Manrope (variable, кириллица и латиница, SIL OFL)
+  fonts/             — Unbounded (заголовки и цифры) и Manrope (текст), variable, кириллица и латиница, SIL OFL
   img/               — фото в WebP, favicon
 ```
 
