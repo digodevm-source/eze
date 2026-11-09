@@ -840,6 +840,8 @@ svg { flex: none; }
 html:not(.js) .hero { height: 100vh; height: 100svh; }
 html:not(.js) .catalog__viewport { overflow-x: auto; }
 html:not(.js) .js-tg { display: none; }
+html:not(.js) .map__ph-text { display: none; }
+html:not(.js) .map__ph .link { display: inline-flex; }
 
 /* Уменьшение движения */
 @media (prefers-reduced-motion: reduce) {

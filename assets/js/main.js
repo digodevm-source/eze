@@ -480,7 +480,8 @@
   /* ---------- Якорные ссылки ---------- */
   document.addEventListener('click', (e) => {
     const a = e.target.closest('a[href^="#"]');
-    if (!a) return;
+    // Кнопки «Заказать» — ссылки на «Как заказать» на случай без JS; с JS они открывают окно заявки
+    if (!a || a.hasAttribute('data-order')) return;
     const id = a.getAttribute('href');
     e.preventDefault();
     if (id === '#') return;
