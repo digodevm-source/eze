@@ -331,6 +331,8 @@
     window.addEventListener('pointermove', (e) => {
       mx = e.clientX;
       my = e.clientY;
+      // При первом движении кружок появляется сразу под мышью, а не прилетает из угла
+      if (cx < -200) { cx = mx; cy = my; }
       checkCursor(e.target);
     }, { passive: true });
     document.addEventListener('pointerleave', () => {
@@ -931,7 +933,7 @@
     if (!entries.some((en) => en.isIntersecting)) return;
     mapIo.disconnect();
     initMap();
-  }, { rootMargin: '700px 0px' });
+  }, { rootMargin: '1500px 0px' });
   mapIo.observe(mapBox);
 
   /* ---------- Старт ---------- */
