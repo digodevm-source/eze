@@ -693,6 +693,11 @@ svg { flex: none; }
   .footer { padding-bottom: 76px; }
 }
 
+/* Без JavaScript (например, в просмотрщике файлов): страница остаётся читаемой и листается */
+html:not(.js) .hero { height: 100vh; height: 100svh; }
+html:not(.js) .catalog__viewport { overflow-x: auto; }
+html:not(.js) .js-tg { display: none; }
+
 /* Уменьшение движения */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-delay: 0s !important; transition-duration: .01ms !important; transition-delay: 0s !important; }
