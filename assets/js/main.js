@@ -105,9 +105,8 @@
   const header = $('.header');
   const hero = $('.hero');
   const heroSticky = $('.hero__sticky');
-  const heroFrame = $('.hero__frame');
-  const heroMedia = $('.hero__media');
-  const heroMediaIn = $('.hero__media-in');
+  const heroArch = $('.hero__arch');
+  const heroImgBox = $('.hero__arch-img');
   const heroHalfL = $('.hero__half--l');
   const heroHalfR = $('.hero__half--r');
   const heroWord = $('.hero__word');
@@ -154,13 +153,7 @@
     const stickyH = heroSticky.offsetHeight;
     heroTop = hero.getBoundingClientRect().top + sy;
     heroRange = Math.max(1, hero.offsetHeight - stickyH);
-    const fr = heroFrame.getBoundingClientRect();
-    const sr = heroSticky.getBoundingClientRect();
-    arch = { top: fr.top - sr.top, left: fr.left - sr.left, w: fr.width, h: fr.height, W: sr.width, H: sr.height };
-    // Фото сначала вписано в арку целиком, потом растёт до размера экрана
-    arch.s0 = Math.max(arch.w / arch.W, arch.h / arch.H);
-    arch.dx = arch.left + arch.w / 2 - arch.W / 2;
-    arch.dy = arch.top + arch.h / 2 - arch.H / 2;
+    measureArch();
 
     catTop = catalog.getBoundingClientRect().top + sy;
     const ar = aboutText.getBoundingClientRect();
@@ -175,7 +168,36 @@
     });
 
     lastWordK = -1;
+    heroKey = '';
+    catKey = -1;
     needsUpdate = true;
+  }
+
+  /* Геометрия арки. Арка растёт только через transform: scale, поэтому ни форма, ни фото
+     не перерисовываются во время прокрутки. Фото внутри всегда размером с экран
+     и получает обратный масштаб, так что на экране оно не меняет размер и не теряет резкость. */
+  function measureArch() {
+    heroArch.style.transform = 'none';
+    const sr = heroSticky.getBoundingClientRect();
+    const ar = heroArch.getBoundingClientRect();
+    const W = sr.width, H = sr.height, w = ar.width, h = ar.height;
+    heroImgBox.style.width = `${W}px`;
+    heroImgBox.style.height = `${H}px`;
+    heroImgBox.style.left = `${(w - W) / 2}px`;
+    heroImgBox.style.top = `${(h - H) / 2}px`;
+
+    // Минимальный масштаб, при котором арка (прямоугольник с полукругом сверху) закрывает углы экрана
+    const a = w / 2;
+    const b = Math.max(0, (h - w) / 2);
+    const A = a * a - b * b, B = b * H, C = (W * W + H * H) / 4;
+    let sEnd = A > 0 ? (-B + Math.sqrt(B * B + 4 * A * C)) / (2 * A) : H / Math.max(1, h - w);
+    sEnd = Math.max(sEnd, W / w, H / Math.max(1, h - 28)) * 1.04;
+
+    arch = {
+      sEnd,
+      dx: W / 2 - (ar.left - sr.left + w / 2),
+      dy: H / 2 - (ar.top - sr.top + h / 2),
+    };
   }
 
   /* ---------- Главный экран: арка раскрывается на весь экран ---------- */
@@ -183,22 +205,23 @@
   let introStart = 0;
   let introT = reduce ? 1 : 0;
 
+  let heroKey = '';
   function updateHero(sy) {
     if (!arch) return;
     const p = reduce ? 0 : clamp((sy - heroTop) / heroRange);
-    const e = easeInOut(clamp(p / 0.8));
-    const k = 1 - e;
     const intro = easeOutExpo(introT);
+    // Пока главный экран не виден и не меняется, стили не трогаем
+    const key = `${p.toFixed(4)}|${intro.toFixed(3)}`;
+    if (key === heroKey) return;
+    heroKey = key;
+    const e = easeInOut(clamp(p / 0.8));
 
-    const top = arch.top * k + (1 - intro) * arch.h * k;
-    const left = arch.left * k;
-    const right = (arch.W - arch.left - arch.w) * k;
-    const bottom = (arch.H - arch.top - arch.h) * k;
-    const rt = (arch.w / 2) * k;
-    const rb = 14 * k;
-    heroMedia.style.clipPath = `inset(${top.toFixed(1)}px ${right.toFixed(1)}px ${bottom.toFixed(1)}px ${left.toFixed(1)}px round ${rt.toFixed(1)}px ${rt.toFixed(1)}px ${rb.toFixed(1)}px ${rb.toFixed(1)}px)`;
-    const sc = (arch.s0 + (1 - arch.s0) * e) * (1.06 - 0.06 * e);
-    heroMediaIn.style.transform = `translate3d(${(arch.dx * k).toFixed(1)}px,${(arch.dy * k).toFixed(1)}px,0) scale(${sc.toFixed(4)})`;
+    // Масштаб растёт плавно и равномерно на глаз (геометрически), центр арки уезжает в центр экрана
+    const s = Math.pow(arch.sEnd, e);
+    const ty = arch.dy * e + (1 - intro) * 70;
+    heroArch.style.transform = `translate3d(${(arch.dx * e).toFixed(1)}px,${ty.toFixed(1)}px,0) scale(${s.toFixed(4)})`;
+    heroArch.style.opacity = intro < 1 ? intro.toFixed(3) : '';
+    heroImgBox.style.transform = `scale(${(1 / s).toFixed(5)})`;
 
     const shift = e * vw * 0.3;
     heroHalfL.style.transform = `translate3d(${-shift}px,0,0)`;
@@ -238,9 +261,12 @@
       catIndex.textContent = String(i).padStart(2, '0');
     }
   }
+  let catKey = -1;
   function updateCatalog(sy) {
     if (!catMode) return;
     const p = catDist > 0 ? clamp((sy - catTop) / catDist) : 0;
+    if (p === catKey) return;
+    catKey = p;
     track.style.transform = `translate3d(${(-p * catDist).toFixed(1)}px,0,0)`;
     setCatProgress(p);
   }
@@ -311,7 +337,7 @@
       needsUpdate = false;
       update(sy);
     }
-    if (cursorEnabled) {
+    if (cursorEnabled && (Math.abs(mx - cx) > 0.3 || Math.abs(my - cy) > 0.3)) {
       cx += (mx - cx) * 0.2;
       cy += (my - cy) * 0.2;
       cursor.style.transform = `translate3d(${cx.toFixed(1)}px,${cy.toFixed(1)}px,0)`;
@@ -323,7 +349,7 @@
   const loader = $('.loader');
   const loaderBar = $('.loader__bar i');
   const loaderCount = $('.js-count');
-  const heroImg = $('.hero__media img');
+  const heroImg = $('.hero__arch img');
 
   root.classList.add('is-loading');
   let quick = false;
@@ -595,23 +621,133 @@
     }
   });
 
-  /* ---------- Карта: загружается, когда до неё доходит прокрутка ---------- */
+  /* ---------- Карта на фоне контактов ----------
+     MapLibre + бесплатные тайлы OpenFreeMap (без рекламы и без ключа), перекрашенные в цвета сайта.
+     Библиотека и карта загружаются, только когда до раздела доходит прокрутка.
+     Колесо мыши и один палец листают страницу, карту двигают Ctrl + колесо или два пальца. */
   const mapBox = $('.js-map');
-  const mapSrc = `https://yandex.ru/map-widget/v1/?ll=${lon}%2C${lat}&z=16&pt=${lon}%2C${lat}%2Cpm2rdm&lang=ru_RU`;
+  const MAP_STYLE_URL = 'https://tiles.openfreemap.org/styles/positron';
+  const MAP_ZOOM = 15.4;
+
+  const loadScript = (src) => new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = src;
+    s.onload = res;
+    s.onerror = rej;
+    document.head.append(s);
+  });
+  const loadCss = (href) => {
+    const l = document.createElement('link');
+    l.rel = 'stylesheet';
+    l.href = href;
+    document.head.append(l);
+  };
+
+  // Перекраска стиля карты под палитру сайта и подписи на русском
+  function tintMapStyle(style) {
+    const C = {
+      bg: '#eee7dc', park: '#e2e3d1', wood: '#dcdfcc', water: '#d0d7d4', residential: '#ebe4d8',
+      building: '#e3d9cb', buildingLine: '#d6cbbb', road: '#fbf8f3', minor: '#f6f1e9', casing: '#dcd1c1',
+      rail: '#d4cabd', boundary: '#c8bdb0', text: '#7a6e65', waterText: '#8b9792', halo: '#f4eee6',
+    };
+    const name = ['coalesce', ['get', 'name:ru'], ['get', 'name'], ['get', 'name_en']];
+    style.layers.forEach((l) => {
+      const id = l.id;
+      const p = l.paint || (l.paint = {});
+      const lay = l.layout || {};
+      if (id === 'background') p['background-color'] = C.bg;
+      else if (id === 'park') p['fill-color'] = C.park;
+      else if (id === 'water') p['fill-color'] = C.water;
+      else if (id === 'waterway') p['line-color'] = C.water;
+      else if (id === 'landuse_residential') p['fill-color'] = C.residential;
+      else if (id === 'landcover_wood') p['fill-color'] = C.wood;
+      else if (id === 'building') { p['fill-color'] = C.building; p['fill-outline-color'] = C.buildingLine; }
+      else if (id === 'road_area_pier') p['fill-color'] = C.bg;
+      else if (id === 'road_pier') p['line-color'] = C.bg;
+      else if (/casing/.test(id)) p['line-color'] = C.casing;
+      else if (/subtle/.test(id)) p['line-color'] = 'rgba(220, 209, 193, .6)';
+      else if (/inner/.test(id)) p['line-color'] = C.road;
+      else if (/highway_minor|highway_path/.test(id)) p['line-color'] = C.minor;
+      else if (/^railway/.test(id)) p['line-color'] = /dashline/.test(id) ? C.bg : C.rail;
+      else if (/^boundary/.test(id)) p['line-color'] = C.boundary;
+      if (l.type === 'symbol' && lay['text-field'] && JSON.stringify(lay['text-field']).includes('name')) {
+        lay['text-field'] = name;
+        p['text-color'] = /water/.test(id) ? C.waterText : C.text;
+        p['text-halo-color'] = C.halo;
+      }
+    });
+    return style;
+  }
+
+  // Отступ слева под карточку, чтобы метка стояла по центру свободной части карты
+  const mapStacked = () => mq('(max-width: 900px), (max-aspect-ratio: 5/6)');
+  function mapPadding() {
+    if (mapStacked()) return { top: 0, right: 0, bottom: 70, left: 0 };
+    const card = $('.contacts__card').getBoundingClientRect();
+    const box = mapBox.getBoundingClientRect();
+    return { top: 0, right: 0, bottom: 0, left: Math.max(0, card.right - box.left + 24) };
+  }
+
+  async function initMap() {
+    try {
+      if (!window.maplibregl) {
+        loadCss('assets/vendor/maplibre-gl.css');
+        await loadScript('assets/vendor/maplibre-gl.js');
+      }
+      const ml = window.maplibregl;
+      const style = tintMapStyle(await (await fetch(MAP_STYLE_URL)).json());
+      const el = document.createElement('div');
+      el.className = 'map__canvas';
+      mapBox.append(el);
+
+      const map = new ml.Map({
+        container: el,
+        style,
+        center: [lon, lat],
+        zoom: MAP_ZOOM,
+        minZoom: 10,
+        maxZoom: 18.5,
+        cooperativeGestures: true,
+        dragRotate: false,
+        pitchWithRotate: false,
+        touchPitch: false,
+        renderWorldCopies: false,
+        attributionControl: { compact: true },
+        pixelRatio: Math.min(window.devicePixelRatio || 1, 2),
+        locale: {
+          'CooperativeGesturesHandler.WindowsHelpText': 'Чтобы приблизить карту, крутите колесо с зажатой Ctrl',
+          'CooperativeGesturesHandler.MacHelpText': 'Чтобы приблизить карту, крутите колесо с зажатой ⌘',
+          'CooperativeGesturesHandler.MobileHelpText': 'Двигайте карту двумя пальцами',
+          'NavigationControl.ZoomIn': 'Приблизить',
+          'NavigationControl.ZoomOut': 'Отдалить',
+          'AttributionControl.ToggleAttribution': 'Источники карты',
+        },
+      });
+      map.touchZoomRotate.disableRotation();
+      map.addControl(new ml.NavigationControl({ showCompass: false }), 'bottom-right');
+
+      const pin = document.createElement('div');
+      pin.className = 'pin';
+      pin.innerHTML = '<span class="pin__dot"><svg><use href="#leaf"/></svg></span><span class="pin__label">LIPA<small>подъезд 10</small></span>';
+      new ml.Marker({ element: pin, anchor: 'center' }).setLngLat([lon, lat]).addTo(map);
+
+      const recenter = () => map.jumpTo({ center: [lon, lat], zoom: map.getZoom(), padding: mapPadding() });
+      recenter();
+      map.once('load', () => { recenter(); mapBox.classList.add('is-ready'); });
+      map.on('error', () => { if (!map.loaded()) mapBox.classList.add('is-failed'); });
+      let t = 0;
+      window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(recenter, 200); });
+    } catch (err) {
+      mapBox.classList.add('is-failed');
+    }
+  }
+
   const mapIo = new IntersectionObserver((entries) => {
     if (!entries.some((en) => en.isIntersecting)) return;
     mapIo.disconnect();
-    const f = document.createElement('iframe');
-    f.src = mapSrc;
-    f.title = 'Карта: LIPA, Москва, ул. Нижние Мнёвники, 9';
-    f.loading = 'lazy';
-    f.allowFullscreen = true;
-    f.referrerPolicy = 'no-referrer-when-downgrade';
-    mapBox.append(f);
-  }, { rootMargin: '900px 0px' });
+    initMap();
+  }, { rootMargin: '700px 0px' });
   mapIo.observe(mapBox);
-  mapBox.addEventListener('click', () => mapBox.classList.add('is-active'));
-  mapBox.addEventListener('mouseleave', () => mapBox.classList.remove('is-active'));
 
   /* ---------- Старт ---------- */
   measure();

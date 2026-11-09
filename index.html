@@ -115,13 +115,12 @@
           <span class="hero__half hero__half--r"><span>P</span><span>A</span></span>
         </div>
 
-        <!-- Рамка-арка: задаёт стартовый размер фото. Сам кадр раскрывается из неё на весь экран при прокрутке -->
-        <div class="hero__frame" aria-hidden="true"></div>
-        <div class="hero__media">
-          <div class="hero__media-in">
+        <!-- Арка с фото. При прокрутке арка увеличивается (только transform, без перерисовки) и закрывает весь экран -->
+        <div class="hero__arch">
+          <div class="hero__arch-img">
             <img src="assets/img/hero.webp" srcset="assets/img/hero-sm.webp 900w, assets/img/hero.webp 1600w" sizes="100vw" alt="Композиция в корзине: хризантемы, ранункулюсы, эустома и амарант" fetchpriority="high" decoding="async">
+            <div class="hero__shade"></div>
           </div>
-          <div class="hero__shade"></div>
         </div>
 
         <div class="hero__bottom">
@@ -355,34 +354,34 @@
 
     <!-- ============ 06 КОНТАКТЫ ============ -->
     <section class="contacts" id="contacts">
-      <div class="container contacts__grid">
-        <div class="contacts__info">
-          <p class="eyebrow" data-reveal><svg><use href="#leaf"/></svg>Контакты</p>
-          <h2 class="h2" data-reveal>Мы на <em>Нижних Мнёвниках</em></h2>
+      <!-- Карта на всю ширину блока, поверх неё слева карточка с контактами -->
+      <div class="contacts__map js-map" role="region" aria-label="Карта: LIPA, Москва, ул. Нижние Мнёвники, 9">
+        <div class="map__ph">
+          <svg><use href="#leaf"/></svg>
+          <span class="map__ph-text">Загружаем карту…</span>
+          <a class="link js-yandex" href="#" target="_blank" rel="noopener">Открыть в Яндекс Картах<svg><use href="#arrow"/></svg></a>
+        </div>
+      </div>
+
+      <div class="container contacts__inner">
+        <div class="contacts__card" data-reveal>
+          <p class="eyebrow"><svg><use href="#leaf"/></svg>Контакты</p>
+          <h2 class="h2">Мы на <em>Нижних Мнёвниках</em></h2>
 
           <dl class="dl">
-            <div data-reveal><dt>Адрес</dt><dd>Москва, ул. Нижние Мнёвники, 9, подъезд&nbsp;10</dd></div>
-            <div data-reveal><dt>Как добраться</dt><dd>Метро «Терехово»&nbsp;— 830&nbsp;м пешком<br>Остановка «Терехово»&nbsp;— 137&nbsp;м</dd></div>
-            <div data-reveal><dt>Телефон</dt><dd><a class="js-phone" href="tel:+79080336688">+7 (908) 033-66-88</a></dd></div>
-            <div data-reveal><dt>Время работы</dt><dd class="js-hours">Открываемся в&nbsp;10:00</dd></div>
-            <div data-reveal><dt>Оплата</dt><dd>Принимаем банковские карты</dd></div>
+            <div><dt>Адрес</dt><dd>Москва, ул. Нижние Мнёвники, 9, подъезд&nbsp;10</dd></div>
+            <div><dt>Как добраться</dt><dd>Метро «Терехово»&nbsp;— 830&nbsp;м пешком<br>Остановка «Терехово»&nbsp;— 137&nbsp;м</dd></div>
+            <div><dt>Телефон</dt><dd><a class="js-phone" href="tel:+79080336688">+7 (908) 033-66-88</a></dd></div>
+            <div><dt>Время работы</dt><dd class="js-hours">Открываемся в&nbsp;10:00</dd></div>
+            <div><dt>Оплата</dt><dd>Принимаем банковские карты</dd></div>
           </dl>
 
-          <div class="contacts__btns" data-reveal>
+          <div class="contacts__btns">
             <a class="btn btn--dark js-route" href="#" target="_blank" rel="noopener">Построить маршрут<svg><use href="#arrow"/></svg></a>
             <a class="btn btn--ghost js-phone" href="tel:+79080336688"><svg><use href="#phone"/></svg>Позвонить</a>
             <a class="btn btn--ghost js-tg" href="#" target="_blank" rel="noopener"><svg><use href="#tg"/></svg>Telegram</a>
           </div>
-        </div>
-
-        <div class="map" data-reveal>
-          <div class="map__frame js-map" aria-label="Карта: LIPA, ул. Нижние Мнёвники, 9">
-            <div class="map__ph">
-              <svg><use href="#leaf"/></svg>
-              <span>Загружаем карту…</span>
-            </div>
-            <span class="map__hint">Нажмите, чтобы двигать карту</span>
-          </div>
+          <a class="contacts__ya js-yandex" href="#" target="_blank" rel="noopener">Открыть в Яндекс Картах<svg><use href="#arrow"/></svg></a>
         </div>
       </div>
     </section>
