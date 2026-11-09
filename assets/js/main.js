@@ -273,17 +273,21 @@
   const cursor = $('.cursor');
   const cursorLabel = $('.cursor__label');
   let mx = -300, my = -300, cx = -300, cy = -300, cursorOn = false;
-  if (finePointer && !reduce) {
+  const cursorEnabled = finePointer && !reduce;
+  function checkCursor(target) {
+    const t = target && target.closest ? target.closest('[data-cursor]') : null;
+    const show = !!t && !target.closest('button, a') && !modalOpen;
+    if (t) cursorLabel.textContent = t.dataset.cursor;
+    if (show !== cursorOn) {
+      cursorOn = show;
+      cursor.classList.toggle('is-on', show);
+    }
+  }
+  if (cursorEnabled) {
     window.addEventListener('pointermove', (e) => {
       mx = e.clientX;
       my = e.clientY;
-      const t = e.target.closest('[data-cursor]');
-      const show = !!t && !e.target.closest('button, a');
-      if (t) cursorLabel.textContent = t.dataset.cursor;
-      if (show !== cursorOn) {
-        cursorOn = show;
-        cursor.classList.toggle('is-on', show);
-      }
+      checkCursor(e.target);
     }, { passive: true });
     document.addEventListener('pointerleave', () => {
       cursorOn = false;
@@ -301,11 +305,13 @@
     }
     const sy = window.scrollY;
     if (sy !== lastSy || needsUpdate) {
+      // При прокрутке колесом мышь стоит на месте, а под ней меняется содержимое
+      if (cursorEnabled && sy !== lastSy && mx >= 0) checkCursor(document.elementFromPoint(mx, my));
       lastSy = sy;
       needsUpdate = false;
       update(sy);
     }
-    if (finePointer && !reduce) {
+    if (cursorEnabled) {
       cx += (mx - cx) * 0.2;
       cy += (my - cy) * 0.2;
       cursor.style.transform = `translate3d(${cx.toFixed(1)}px,${cy.toFixed(1)}px,0)`;
@@ -464,6 +470,7 @@
     clearMsg();
     if (bouquet) field('bouquet').value = bouquet;
     modalOpen = true;
+    if (cursorOn) { cursorOn = false; cursor.classList.remove('is-on'); }
     modal.classList.add('is-open');
     modal.setAttribute('aria-hidden', 'false');
     root.classList.add('modal-open');
