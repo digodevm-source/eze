@@ -9,8 +9,10 @@
 
   /* ===== Данные лавки: меняйте здесь ===== */
   const CONFIG = {
-    // Ссылка на Telegram для заказов, например 'https://t.me/username'.
-    // Пока пусто, все кнопки Telegram на сайте скрыты.
+    // Телефон для звонков и SMS-заявок, только цифры с «+»
+    phone: '+79080336688',
+    // Ссылка на Telegram-аккаунт, который принимает заказы, например 'https://t.me/username'.
+    // В заявку подставится готовый текст. Пока пусто, все кнопки Telegram на сайте скрыты.
     telegram: '',
     // Карточка лавки на Яндекс Картах (кнопка «Поделиться» в карточке).
     // Пока стоит поиск по названию и адресу.
@@ -24,7 +26,23 @@
     hours: '',
     // Подпись «Демо-версия сайта» в подвале. Убрать: false или ссылка с ?demo=0
     demo: true,
+    // Номер счётчика Яндекс Метрики, например 98765432. Пусто: Метрика не подключается.
+    // Цели: order (заявка), call (звонок), sms, telegram, route (маршрут).
+    metrikaId: '',
+    // Оператор персональных данных для политики: 'ИП Иванова Анна Сергеевна, ИНН 770000000000'
+    operator: '',
   };
+
+  /* ---------- Яндекс Метрика ---------- */
+  if (CONFIG.metrikaId) {
+    window.ym = window.ym || function ym() { (window.ym.a = window.ym.a || []).push(arguments); };
+    window.ym.l = Date.now();
+    const s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://mc.yandex.ru/metrika/tag.js';
+    document.head.append(s);
+    window.ym(Number(CONFIG.metrikaId), 'init', { clickmap: true, trackLinks: true, accurateTrackBounce: true });
+  }
 
   const root = document.documentElement;
   const $ = (s, c = document) => c.querySelector(s);
@@ -444,6 +462,21 @@
   }, { threshold: 0 });
   $$('.signature').forEach((el) => signIo.observe(el));
 
+  /* ---------- Текущий раздел в меню ---------- */
+  const navLinks = $$('.nav a, .menu__nav a');
+  const navIo = new IntersectionObserver((entries) => {
+    entries.forEach((en) => {
+      if (!en.isIntersecting) return;
+      const id = `#${en.target.id}`;
+      navLinks.forEach((a) => a.classList.toggle('is-active', a.getAttribute('href') === id));
+    });
+  }, { rootMargin: '-45% 0px -50% 0px' });
+  ['top', 'about', 'bouquets', 'shop', 'order', 'care', 'contacts'].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) navIo.observe(el);
+  });
+  if (location.hash === '#privacy') setTimeout(openDoc, 600);
+
   /* ---------- Якорные ссылки ---------- */
   document.addEventListener('click', (e) => {
     const a = e.target.closest('a[href^="#"]');
@@ -451,6 +484,7 @@
     const id = a.getAttribute('href');
     e.preventDefault();
     if (id === '#') return;
+    if (id === '#privacy') { openDoc(); return; }
     setMenu(false);
     if (id === '#top') { scrollToY(0); return; }
     const el = $(id);
@@ -471,7 +505,7 @@
     burger.setAttribute('aria-expanded', String(open));
     burger.setAttribute('aria-label', open ? 'Закрыть меню' : 'Открыть меню');
     menu.setAttribute('aria-hidden', String(!open));
-    lockScroll(open || modalOpen);
+    lockScroll(open || modalOpen || docOpen);
   }
   burger.addEventListener('click', () => setMenu(!menuOpen));
 
@@ -483,16 +517,27 @@
   /* ---------- Окно заявки ---------- */
   const modal = $('#modal');
   const form = $('.form', modal);
+  const formSend = $('.form-send', modal);
   const formDone = $('.form-done', modal);
   const submitBtn = $('.form__submit', form);
   const field = (n) => form.querySelector(`[name="${n}"]`);
+  const checked = (n) => { const el = form.querySelector(`[name="${n}"]:checked`); return el ? el.value : ''; };
   let modalOpen = false;
   let lastFocus = null;
+  let orderSent = false;
+
+  function showStep(step) {
+    form.hidden = step !== form;
+    formSend.hidden = step !== formSend;
+    formDone.hidden = step !== formDone;
+    $('.modal__box', modal).scrollTop = 0;
+  }
 
   function openModal(bouquet) {
     lastFocus = document.activeElement;
-    form.hidden = false;
-    formDone.hidden = true;
+    // После отправленной заявки форма открывается чистой, иначе сохраняется черновик
+    if (orderSent) { form.reset(); dateChip.hidden = true; orderSent = false; }
+    showStep(form);
     clearMsg();
     if (bouquet) field('bouquet').value = bouquet;
     modalOpen = true;
@@ -510,7 +555,7 @@
     modal.classList.remove('is-open');
     modal.setAttribute('aria-hidden', 'true');
     root.classList.remove('modal-open');
-    lockScroll(menuOpen);
+    lockScroll(menuOpen || docOpen);
     if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true });
   }
   $('.modal__box', modal).setAttribute('tabindex', '-1');
@@ -524,6 +569,8 @@
       return;
     }
     if (e.target.closest('[data-close]')) { closeModal(); return; }
+    if (e.target.closest('[data-close-doc]')) { closeDoc(); return; }
+    if (e.target.closest('[data-back]')) { orderSent = false; showStep(form); return; }
     // Клик по карточке букета тоже открывает заявку
     const card = e.target.closest('.card');
     if (card && !e.target.closest('a, button')) {
@@ -533,18 +580,104 @@
   });
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
-    if (modalOpen) closeModal();
+    if (docOpen) closeDoc();
+    else if (modalOpen) closeModal();
     else if (menuOpen) setMenu(false);
   });
-  // Фокус не уходит из окна, пока оно открыто
-  modal.addEventListener('keydown', (e) => {
-    if (e.key !== 'Tab') return;
-    const items = $$('button, input, textarea, a[href]', modal).filter((el) => el.offsetParent !== null);
-    if (!items.length) return;
-    const first = items[0];
-    const last = items[items.length - 1];
-    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  // Фокус не уходит из открытого окна
+  function trapFocus(box) {
+    box.addEventListener('keydown', (e) => {
+      if (e.key !== 'Tab') return;
+      const items = $$('button, input, textarea, a[href]', box).filter((el) => el.offsetParent !== null && !el.disabled);
+      if (!items.length) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    });
+  }
+  trapFocus(modal);
+
+  /* ---------- Политика обработки персональных данных ---------- */
+  const doc = $('#privacy');
+  const docBox = $('.modal__box', doc);
+  docBox.setAttribute('tabindex', '-1');
+  let docOpen = false;
+  let docFocus = null;
+  if (CONFIG.operator) $$('.js-operator').forEach((el) => el.replaceWith(document.createTextNode(CONFIG.operator)));
+  function openDoc() {
+    if (docOpen) return;
+    docFocus = document.activeElement;
+    docOpen = true;
+    setMenu(false);
+    doc.classList.add('is-open');
+    doc.setAttribute('aria-hidden', 'false');
+    docBox.scrollTop = 0;
+    lockScroll(true);
+    setTimeout(() => docBox.focus({ preventScroll: true }), 300);
+  }
+  function closeDoc() {
+    if (!docOpen) return;
+    docOpen = false;
+    doc.classList.remove('is-open');
+    doc.setAttribute('aria-hidden', 'true');
+    lockScroll(modalOpen || menuOpen);
+    if (docFocus && docFocus.focus) docFocus.focus({ preventScroll: true });
+  }
+  trapFocus(doc);
+
+  /* ---------- Быстрый выбор в заявке ---------- */
+  // Повторное нажатие на выбранный вариант снимает выбор
+  $$('.chip input[type="radio"]', form).forEach((r) => {
+    r.addEventListener('pointerdown', () => { r.dataset.was = r.checked ? '1' : ''; });
+    r.addEventListener('click', () => {
+      if (r.dataset.was === '1') { r.checked = false; r.dataset.was = ''; r.dispatchEvent(new Event('change', { bubbles: true })); }
+    });
+  });
+  const dateChip = $('.chip--date', form);
+  const dateInput = field('date');
+  const today = new Date();
+  const iso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  dateInput.min = iso(today);
+  form.addEventListener('change', (e) => {
+    if (e.target.name !== 'when') return;
+    const other = checked('when') === 'date';
+    dateChip.hidden = !other;
+    if (other && !dateInput.value) {
+      const t = new Date(today); t.setDate(t.getDate() + 2);
+      dateInput.value = iso(t);
+    }
+  });
+
+  function whenText() {
+    const w = checked('when');
+    if (w !== 'date') return w;
+    if (!dateInput.value) return '';
+    const [y, m, d] = dateInput.value.split('-').map(Number);
+    return new Date(y, m - 1, d).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', weekday: 'long' });
+  }
+
+  function orderText(d) {
+    const lines = ['Здравствуйте! Хочу заказать букет.', `Имя: ${d.name}`, `Телефон: ${d.phone}`];
+    if (d.bouquet) lines.push(`Букет: ${d.bouquet}`);
+    if (d.occasion) lines.push(`Повод: ${d.occasion}`);
+    if (d.budget) lines.push(`Бюджет: ${d.budget}`);
+    if (d.when) lines.push(`Когда: ${d.when}`);
+    if (d.comment) lines.push(`Комментарий: ${d.comment}`);
+    return lines.join('\n');
+  }
+
+  /* ---------- Цели Яндекс Метрики (если подключена) ---------- */
+  function goal(name) {
+    if (CONFIG.metrikaId && typeof window.ym === 'function') window.ym(CONFIG.metrikaId, 'reachGoal', name);
+  }
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('a');
+    if (!a) return;
+    if (a.href.startsWith('tel:')) goal('call');
+    else if (a.classList.contains('js-route')) goal('route');
+    else if (a.classList.contains('js-tg') || a.classList.contains('js-send-tg')) goal('telegram');
+    else if (a.classList.contains('js-send-sms')) goal('sms');
   });
 
   // Маска телефона: +7 (999) 123-45-67
@@ -588,37 +721,88 @@
       name: name.value.trim(),
       phone: phone.value,
       bouquet: field('bouquet').value.trim(),
+      occasion: checked('occasion'),
+      budget: checked('budget'),
+      when: whenText(),
       comment: field('comment').value.trim(),
-      page: location.href,
     };
+    data.text = orderText(data);
+    data.page = location.href;
+    goal('order');
+
+    // Адрес для заявок не настроен: показываем готовое сообщение и кнопки отправки флористу
+    if (!CONFIG.formEndpoint) {
+      showOrderText(data.text);
+      return;
+    }
+
     const label = $('span', submitBtn);
     const initial = label.textContent;
     submitBtn.classList.add('is-sending');
     label.textContent = 'Отправляем…';
     try {
-      if (CONFIG.formEndpoint) {
-        const r = await fetch(CONFIG.formEndpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-          body: JSON.stringify(data),
-        });
-        if (!r.ok) throw new Error(String(r.status));
-      } else {
-        await new Promise((r) => setTimeout(r, 700)); // демо: заявка никуда не уходит
-      }
-      form.reset();
-      form.hidden = true;
-      formDone.hidden = false;
+      const r = await fetch(CONFIG.formEndpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!r.ok) throw new Error(String(r.status));
+      orderSent = true;
+      showStep(formDone);
       $('.modal__box', modal).focus({ preventScroll: true });
     } catch (err) {
-      const m = document.createElement('p');
-      m.className = 'form__msg';
-      m.textContent = 'Не получилось отправить. Позвоните нам: +7 (908) 033-66-88';
-      submitBtn.after(m);
+      // Сервер не ответил: даём отправить ту же заявку по SMS или в Telegram
+      showOrderText(data.text, true);
     } finally {
       submitBtn.classList.remove('is-sending');
       label.textContent = initial;
     }
+  });
+
+  const orderTextEl = $('.js-order-text', formSend);
+  const sendSms = $('.js-send-sms', formSend);
+  const sendTg = $('.js-send-tg', formSend);
+  const copyBtn = $('.js-copy', formSend);
+  // Ссылка Telegram с готовым текстом работает для аккаунта по имени: t.me/имя?text=...
+  const tgWithText = (text) => {
+    if (!CONFIG.telegram) return '';
+    const u = CONFIG.telegram.replace(/\/+$/, '');
+    return /^https:\/\/t\.me\/[A-Za-z0-9_]{4,}$/.test(u) ? `${u}?text=${encodeURIComponent(text)}` : CONFIG.telegram;
+  };
+
+  function showOrderText(text, failed) {
+    orderTextEl.textContent = text;
+    // sms:номер?&body= понимают и iPhone, и Android
+    sendSms.href = `sms:${CONFIG.phone}?&body=${encodeURIComponent(text)}`;
+    sendTg.hidden = !CONFIG.telegram;
+    if (CONFIG.telegram) sendTg.href = tgWithText(text);
+    $('p', formSend).textContent = failed
+      ? 'Не получилось отправить заявку через сайт. Отправьте её флористу сами: сообщение уже составлено.'
+      : 'Осталось отправить её флористу: сообщение уже составлено, нажмите кнопку и «Отправить».';
+    $('span', copyBtn).textContent = 'Скопировать';
+    orderSent = true;
+    showStep(formSend);
+    $('.modal__box', modal).focus({ preventScroll: true });
+  }
+
+  copyBtn.addEventListener('click', async () => {
+    const text = orderTextEl.textContent;
+    let ok = false;
+    try {
+      await navigator.clipboard.writeText(text);
+      ok = true;
+    } catch (e) {
+      // Запасной способ для старых браузеров и локального файла
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.cssText = 'position:fixed;opacity:0;left:-9999px';
+      document.body.append(ta);
+      ta.select();
+      try { ok = document.execCommand('copy'); } catch (err) { ok = false; }
+      ta.remove();
+    }
+    $('span', copyBtn).textContent = ok ? 'Скопировано' : 'Выделите текст выше';
   });
 
   /* ---------- Карта на фоне контактов ----------

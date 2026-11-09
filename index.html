@@ -8,11 +8,18 @@
   <meta name="theme-color" content="#f4eee6">
   <meta name="color-scheme" content="light">
   <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+  <link rel="manifest" href="site.webmanifest">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="ru_RU">
+  <meta property="og:site_name" content="LIPA flowers shop">
   <meta property="og:title" content="LIPA — цветочная лавка на Нижних Мнёвниках">
   <meta property="og:description" content="Букеты, цветы поштучно и композиции в корзинах. Ул. Нижние Мнёвники, 9, подъезд 10.">
-  <meta property="og:image" content="assets/img/hero-sm.webp">
+  <!-- После публикации укажите полный адрес картинки: https://ваш-домен/assets/img/og.jpg -->
+  <meta property="og:image" content="assets/img/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
 
   <link rel="preload" href="assets/fonts/unbounded-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/unbounded-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
@@ -39,6 +46,7 @@
   </script>
 </head>
 <body>
+  <a class="skip" href="#about">Перейти к содержимому</a>
 
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <defs>
@@ -51,6 +59,8 @@
       <symbol id="star" viewBox="0 0 24 24"><path d="M12 2.6l2.9 6 6.5.8-4.8 4.5 1.2 6.5L12 17.2l-5.8 3.2 1.2-6.5L2.6 9.4l6.5-.8z" fill="currentColor"/></symbol>
       <symbol id="phone" viewBox="0 0 24 24"><path d="M6.6 10.8a15.2 15.2 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1z" fill="currentColor"/></symbol>
       <symbol id="tg" viewBox="0 0 24 24"><path d="M21.4 4.3 18.3 19c-.2 1-.8 1.3-1.7.8l-4.6-3.4-2.2 2.1c-.3.3-.5.5-1 .5l.3-4.7 8.6-7.8c.4-.3-.1-.5-.6-.2L6.5 13 2 11.6c-1-.3-1-1 .2-1.5l17.7-6.8c.8-.3 1.6.2 1.5 1z" fill="currentColor"/></symbol>
+      <symbol id="chat" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.2 3.6c-.5.4-1.3.1-1.3-.6V16A2.5 2.5 0 0 1 4 13.5z" fill="currentColor"/></symbol>
+      <symbol id="copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M16 5.5A1.5 1.5 0 0 0 14.5 4h-9A1.5 1.5 0 0 0 4 5.5v9A1.5 1.5 0 0 0 5.5 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
       <symbol id="arrow" viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
     </defs>
   </svg>
@@ -96,7 +106,8 @@
       <a href="#bouquets"><span>01</span>Букеты</a>
       <a href="#shop"><span>02</span>Лавка</a>
       <a href="#order"><span>03</span>Как заказать</a>
-      <a href="#contacts"><span>04</span>Контакты</a>
+      <a href="#care"><span>04</span>Уход и вопросы</a>
+      <a href="#contacts"><span>05</span>Контакты</a>
     </nav>
     <div class="menu__foot">
       <a class="menu__phone js-phone" href="tel:+79080336688">+7 (908) 033-66-88</a>
@@ -352,7 +363,69 @@
       </div>
     </section>
 
-    <!-- ============ 06 КОНТАКТЫ ============ -->
+    <!-- ============ 06 УХОД И ВОПРОСЫ ============ -->
+    <section class="care" id="care">
+      <div class="container care__grid">
+        <div class="care__intro">
+          <p class="eyebrow" data-reveal><svg><use href="#leaf"/></svg>Уход</p>
+          <h2 class="h2" data-reveal>Чтобы букет <em>стоял дольше</em></h2>
+          <p class="care__lead" data-reveal>Четыре простых правила, которые продлевают жизнь любым срезанным цветам.</p>
+        </div>
+        <ol class="tips">
+          <li class="tip" data-reveal>
+            <span class="tip__num">01</span>
+            <h3 class="tip__title">Подрежьте стебли</h3>
+            <p>Острым ножом наискосок на&nbsp;1–2&nbsp;см, сразу перед тем как поставить цветы в&nbsp;воду.</p>
+          </li>
+          <li class="tip" data-reveal style="--d:.08s">
+            <span class="tip__num">02</span>
+            <h3 class="tip__title">Уберите нижние листья</h3>
+            <p>Всё, что окажется в&nbsp;воде, начнёт подгнивать и&nbsp;быстро испортит воду.</p>
+          </li>
+          <li class="tip" data-reveal style="--d:.16s">
+            <span class="tip__num">03</span>
+            <h3 class="tip__title">Меняйте воду</h3>
+            <p>Каждые 1–2&nbsp;дня. Заодно обновляйте срез на&nbsp;стеблях.</p>
+          </li>
+          <li class="tip" data-reveal style="--d:.24s">
+            <span class="tip__num">04</span>
+            <h3 class="tip__title">Подальше от&nbsp;тепла</h3>
+            <p>Батареи, прямое солнце и&nbsp;фрукты рядом ускоряют увядание.</p>
+          </li>
+        </ol>
+      </div>
+
+      <div class="container faq">
+        <div class="faq__head">
+          <p class="eyebrow" data-reveal><svg><use href="#leaf"/></svg>Вопросы</p>
+          <h2 class="h2" data-reveal>Частые <em>вопросы</em></h2>
+        </div>
+        <div class="faq__list" data-reveal>
+          <details class="faq__item">
+            <summary>Можно собрать букет по&nbsp;фото?<i aria-hidden="true"></i></summary>
+            <div class="faq__a"><p>Да. Пришлите фото букета, который понравился, и&nbsp;флорист соберёт похожий из&nbsp;цветов, которые есть в&nbsp;лавке. Насколько точно получится повторить, зависит от&nbsp;сезона.</p></div>
+          </details>
+          <details class="faq__item">
+            <summary>Можно заказать букет заранее?<i aria-hidden="true"></i></summary>
+            <div class="faq__a"><p>Да. Позвоните или оставьте заявку на&nbsp;сайте: обсудим состав и&nbsp;отложим букет к&nbsp;нужному дню и&nbsp;времени.</p></div>
+          </details>
+          <details class="faq__item">
+            <summary>Сколько стоит букет?<i aria-hidden="true"></i></summary>
+            <div class="faq__a"><p>Розы&nbsp;— от&nbsp;400&nbsp;₽ за&nbsp;штуку, монобукет из&nbsp;пионовидных роз&nbsp;— 5&nbsp;000&nbsp;₽. Остальные букеты собираем под ваш бюджет: просто назовите сумму.</p></div>
+          </details>
+          <details class="faq__item">
+            <summary>Как оплатить?<i aria-hidden="true"></i></summary>
+            <div class="faq__a"><p>В&nbsp;лавке принимаем банковские карты.</p></div>
+          </details>
+          <details class="faq__item">
+            <summary>Сколько простоит букет?<i aria-hidden="true"></i></summary>
+            <div class="faq__a"><p>Зависит от&nbsp;цветов и&nbsp;ухода. Хризантемы и&nbsp;гвоздики могут стоять пару недель, розы&nbsp;— около недели, а&nbsp;пионы и&nbsp;ранункулюсы раскрываются и&nbsp;отцветают быстрее. Советы по&nbsp;уходу&nbsp;— чуть выше.</p></div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 07 КОНТАКТЫ ============ -->
     <section class="contacts" id="contacts">
       <!-- Карта на всю ширину блока, поверх неё слева карточка с контактами -->
       <div class="contacts__map js-map" role="region" aria-label="Карта: LIPA, Москва, ул. Нижние Мнёвники, 9">
@@ -396,6 +469,7 @@
           <a href="#bouquets">Букеты</a>
           <a href="#shop">Лавка</a>
           <a href="#order">Как заказать</a>
+          <a href="#care">Уход и вопросы</a>
           <a href="#contacts">Контакты</a>
         </div>
         <div class="footer__col">
@@ -416,6 +490,7 @@
 
       <div class="footer__bottom">
         <span>© <span class="js-year">2026</span> LIPA flowers shop</span>
+        <a href="#privacy" class="footer__link">Политика обработки персональных данных</a>
         <span class="footer__demo js-demo">Демо-версия сайта</span>
         <a href="#top" class="footer__up">Наверх<svg><use href="#arrow"/></svg></a>
       </div>
@@ -439,30 +514,79 @@
       <form class="form" novalidate>
         <p class="eyebrow"><svg><use href="#leaf"/></svg>Заявка</p>
         <h2 class="modal__title" id="modal-title">Заказать <em>букет</em></h2>
-        <p class="form__lead">Оставьте телефон&nbsp;— флорист перезвонит, уточнит детали и&nbsp;назовёт цену.</p>
+        <p class="form__lead">Заполните пару полей&nbsp;— флорист свяжется с&nbsp;вами, уточнит детали и&nbsp;назовёт цену.</p>
 
-        <label class="field">
-          <span>Как вас зовут</span>
-          <input type="text" name="name" autocomplete="name" required minlength="2" placeholder="Анна">
-          <em class="field__err">Напишите имя</em>
-        </label>
-        <label class="field">
-          <span>Телефон</span>
-          <input type="tel" name="phone" autocomplete="tel" inputmode="tel" required placeholder="+7 (___) ___-__-__">
-          <em class="field__err">Проверьте номер телефона</em>
-        </label>
+        <div class="form__row">
+          <label class="field">
+            <span>Как вас зовут</span>
+            <input type="text" name="name" autocomplete="name" required minlength="2" placeholder="Анна">
+            <em class="field__err">Напишите имя</em>
+          </label>
+          <label class="field">
+            <span>Телефон</span>
+            <input type="tel" name="phone" autocomplete="tel" inputmode="tel" required placeholder="+7 (___) ___-__-__">
+            <em class="field__err">Проверьте номер телефона</em>
+          </label>
+        </div>
+
+        <fieldset class="chips">
+          <legend>Повод</legend>
+          <div class="chips__list">
+            <label class="chip"><input type="radio" name="occasion" value="День рождения"><span>День рождения</span></label>
+            <label class="chip"><input type="radio" name="occasion" value="Любимой"><span>Любимой</span></label>
+            <label class="chip"><input type="radio" name="occasion" value="Маме"><span>Маме</span></label>
+            <label class="chip"><input type="radio" name="occasion" value="Свадьба или праздник"><span>Свадьба, праздник</span></label>
+            <label class="chip"><input type="radio" name="occasion" value="Просто так"><span>Просто так</span></label>
+          </div>
+        </fieldset>
+
+        <fieldset class="chips">
+          <legend>Бюджет</legend>
+          <div class="chips__list">
+            <label class="chip"><input type="radio" name="budget" value="до 3 000 ₽"><span>до 3 000 ₽</span></label>
+            <label class="chip"><input type="radio" name="budget" value="3 000–5 000 ₽"><span>3–5 тыс.</span></label>
+            <label class="chip"><input type="radio" name="budget" value="5 000–8 000 ₽"><span>5–8 тыс.</span></label>
+            <label class="chip"><input type="radio" name="budget" value="от 8 000 ₽"><span>от 8 000 ₽</span></label>
+          </div>
+        </fieldset>
+
+        <fieldset class="chips">
+          <legend>Когда нужен</legend>
+          <div class="chips__list">
+            <label class="chip"><input type="radio" name="when" value="Сегодня"><span>Сегодня</span></label>
+            <label class="chip"><input type="radio" name="when" value="Завтра"><span>Завтра</span></label>
+            <label class="chip"><input type="radio" name="when" value="date"><span>Другой день</span></label>
+            <label class="chip chip--date" hidden><input type="date" name="date" aria-label="Дата"></label>
+          </div>
+        </fieldset>
+
         <label class="field">
           <span>Какой букет хотите</span>
           <input type="text" name="bouquet" placeholder="Например, розовые пионовидные розы">
         </label>
         <label class="field">
-          <span>Повод, бюджет, когда нужен <small>— по желанию</small></span>
-          <textarea name="comment" rows="2" placeholder="День рождения мамы, до 5 000 ₽, завтра к 18:00"></textarea>
+          <span>Комментарий <small>— по желанию</small></span>
+          <textarea name="comment" rows="2" placeholder="Время, пожелания к цветам или текст открытки"></textarea>
         </label>
 
         <button class="btn btn--dark btn--wide form__submit" type="submit"><span>Отправить заявку</span></button>
-        <p class="form__legal">Нажимая кнопку, вы соглашаетесь на&nbsp;обработку персональных данных.</p>
+        <p class="form__legal">Нажимая кнопку, вы соглашаетесь с&nbsp;<a href="#privacy">политикой обработки персональных данных</a>.</p>
       </form>
+
+      <!-- Если адрес для заявок не настроен: готовое сообщение уходит флористу по SMS или в Telegram -->
+      <div class="form-send" hidden>
+        <svg class="form-done__leaf"><use href="#leaf"/></svg>
+        <h2 class="modal__title">Заявка <em>готова</em></h2>
+        <p>Осталось отправить её флористу: сообщение уже составлено, нажмите кнопку и&nbsp;«Отправить».</p>
+        <pre class="form-send__text js-order-text"></pre>
+        <div class="form-send__btns">
+          <a class="btn btn--dark js-send-tg" href="#" target="_blank" rel="noopener"><svg><use href="#tg"/></svg>Отправить в Telegram</a>
+          <a class="btn btn--dark js-send-sms" href="#"><svg><use href="#chat"/></svg>Отправить по SMS</a>
+          <button class="btn btn--ghost js-copy" type="button"><svg><use href="#copy"/></svg><span>Скопировать</span></button>
+          <a class="btn btn--ghost js-phone" href="tel:+79080336688"><svg><use href="#phone"/></svg>Позвонить</a>
+        </div>
+        <button class="form-send__back" type="button" data-back>← Изменить заявку</button>
+      </div>
 
       <div class="form-done" hidden>
         <svg class="form-done__leaf"><use href="#leaf"/></svg>
@@ -470,6 +594,46 @@
         <p>Флорист скоро свяжется с&nbsp;вами. Если букет нужен срочно, позвоните: <a class="js-phone" href="tel:+79080336688">+7 (908) 033-66-88</a></p>
         <button class="btn btn--dark" type="button" data-close>Хорошо</button>
       </div>
+    </div>
+  </div>
+
+  <!-- ============ ПОЛИТИКА ОБРАБОТКИ ДАННЫХ ============ -->
+  <div class="modal modal--doc" id="privacy" role="dialog" aria-modal="true" aria-labelledby="privacy-title" aria-hidden="true" data-lenis-prevent>
+    <div class="modal__backdrop" data-close-doc></div>
+    <div class="modal__box">
+      <button class="modal__close" type="button" aria-label="Закрыть" data-close-doc><i></i><i></i></button>
+      <article class="doc">
+        <p class="eyebrow"><svg><use href="#leaf"/></svg>Документы</p>
+        <h2 class="modal__title" id="privacy-title">Политика обработки <em>персональных данных</em></h2>
+        <p class="doc__date">Редакция от 9 ноября 2026 года</p>
+
+        <h3>1. Общие положения</h3>
+        <p>Политика описывает, как цветочная лавка LIPA (далее&nbsp;— оператор) обрабатывает персональные данные посетителей сайта. Политика составлена в&nbsp;соответствии с&nbsp;Федеральным законом от&nbsp;27.07.2006 №&nbsp;152-ФЗ «О&nbsp;персональных данных».</p>
+        <p>Оператор: <mark class="js-operator">наименование ИП или организации, ИНН, ОГРН</mark>. Адрес: Москва, ул.&nbsp;Нижние Мнёвники, 9, подъезд&nbsp;10. Телефон: <a class="js-phone" href="tel:+79080336688">+7 (908) 033-66-88</a>.</p>
+
+        <h3>2. Какие данные мы обрабатываем</h3>
+        <p>Имя, номер телефона и&nbsp;сведения о&nbsp;заказе, которые вы указываете в&nbsp;заявке: букет, повод, бюджет, дату и&nbsp;комментарий.</p>
+
+        <h3>3. Зачем</h3>
+        <p>Чтобы связаться с&nbsp;вами, уточнить заказ, собрать и&nbsp;выдать букет.</p>
+
+        <h3>4. Правовые основания</h3>
+        <p>Ваше согласие, которое вы даёте, отправляя заявку, и&nbsp;исполнение договора, стороной которого вы являетесь (пункты&nbsp;1 и&nbsp;5 части&nbsp;1 статьи&nbsp;6 Закона №&nbsp;152-ФЗ).</p>
+
+        <h3>5. Как мы обрабатываем и&nbsp;храним данные</h3>
+        <p>Данные обрабатываются с&nbsp;использованием средств автоматизации и&nbsp;без них. Мы не&nbsp;передаём их третьим лицам, кроме случаев, предусмотренных законом, и&nbsp;храним не&nbsp;дольше, чем нужно для выполнения заказа. Если вы отправляете заявку по&nbsp;SMS или в&nbsp;Telegram, сообщение передаётся через эти сервисы по&nbsp;их правилам.</p>
+
+        <h3>6. Сайт и&nbsp;сторонние сервисы</h3>
+        <p>Сайт не&nbsp;использует рекламные cookie. Карта в&nbsp;разделе «Контакты» загружается с&nbsp;сервиса OpenFreeMap. Для статистики посещений может использоваться Яндекс Метрика: она собирает обезличенные данные с&nbsp;помощью cookie. Cookie можно запретить в&nbsp;настройках браузера.</p>
+
+        <h3>7. Ваши права</h3>
+        <p>Вы можете узнать, какие ваши данные мы храним, потребовать их уточнения или удаления и&nbsp;отозвать согласие. Для этого позвоните или напишите нам по&nbsp;телефону <a class="js-phone" href="tel:+79080336688">+7 (908) 033-66-88</a>. Мы ответим в&nbsp;течение 10&nbsp;рабочих дней.</p>
+
+        <h3>8. Изменения политики</h3>
+        <p>Мы можем обновлять политику. Действующая редакция всегда доступна на&nbsp;этом сайте.</p>
+
+        <button class="btn btn--dark" type="button" data-close-doc>Понятно</button>
+      </article>
     </div>
   </div>
 

@@ -44,9 +44,9 @@
   --paper: #fbf8f3;       /* карточки и окно заявки */
   --ink: #241d19;         /* основной текст */
   --ink-2: #4b413a;
-  --muted: #85796f;
+  --muted: #74685e;       /* мелкий второстепенный текст, контраст не ниже 4.5:1 */
   --line: rgba(36, 29, 25, .14);
-  --rose: #b7546a;        /* акцент: пыльная роза */
+  --rose: #a3455c;        /* акцент: пыльная роза (контраст мелкого текста не ниже 4.5:1) */
   --rose-2: #d98d9a;
   --blush: #f0d9d5;
   --sage: #6c7c5e;        /* зелень липы */
@@ -89,6 +89,7 @@ html { font-synthesis: none; }
 ::selection { background: var(--rose); color: var(--cream); }
 :focus-visible { outline: 2px solid var(--rose); outline-offset: 3px; border-radius: 6px; }
 svg { flex: none; }
+[hidden] { display: none !important; }
 
 .container { width: 100%; padding-inline: var(--pad); margin-inline: auto; max-width: 1600px; }
 
@@ -438,6 +439,46 @@ svg { flex: none; }
 /* =========================================================
    06 КОНТАКТЫ
    ========================================================= */
+/* =========================================================
+   УХОД И ВОПРОСЫ
+   ========================================================= */
+.care { padding: clamp(110px, 16vh, 180px) 0 clamp(100px, 14vh, 160px); }
+.care__grid, .faq { display: grid; grid-template-columns: 5fr 7fr; gap: clamp(40px, 6vw, 110px); align-items: start; }
+.care__lead { margin-top: 24px; color: var(--ink-2); font-size: 17px; line-height: 1.6; max-width: 38ch; }
+.tips { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(30px, 3.4vw, 48px) clamp(24px, 3vw, 48px); }
+.tip { display: grid; gap: 10px; align-content: start; padding-top: 22px; border-top: 1px solid var(--line); }
+.tip__num { font: 300 15px/1 var(--display); color: var(--rose); }
+.tip__title { font: 400 clamp(18px, 1.5vw, 23px)/1.2 var(--display); letter-spacing: -.02em; }
+.tip p { color: var(--ink-2); font-size: 15px; line-height: 1.55; max-width: 34ch; }
+
+.faq { margin-top: clamp(90px, 13vh, 150px); }
+.faq__list { border-top: 1px solid var(--line); }
+.faq__item { border-bottom: 1px solid var(--line); }
+.faq__item summary {
+  display: flex; align-items: center; justify-content: space-between; gap: 20px;
+  padding: 22px 0; cursor: pointer; list-style: none;
+  font: 400 clamp(16px, 1.35vw, 20px)/1.3 var(--display); letter-spacing: -.02em;
+}
+.faq__item summary::-webkit-details-marker { display: none; }
+.faq__item summary i { position: relative; flex: none; width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--line); transition: background .3s, border-color .3s; }
+.faq__item summary i::before, .faq__item summary i::after { content: ""; position: absolute; left: 12px; right: 12px; top: 18px; height: 1.5px; background: var(--ink); transition: transform .4s var(--ease), background .3s; }
+.faq__item summary i::after { transform: rotate(90deg); }
+.faq__item[open] summary i { background: var(--ink); border-color: var(--ink); }
+.faq__item[open] summary i::before, .faq__item[open] summary i::after { background: var(--cream); }
+.faq__item[open] summary i::after { transform: rotate(0deg); }
+@media (hover: hover) { .faq__item summary:hover i { border-color: var(--ink); } }
+.faq__a { padding: 0 58px 24px 0; color: var(--ink-2); font-size: 16px; line-height: 1.6; }
+.faq__item[open] .faq__a { animation: faq-in .5s var(--ease); }
+@keyframes faq-in { from { opacity: 0; transform: translateY(-6px); } }
+
+/* Ссылка «Перейти к содержимому» для клавиатуры */
+.skip { position: fixed; left: 16px; top: 12px; z-index: 300; padding: 12px 18px; border-radius: 12px; background: var(--ink); color: var(--cream); font: 600 14px/1 var(--sans); transform: translateY(-160%); transition: transform .3s var(--ease); }
+.skip:focus { transform: none; }
+
+/* Текущий раздел в меню */
+.nav a.is-active::after { transform: scaleX(1); }
+.menu__nav a.is-active { color: var(--rose); }
+
 /* Карта на всю ширину блока, карточка с контактами слева поверх неё */
 .contacts {
   position: relative; overflow: hidden;
@@ -520,6 +561,8 @@ svg { flex: none; }
 /* =========================================================
    ПОДВАЛ
    ========================================================= */
+.footer__link { transition: color .3s; }
+@media (hover: hover) { .footer__link:hover { color: var(--ink); } }
 .footer { background: var(--bg-2); padding: clamp(80px, 12vh, 130px) 0 0; overflow: hidden; }
 .footer__top { display: grid; grid-template-columns: 1fr 1.2fr 2fr; gap: 40px; }
 .footer__col { display: grid; gap: 10px; align-content: start; color: var(--ink-2); }
@@ -601,6 +644,50 @@ svg { flex: none; }
 .form-done p { color: var(--ink-2); }
 .form-done a { border-bottom: 1px solid var(--line); white-space: nowrap; }
 .form-done__leaf { width: 46px; height: 46px; color: var(--rose); }
+.form__row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form__legal a { color: var(--ink-2); border-bottom: 1px solid var(--line); }
+
+/* Быстрый выбор: повод, бюджет, когда */
+.chips { border: 0; margin: 0; padding: 0; min-width: 0; }
+.chips legend { padding: 0; margin-bottom: 8px; font: 600 12px/1.2 var(--sans); letter-spacing: .04em; color: var(--muted); }
+.chips__list { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { position: relative; display: inline-flex; }
+.chip[hidden] { display: none; }
+.chip input[type="radio"] { position: absolute; inset: 0; margin: 0; opacity: 0; cursor: pointer; }
+.chip span {
+  display: inline-flex; align-items: center; height: 40px; padding: 0 15px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--bg);
+  font: 500 14px/1 var(--sans); white-space: nowrap; color: var(--ink-2);
+  transition: background .25s, color .25s, border-color .25s;
+}
+@media (hover: hover) { .chip:hover span { border-color: var(--ink); } }
+.chip input:checked + span { background: var(--ink); border-color: var(--ink); color: var(--cream); }
+.chip input:focus-visible + span { outline: 2px solid var(--rose); outline-offset: 2px; }
+.chip--date input { height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--ink); background: #fff; font: 500 14px/1 var(--sans); color: var(--ink); }
+
+/* Шаг «Заявка готова»: отправка по SMS, в Telegram или копирование */
+.form-send { display: grid; gap: 16px; justify-items: start; }
+.form-send[hidden] { display: none; }
+.form-send > p { color: var(--ink-2); }
+.form-send__text {
+  justify-self: stretch; margin: 0; max-height: 210px; overflow: auto;
+  padding: 16px 18px; border-radius: 16px; background: var(--bg); border: 1px solid var(--line);
+  font: 500 14px/1.55 var(--sans); color: var(--ink); white-space: pre-wrap; word-break: break-word;
+}
+.form-send__btns { display: flex; flex-wrap: wrap; gap: 10px; }
+.form-send__back { font: 600 13px/1 var(--sans); color: var(--muted); padding: 6px 0; }
+@media (hover: hover) { .form-send__back:hover { color: var(--ink); } }
+
+/* Окно с политикой: поверх окна заявки */
+.modal--doc { z-index: 130; }
+.modal--doc .modal__box { width: min(760px, 100%); }
+.doc h3 { margin: 26px 0 8px; font: 400 17px/1.3 var(--display); letter-spacing: -.02em; }
+.doc p { color: var(--ink-2); font-size: 15px; line-height: 1.65; }
+.doc p + p { margin-top: 10px; }
+.doc a { border-bottom: 1px solid var(--line); }
+.doc mark { background: var(--blush); color: var(--ink); padding: 0 4px; border-radius: 4px; }
+.doc__date { margin-top: 10px; font-size: 13px !important; color: var(--muted) !important; }
+.doc .btn { margin-top: 30px; }
 
 /* =========================================================
    КУРСОР «Хочу такой» (только мышь)
@@ -638,6 +725,7 @@ svg { flex: none; }
 
 @media (max-width: 1024px) {
   .facts { grid-template-columns: repeat(2, 1fr); row-gap: 40px; }
+  .care__grid, .faq { grid-template-columns: 1fr; gap: 36px; }
   .shop__grid { grid-template-columns: 1fr; }
   .shop__text { position: static; }
   .shop__collage { margin-top: 20px; }
@@ -721,6 +809,10 @@ svg { flex: none; }
   .dl > div { grid-template-columns: 1fr; gap: 4px; }
   .contacts__btns .btn { flex: 1 1 auto; }
   .contacts__card { padding: 26px 22px; }
+  .tips { grid-template-columns: 1fr; }
+  .faq__a { padding-right: 0; }
+  .form__row { grid-template-columns: 1fr; }
+  .form-send__btns .btn { flex: 1 1 auto; }
   .pin__label { font-size: 13px; padding: 8px 12px 9px; }
 
   .footer__top { grid-template-columns: 1fr; gap: 32px; }
