@@ -1,0 +1,20 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>more</title>
+<style>
+  @font-face { font-family: 'CormSC'; font-weight: 600; src: url('node_modules/@fontsource/cormorant-sc/files/cormorant-sc-cyrillic-600-normal.woff2') format('woff2'); }
+  @font-face { font-family: 'CormSC'; font-weight: 700; src: url('node_modules/@fontsource/cormorant-sc/files/cormorant-sc-cyrillic-700-normal.woff2') format('woff2'); }
+  @font-face { font-family: 'CormSC'; font-weight: 600; src: url('node_modules/@fontsource/cormorant-sc/files/cormorant-sc-latin-600-normal.woff2') format('woff2'); unicode-range: U+0000-00FF; }
+  html, body { margin: 0; padding: 0; background: #000; overflow: hidden; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; }
+  canvas { display: block; width: 1080px; height: 1920px; }
+  #cap { position: absolute; left: 60px; right: 60px; top: 520px; text-align: center; pointer-events: none;
+         font-family: 'CormSC', serif; font-weight: 700; font-size: 92px; line-height: 1.02; color: #fff; letter-spacing: 2px;
+         -webkit-box-reflect: below -12px linear-gradient(transparent 45%, rgba(255,255,255,0.22)); }
+  #cap .w { display: inline-block; margin: 0 14px; white-space: nowrap; text-shadow: 0 0 18px rgba(255,210,170,0.55), 0 4px 18px rgba(20,0,30,0.6); }
+  #cap .ring { position: absolute; left: 50%; top: 50%; border: 3px solid rgba(255,255,255,0.75); border-radius: 50%; transform: translate(-50%, -50%); }
+</style>
+<script type="importmap">{ "imports": { "three": "./node_modules/three/build/three.module.js", "three/addons/": "./node_modules/three/examples/jsm/" } }</script>
+</head><body>
+<canvas id="out" width="1080" height="1920"></canvas>
+<script type="module" src="./src/main.js"></script>
+</body></html>
