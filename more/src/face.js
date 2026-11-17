@@ -68,6 +68,20 @@ export class Face {
     }
 
     this.mouth();
+    if (o.mustache) {
+      const [x, y] = P(1, -30);
+      c.fillStyle = '#2a1712';
+      c.beginPath();
+      c.moveTo(x, y - 6);
+      c.bezierCurveTo(x - 40, y - 26, x - 90, y - 8, x - 96, y + 22);
+      c.bezierCurveTo(x - 70, y + 6, x - 30, y + 8, x, y + 4);
+      c.bezierCurveTo(x + 30, y + 8, x + 70, y + 6, x + 96, y + 22);
+      c.bezierCurveTo(x + 90, y - 8, x + 40, y - 26, x, y - 6);
+      c.fill();
+    }
+    if (o.lipstick) {
+      // handled by lip color in mouth()
+    }
   }
 
   eye(side) {

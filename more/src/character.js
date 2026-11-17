@@ -115,6 +115,23 @@ function hairGeometry(style, seed) {
         add(at(lon, lat, 1.06 + r() * 0.08), 0.04 + r() * 0.022, [1, 1.35, 0.85]);
       }
     }
+  } else if (style.type === 'long') {
+    const cap = new THREE.SphereGeometry(HEAD_R * 1.08, 32, 20, 0, Math.PI * 2, 0, Math.PI * 0.58);
+    cap.applyMatrix4(new THREE.Matrix4().makeRotationX(-0.3));
+    cap.applyMatrix4(new THREE.Matrix4().makeTranslation(0, HEAD_R + 0.01, -0.01));
+    geos.push(colorize(cap, dark));
+    const strand = (lon, latTop, latBot, width, out = 1.1, drop = 0) => {
+      const top = at(lon, latTop, out);
+      const bot = at(lon * 1.0, latBot, out + 0.08); bot.y -= drop; bot.z -= 0.05;
+      const mid = top.clone().add(bot).multiplyScalar(0.5);
+      add(mid, 1, [width, top.distanceTo(bot) * 0.58, width * 0.45], top.clone().sub(bot), r() * 0.7);
+    };
+    for (let i = 0; i < 22; i++) {
+      const lon = 70 + i * (220 / 21);
+      const L = lon > 180 ? lon - 360 : lon;
+      strand(L, 38, -60, 0.07, 1.06, 0.25 + r() * 0.15);
+    }
+    for (let i = 0; i < 9; i++) strand(-40 + i * 10, 44, 18 + r() * 6, 0.045);
   } else {
     // straight, sleek hair with heavy bangs
     const cap = new THREE.SphereGeometry(HEAD_R * 1.1, 32, 20, 0, Math.PI * 2, 0, Math.PI * 0.6);
@@ -167,7 +184,7 @@ function teeGeometry() {
 
 export function buildCharacter(opts = {}) {
   const o = {
-    skin: '#f1c6ae', tee: '#1d1c24', teePrint: 'triangles', shorts: '#8c8f99', shoes: '#ecebe8', sole: '#6c6a70',
+    skin: '#f1c6ae', tee: '#1d1c24', teePrint: 'triangles', headScale: 1.18, shorts: '#8c8f99', shoes: '#ecebe8', sole: '#6c6a70',
     hair: { type: 'curly', color: '#2e1a12', light: '#6a412b' }, iris: '#86a29a', irisDark: '#4d6461', seed: 3, ...opts,
   };
   const root = new THREE.Group();
@@ -271,6 +288,42 @@ export function buildCharacter(opts = {}) {
 
   const ch = { root, J, face, o, pose: {} };
   ch.apply = (pose) => applyPose(ch, pose);
+  // "чёлка до колена": a curtain of curls that can grow down from the forehead
+  {
+    const lb = new THREE.Group();
+    const hm = J.hairMesh.material;
+    const r = rng(77);
+    const strands = [];
+    for (let i = 0; i < 9; i++) {
+      const sg = new THREE.Group();
+      const x = (i - 4) * 0.045;
+      const segs = 9;
+      for (let k = 0; k < segs; k++) {
+        const g = new THREE.SphereGeometry(0.03 + r() * 0.01, 10, 8);
+        colorize(g, new THREE.Color(o.hair.color).lerp(new THREE.Color(o.hair.light), r() * 0.8));
+        const m = mesh(g, hm, { width: 0.0014 });
+        m.position.set(Math.sin(k * 1.7 + i) * 0.012, -k * 0.11, 0);
+        m.scale.set(1, 2.2, 0.8);
+        sg.add(m);
+      }
+      sg.position.set(x, 0, 0);
+      lb.add(sg); strands.push(sg);
+    }
+    lb.position.set(0, HEAD_R + 0.06, HEAD_R * 1.12);
+    lb.visible = false;
+    J.head.add(lb);
+    ch.longBangs = (k, t = 0) => {
+      lb.visible = k > 0.01;
+      strands.forEach((sg, i) => {
+        sg.scale.y = Math.max(0.01, k * (0.85 + 0.15 * Math.sin(i * 2.3)));
+        sg.rotation.z = Math.sin(t * 9 + i) * 0.08 * k;
+        sg.rotation.x = -0.12 - Math.sin(t * 7 + i * 0.7) * 0.06 * k;
+      });
+    };
+  }
+  ch.attach = (obj, jointName, pos = [0, 0, 0], rot = [0, 0, 0]) => {
+    obj.position.set(...pos); obj.rotation.set(...rot); J[jointName].add(obj); return obj;
+  };
   applyPose(ch, POSES.stand);
   return ch;
 }

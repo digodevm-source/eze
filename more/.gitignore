@@ -1,2 +1,7 @@
 node_modules/
 *.log
+out/
+audio/*.wav
+audio/*.mp3
+audio/*.npy
+preview/*.jpg

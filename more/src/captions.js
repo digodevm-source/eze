@@ -53,7 +53,7 @@ export function drawCaption(ctx, words, t, opts = {}) {
       if (opts.reflect !== false && li === lines.length - 1) {
         ctx.save();
         ctx.shadowBlur = 0;
-        ctx.globalAlpha = alpha * 0.16;
+        ctx.globalAlpha = alpha * 0.1;
         ctx.filter = `blur(${(blur + 2.5).toFixed(1)}px)`;
         ctx.translate(x + w.width / 2, y + size * 0.22 + dy);
         ctx.scale(1, -0.75);

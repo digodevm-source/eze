@@ -13,6 +13,7 @@ window.__ready = (async () => {
   const shot = await mod.build(E, params);
   if (params.get('nobloom')) E.bloom.enabled = false;
   window.duration = shot.duration || 1;
+  window.shotList = (shot.shots || []).map((s) => [s.t0, s.t1]);
   window.frame = (t, q = 0.93) => {
     shot.update(t);
     E.render(t, shot.world);
