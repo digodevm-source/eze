@@ -574,7 +574,7 @@ export async function build(E, params) {
       const a = clamp01((t - 0.3) / 0.5) * (1 - clamp01((t - (L[0].t0 - 0.5)) / 0.4));
       titleCard(ctx, a);
     }
-    if (t > L[11].t1 + 0.55) titleCard(ctx, clamp01((t - L[11].t1 - 0.55) / 0.5));
+    if (t > w(11, 5).t0 + 0.3) titleCard(ctx, clamp01((t - w(11, 5).t0 - 0.3) / 0.5));
     // lyrics
     for (const line of L) {
       if (t >= line.t0 - 0.15 && t < line.until) {
